@@ -43,10 +43,11 @@ h1 {
 }
 
 main {
-  height: 100vh;
+  height: 100dvh;
   width: 100vw;
   display: grid;
   grid-template-columns: 17rem auto;
   background-color: var(--p-surface-50);
+  overflow: hidden;
 }
 </style>

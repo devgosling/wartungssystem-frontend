@@ -68,7 +68,7 @@ export default {
   animation-fill-mode: forwards;
   transform: translateX(-100%);
 
-  height: 100vh;
+  height: 100dvh;
   width: 100%;
 
   padding: 2rem 1rem;
