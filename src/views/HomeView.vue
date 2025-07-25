@@ -1,4 +1,4 @@
-<template></template>
+<template>Hello World!</template>
 <script>
 import { account } from '@/lib/appwrite'
 
