@@ -9,13 +9,16 @@
     >
     <div class="login-inputs">
       <FloatLabel variant="on">
-        <InputText
+        <IconField>
+          <InputText
           v-model="email"
           class="login-inputs-ip"
           id="email"
           type="text"
           :invalid="emailInvalid"
-        ></InputText>
+          ></InputText>
+          <InputIcon class="fa-light fa-at"></InputIcon>
+        </IconField>
         <label for="email">E-Mail Adresse</label>
       </FloatLabel>
       <FloatLabel variant="on">
@@ -56,6 +59,7 @@ import { account } from '@/lib/appwrite'
 import { validate } from 'email-validator'
 import router from '@/router'
 import { AppwriteException } from 'appwrite'
+import { IconField, InputIcon } from 'primevue'
 
 export default {
   components: {
@@ -64,6 +68,8 @@ export default {
     Password,
     Button,
     Divider,
+    IconField,
+    InputIcon
   },
 
   data() {

@@ -6,7 +6,8 @@ import Ripple from 'primevue/ripple'
 import PrimeVue from 'primevue/config'
 import { palette, updatePrimaryPalette } from '@primeuix/themes'
 import Aura from '@primeuix/themes/aura'
-import ToastService from 'primevue/toastservice';
+import ToastService from 'primevue/toastservice'
+import * as DE from './assets/de.json'
 
 import App from './App.vue'
 import router from './router'
@@ -23,9 +24,10 @@ app.use(PrimeVue, {
       darkModeSelector: '.app-darkmode',
     },
   },
+  locale: DE.de,
 })
-app.use(ToastService);
+app.use(ToastService)
 
-updatePrimaryPalette(palette('#6bd0ff'))
+updatePrimaryPalette(palette('#5ebae6')) //OLD: #6bd0ff
 
 app.mount('#app')

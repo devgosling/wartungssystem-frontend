@@ -3,6 +3,7 @@ import { account } from '@/lib/appwrite'
 import HomeView from '../views/HomeView.vue'
 import LoginScreen from '../views/LoginScreen.vue'
 import FourOFourPage from '../views/404.vue'
+import WartungsberichteView from '@/views/Wartungsberichte.vue'
 import { AppwriteException } from 'appwrite'
 import { isUserLoggedIn } from '@/lib/utils'
 
@@ -21,7 +22,7 @@ const router = createRouter({
     {
       path: '/wartungsberichte',
       name: 'wartungsberichte',
-      component: HomeView,
+      component: WartungsberichteView,
       meta: {
         requiresAuth: true,
         title: 'Wartungsberichte',
@@ -55,8 +56,6 @@ async function guard(to, from, next) {
   const isAuth = await isUserLoggedIn()
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
   const requiresUnauth = to.matched.some((record) => record.meta.requiresUnauth)
-
-  console.log(isAuth, requiresAuth)
 
   document.title = 'KWT | ' + to.meta?.title ?? 'Panel'
 
