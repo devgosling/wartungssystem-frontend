@@ -241,7 +241,7 @@
                   iconPos="left"
                   @click="activateCallback('1')"
                 />
-                <Motor_Filler v-if="inputValues.berichtType.id == 'motor'" />
+                <Motor_Filler ref="filler" v-if="inputValues.berichtType.id == 'motor'" />
                 <h2 style="margin: 3rem 8rem; text-align: center" v-else>
                   Für diese Art von Wartungsbericht gibt es noch nichts zum ausfüllen... :(
                 </h2>
@@ -334,6 +334,7 @@
                       severity="success"
                       icon="fa-regular fa-check"
                       :disabled="isSignpadEmpty"
+                      @click="submit"
                     />
                   </div>
                 </div>
@@ -359,8 +360,7 @@
           </StepItem>
           <StepItem value="4">
             <Step>Wartungsbericht Speichern</Step>
-            <StepPanel v-slot="{ activateCallback }">
-            </StepPanel>
+            <StepPanel v-slot="{ activateCallback }"> </StepPanel>
           </StepItem>
         </Stepper>
       </template>
@@ -386,6 +386,8 @@ import Stepper from 'primevue/stepper'
 import Step from 'primevue/step'
 import Motor_Filler from '@/components/Motor_Filler.vue'
 import SignaturePad from 'signature_pad'
+import { useInputStore } from '@/stores/inputStore'
+import { fillMotorPDF } from '@/lib/pdf-lib'
 
 export default {
   components: {
@@ -470,6 +472,20 @@ export default {
       this.signpad.addEventListener('beginStroke', () => {
         this.isSignpadEmpty = !this.signpad.isEmpty
       })
+    },
+    submit() {
+      let signature = this.signpad.toDataURL()
+      this.$refs.filler.broadcastInputsToStore()
+      console.log(signature)
+      
+      switch (this.inputValues.berichtType.id) {
+        case "motor":
+          fillMotorPDF(this.inputValues, signature)
+          break;
+      
+        default:
+          break;
+      }
     },
   },
 }

@@ -36,6 +36,7 @@ export default {
 <style lang="scss">
 #router-view-main {
   padding: 1.5rem;
+  overflow-y: scroll;
 }
 
 h1 {
