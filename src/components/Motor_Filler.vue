@@ -195,6 +195,42 @@
         </div>
       </div>
     </div>
+    <Divider />
+    <div class="wb_motor-multidata">
+      <div class="wb_motor-multidata-data">
+        <span><b>Lagerung</b></span>
+        <div class="wb_motor-multidata-data-radiobtns">
+          <div class="wb_motor-multidata-data-radiobtns-btn">
+            <label>Lauf</label>
+            <RadioButton v-model="inputValues['lagerung']" value="1"></RadioButton>
+          </div>
+          <div class="wb_motor-multidata-data-radiobtns-btn">
+            <label>Ruhe</label>
+            <RadioButton v-model="inputValues['lagerung']" value="2"></RadioButton>
+          </div>
+        </div>
+        <div></div>
+        <span><b>Bemerkung</b></span>
+      </div>
+      <div v-for="(input, index) in inputs[2]" :key="index" class="wb_motor-multidata-data">
+        <span>{{ input.label }}</span>
+        <div class="wb_motor-multidata-data-radiobtns">
+          <div class="wb_motor-multidata-data-radiobtns-btn">
+            <label>i.O.</label>
+            <RadioButton v-model="inputValues[input.id]" value="1"></RadioButton>
+          </div>
+          <div class="wb_motor-multidata-data-radiobtns-btn">
+            <label>n.i.O</label>
+            <RadioButton v-model="inputValues[input.id]" value="2"></RadioButton>
+          </div>
+        </div>
+        <div class="wb_motor-multidata-data-checkbox">
+          <label>Behoben</label>
+          <Checkbox v-model="inputValues['fixed.' + input.id]" binary></Checkbox>
+        </div>
+        <InputText type="text" v-model="inputValues['bemerkung.' + input.id]" />
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -248,6 +284,12 @@ export default {
           { label: 'Anschlusshaube + Einführung', id: 'anschlusshaube_einfuehrung' },
           { label: 'Kupplung / Kupplungsgummi', id: 'kupplung-kupplungsgummi' },
           { label: 'Ölstand / Öl-Qualität', id: 'oelstand-oelqualitaet' },
+        ],
+        [
+          { label: 'Laufgeräuche', id: 'laufgeraeuche' },
+          { label: 'Schwingungen', id: 'schwingungen' },
+          { label: 'Stromaufnahme', id: 'Stromaufnahme' },
+          { label: 'Drehzahl', id: 'drehzahl' },
         ],
       ],
       extraValues: ['sichtpruefung'],
