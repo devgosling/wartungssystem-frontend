@@ -231,6 +231,60 @@
         <InputText type="text" v-model="inputValues['bemerkung.' + input.id]" />
       </div>
     </div>
+    <Divider />
+    <h3>Fettnachschmierung</h3>
+    <div class="wb_motor-fat">
+      <div class="wb_motor-fat-data">
+        <span>geforderte Fettmenge</span>
+        <InputText
+          class="wb_motor-fat-data-input"
+          size="small"
+          v-model="inputValues['geforderte_fettmenge']"
+        />
+      </div>
+      <div class="wb_motor-fat-data">
+        <span>Fettsorte</span>
+        <InputText
+          class="wb_motor-fat-data-input"
+          size="small"
+          v-model="inputValues['fettsorte']"
+        />
+      </div>
+      <div class="wb_motor-fat-data">
+        <span>Intervall</span>
+        <InputText
+          class="wb_motor-fat-data-input"
+          size="small"
+          v-model="inputValues['intervall']"
+        />
+      </div>
+      <div class="wb_motor-fat-radiobtns">
+        <div>
+          <label>Ausgeführt</label>
+          <RadioButton
+            v-model="inputValues['fettnachschmierung_ausgefuehrt']"
+            value="1"
+          ></RadioButton>
+        </div>
+        <div>
+          <label>nicht ausgeführt</label>
+          <RadioButton
+            v-model="inputValues['fettnachschmierung_ausgefuehrt']"
+            value="2"
+          ></RadioButton>
+        </div>
+      </div>
+      <div class="wb_motor-fat-textarea">
+        <span>Bemerkung</span>
+        <Textarea
+          fluid
+          v-model="inputValues['fettnachschmierung_bemerkung']"
+        />
+      </div>
+    </div>
+    <Divider />
+    <h3>Sonstiges</h3>
+    <Textarea v-model="inputValues['sonstiges']" class="wb_motor-sonstiges-area"></Textarea>
   </div>
 </template>
 <script>
@@ -244,6 +298,7 @@ import {
   InputNumber,
   InputText,
   RadioButton,
+  Textarea,
 } from 'primevue'
 
 export default {
@@ -257,6 +312,7 @@ export default {
     Checkbox,
     InputText,
     InputNumber,
+    Textarea,
   },
 
   data() {
@@ -288,11 +344,11 @@ export default {
         [
           { label: 'Laufgeräuche', id: 'laufgeraeuche' },
           { label: 'Schwingungen', id: 'schwingungen' },
-          { label: 'Stromaufnahme', id: 'Stromaufnahme' },
+          { label: 'Stromaufnahme', id: 'stromaufnahme' },
           { label: 'Drehzahl', id: 'drehzahl' },
         ],
       ],
-      extraValues: ['sichtpruefung'],
+      extraValues: ['sichtpruefung'], // DEPRECATED - Nicht alles wird benötigt; Somit unnötig um zu checken ob alles ausgefüllt wurde
     }
   },
 
@@ -311,6 +367,50 @@ export default {
 
   &-subheader {
     margin: 0.3rem 0;
+  }
+
+  &-sonstiges-area {
+    width: 100%;
+    height: 5rem;
+    resize: none;
+  }
+
+  &-fat {
+    display: grid;
+    grid-template-columns: 6fr 4fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    gap: 0.3rem;
+    column-gap: 3rem;
+    grid-auto-flow: column;
+
+    &-textarea {
+      grid-row: 1 / 5;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      
+      textarea {
+        resize: none;
+      }
+    }
+
+    &-radiobtns {
+      display: grid;
+      grid-template-columns: auto 12.5rem;
+
+      div {
+        gap: 0.4rem;
+        display: flex;
+        justify-self: right;
+      }
+    }
+
+    &-data {
+      display: flex;
+      justify-content: right;
+      align-items: center;
+      gap: 0.3rem;
+    }
   }
 
   &-resistance {
