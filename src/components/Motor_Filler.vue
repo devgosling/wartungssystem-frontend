@@ -339,7 +339,7 @@ export default {
           { label: 'Ölstand / Öl-Qualität', id: 'oelstand-oelqualitaet' },
         ],
         [
-          { label: 'Laufgeräuche', id: 'laufgeraeuche' },
+          { label: 'Laufgeräusche', id: 'laufgeraeusche' },
           { label: 'Schwingungen', id: 'schwingungen' },
           { label: 'Stromaufnahme', id: 'stromaufnahme' },
           { label: 'Drehzahl', id: 'drehzahl' },

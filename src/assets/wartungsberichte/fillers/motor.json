@@ -37,7 +37,7 @@
     "wicklungswiderstand_l3_1": "Textfeld 84",
     "wicklungswiderstand_l3_2": "Textfeld 87",
 
-    "bemerkung.laufgeraeuche": "Textfeld 88",
+    "bemerkung.laufgeraeusche": "Textfeld 88",
     "bemerkung.schwingungen": "Textfeld 89",
     "bemerkung.stromaufnahme": "Textfeld 90",
     "bemerkung.drehzahl": "Textfeld 91",
@@ -62,7 +62,7 @@
     "oelstand-oelqualitaet": "Optionsfeld 28",
 
     "lagerung": "Optionsfeld 29",
-    "laufgeraeuche": "Optionsfeld 30",
+    "laufgeraeusche": "Optionsfeld 30",
     "schwingungen": "Optionsfeld 31",
     "stromaufnahme": "Optionsfeld 32",
     "drehzahl": "Optionsfeld 33",
@@ -80,7 +80,7 @@
     "fixed.kupplung-kupplungsgummi": "Kontrollkästchen 31",
     "fixed.oelstand-oelqualitaet": "Kontrollkästchen 32",
 
-    "fixed.laufgeraeuche": "Kontrollkästchen 34",
+    "fixed.laufgeraeusche": "Kontrollkästchen 34",
     "fixed.schwingungen": "Kontrollkästchen 35",
     "fixed.stromaufnahme": "Kontrollkästchen 36",
     "fixed.drehzahl": "Kontrollkästchen 37"
