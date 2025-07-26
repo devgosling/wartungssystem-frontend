@@ -33,7 +33,7 @@
             <RadioButton v-model="inputValues[input.id]" value="1"></RadioButton>
           </div>
           <div class="wb_motor-multidata-data-radiobtns-btn">
-            <label>n.i.O</label>
+            <label>n.i.O.</label>
             <RadioButton v-model="inputValues[input.id]" value="2"></RadioButton>
           </div>
         </div>
@@ -41,7 +41,7 @@
           <label>Behoben</label>
           <Checkbox v-model="inputValues['fixed.' + input.id]" binary></Checkbox>
         </div>
-        <InputText type="text" v-model="inputValues['bemerkung.' + input.id]" />
+        <InputText type="text" v-model="inputValues['bemerkung.' + input.id]" fluid size="small" />
       </div>
     </div>
     <Divider />
@@ -228,7 +228,7 @@
           <label>Behoben</label>
           <Checkbox v-model="inputValues['fixed.' + input.id]" binary></Checkbox>
         </div>
-        <InputText type="text" v-model="inputValues['bemerkung.' + input.id]" />
+        <InputText type="text" v-model="inputValues['bemerkung.' + input.id]" fluid size="small" />
       </div>
     </div>
     <Divider />
@@ -474,7 +474,7 @@ export default {
       grid-template-columns: 3fr 2fr 2fr 3fr;
 
       align-items: center;
-      height: 2.3rem;
+      height: 1.9rem;
 
       &-checkbox {
         display: flex;
@@ -484,7 +484,7 @@ export default {
 
       &-radiobtns {
         display: grid;
-        grid-template-columns: auto auto;
+        grid-template-columns: 1fr 1fr;
 
         &-btn {
           display: flex;

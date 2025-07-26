@@ -1,0 +1,88 @@
+{
+  "textfields": {
+    "customerdata": "Textfeld 99",
+    "employee": "Textfeld 98",
+    "date": "Textfeld 97",
+
+    "fabrikant": "Textfeld 58",
+    "typnr": "Textfeld 59",
+    "typ": "Textfeld 60",
+    "drehzahl": "Textfeld 61",
+    "leistung": "Textfeld 62",
+    "maschinennr": "Textfeld 63",
+    "ort": "Textfeld 64",
+    "gebauede": "Textfeld 65",
+    "raum": "Textfeld 66",
+    "anlage": "Textfeld 67",
+
+    "bemerkung.verschmutzung": "Textfeld 68",
+    "bemerkung.kuelrippen_lueftungswege": "Textfeld 69",
+    "bemerkung.luefterhaube": "Textfeld 70",
+    "bemerkung.beschaedigungen": "Textfeld 71",
+    "bemerkung.klemmkasten": "Textfeld 72",
+    "bemerkung.anschlusshaube_einfuehrung": "Textfeld 73",
+    "bemerkung.kupplung-kupplungsgummi": "Textfeld 74",
+    "bemerkung.oelstand-oelqualitaet": "Textfeld 75",
+
+    "l1tope": "Textfeld 76",
+    "l2tope": "Textfeld 77",
+    "l3tope": "Textfeld 78",
+    "l1tol2": "Textfeld 79",
+    "l2tol3": "Textfeld 80",
+    "l3tol1": "Textfeld 81",
+    "wicklungswiderstand_l1_1": "Textfeld 82",
+    "wicklungswiderstand_l1_2": "Textfeld 85",
+    "wicklungswiderstand_l2_1": "Textfeld 83",
+    "wicklungswiderstand_l2_2": "Textfeld 86",
+    "wicklungswiderstand_l3_1": "Textfeld 84",
+    "wicklungswiderstand_l3_2": "Textfeld 87",
+
+    "bemerkung.laufgeraeuche": "Textfeld 88",
+    "bemerkung.schwingungen": "Textfeld 89",
+    "bemerkung.stromaufnahme": "Textfeld 90",
+    "bemerkung.drehzahl": "Textfeld 91",
+
+    "geforderte_fettmenge": "Textfeld 92",
+    "fettsort": "Textfeld 93",
+    "intervall": "Textfeld 94",
+    "fettnachschmierung_bemerkung": "Textfeld 95",
+
+    "sonstiges": "Textfeld 96"
+  },
+
+  "radiogroups": {
+    "sichtpruefung": "Optionsfeld 20",
+    "verschmutzung": "Optionsfeld 21",
+    "kuelrippen_lueftungswege": "Optionsfeld 22",
+    "luefterhaube": "Optionsfeld 23",
+    "beschaedigungen": "Optionsfeld 24",
+    "klemmkasten": "Optionsfeld 25",
+    "anschlusshaube_einfuehrung": "Optionsfeld 26",
+    "kupplung-kupplungsgummi": "Optionsfeld 27",
+    "oelstand-oelqualitaet": "Optionsfeld 28",
+
+    "lagerung": "Optionsfeld 29",
+    "laufgeraeuche": "Optionsfeld 30",
+    "schwingungen": "Optionsfeld 31",
+    "stromaufnahme": "Optionsfeld 32",
+    "drehzahl": "Optionsfeld 33",
+
+    "fettnachschmierung_ausgefuehrt": "Optionsfeld 34"
+  },
+
+  "checkboxes": {
+    "fixed.verschmutzung": "Kontrollkästchen 33",
+    "fixed.kuelrippen_lueftungswege": "Kontrollkästchen 26",
+    "fixed.luefterhaube": "Kontrollkästchen 27",
+    "fixed.beschaedigungen": "Kontrollkästchen 28",
+    "fixed.klemmkasten": "Kontrollkästchen 29",
+    "fixed.anschlusshaube_einfuehrung": "Kontrollkästchen 30",
+    "fixed.kupplung-kupplungsgummi": "Kontrollkästchen 31",
+    "fixed.oelstand-oelqualitaet": "Kontrollkästchen 32",
+
+    "fixed.laufgeraeuche": "Kontrollkästchen 34",
+    "fixed.schwingungen": "Kontrollkästchen 35",
+    "fixed.stromaufnahme": "Kontrollkästchen 36",
+    "fixed.drehzahl": "Kontrollkästchen 37"
+  }
+}

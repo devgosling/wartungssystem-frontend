@@ -440,6 +440,7 @@ export default {
         'Lena Hoxjai',
         'Blauer Hai',
         'Mark Forster',
+        'Mark Rene Frank',
       ],
       kunden: [
         {
@@ -477,14 +478,14 @@ export default {
       let signature = this.signpad.toDataURL()
       this.$refs.filler.broadcastInputsToStore()
       console.log(signature)
-      
+
       switch (this.inputValues.berichtType.id) {
-        case "motor":
+        case 'motor':
           fillMotorPDF(this.inputValues, signature)
-          break;
-      
+          break
+
         default:
-          break;
+          break
       }
     },
   },
