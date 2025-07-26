@@ -276,10 +276,7 @@
       </div>
       <div class="wb_motor-fat-textarea">
         <span>Bemerkung</span>
-        <Textarea
-          fluid
-          v-model="inputValues['fettnachschmierung_bemerkung']"
-        />
+        <Textarea v-model="inputValues['fettnachschmierung_bemerkung']" />
       </div>
     </div>
     <Divider />
@@ -387,10 +384,11 @@ export default {
       grid-row: 1 / 5;
       display: flex;
       flex-direction: column;
-      gap: 0.3rem;
-      
+      gap: 0rem;
+
       textarea {
         resize: none;
+        flex: 1;
       }
     }
 
