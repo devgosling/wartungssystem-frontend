@@ -44,11 +44,171 @@
         <InputText type="text" v-model="inputValues['bemerkung.' + input.id]" />
       </div>
     </div>
+    <Divider />
+    <h3>Isolationswerte + Widerstand</h3>
+    <div class="wb_motor-resistance">
+      <span>Phase➜Körper</span>
+      <div class="wb_motor-resistance-data">
+        <span>L1 ➜ PE</span>
+        <InputNumber
+          class="wb_motor-resistance-data-input"
+          :useGrouping="false"
+          :minFractionDigits="0"
+          :maxFractionDigits="10"
+          size="small"
+          v-model="inputValues['l1tope']"
+        />
+        <span>Ω</span>
+      </div>
+      <div class="wb_motor-resistance-data">
+        <span>L2 ➜ PE</span>
+        <InputNumber
+          class="wb_motor-resistance-data-input"
+          :useGrouping="false"
+          :minFractionDigits="0"
+          :maxFractionDigits="10"
+          size="small"
+          v-model="inputValues['l2tope']"
+        />
+        <span>Ω</span>
+      </div>
+      <div class="wb_motor-resistance-data">
+        <span>L3 ➜ PE</span>
+        <InputNumber
+          class="wb_motor-resistance-data-input"
+          :useGrouping="false"
+          :minFractionDigits="0"
+          :maxFractionDigits="10"
+          size="small"
+          v-model="inputValues['l3tope']"
+        />
+        <span>Ω</span>
+      </div>
+      <span>Phase➜Phase</span>
+      <div class="wb_motor-resistance-data">
+        <span>L1 ➜ L2</span>
+        <InputNumber
+          class="wb_motor-resistance-data-input"
+          :useGrouping="false"
+          :minFractionDigits="0"
+          :maxFractionDigits="10"
+          size="small"
+          v-model="inputValues['l1tol2']"
+        />
+        <span>Ω</span>
+      </div>
+      <div class="wb_motor-resistance-data">
+        <span>L2 ➜ L3</span>
+        <InputNumber
+          class="wb_motor-resistance-data-input"
+          :useGrouping="false"
+          :minFractionDigits="0"
+          :maxFractionDigits="10"
+          size="small"
+          v-model="inputValues['l2tol3']"
+        />
+        <span>Ω</span>
+      </div>
+      <div class="wb_motor-resistance-data">
+        <span>L3 ➜ L1</span>
+        <InputNumber
+          class="wb_motor-resistance-data-input"
+          :useGrouping="false"
+          :minFractionDigits="0"
+          :maxFractionDigits="10"
+          size="small"
+          v-model="inputValues['l3tol1']"
+        />
+        <span>Ω</span>
+      </div>
+      <span>Wicklungswiderstände</span>
+      <div class="wb_motor-resistance-data2">
+        <div>
+          <span>L1</span>
+          <InputNumber
+            class="wb_motor-resistance-data2-input"
+            :useGrouping="false"
+            :minFractionDigits="0"
+            :maxFractionDigits="10"
+            size="small"
+            v-model="inputValues['wicklungswiderstand_l1_1']"
+          />
+        </div>
+        <div>
+          <InputNumber
+            class="wb_motor-resistance-data2-input"
+            :useGrouping="false"
+            :minFractionDigits="0"
+            :maxFractionDigits="10"
+            size="small"
+            v-model="inputValues['wicklungswiderstand_l1_2']"
+          />
+          <span>Ω</span>
+        </div>
+      </div>
+      <div class="wb_motor-resistance-data2">
+        <div>
+          <span>L2</span>
+          <InputNumber
+            class="wb_motor-resistance-data2-input"
+            :useGrouping="false"
+            :minFractionDigits="0"
+            :maxFractionDigits="10"
+            size="small"
+            v-model="inputValues['wicklungswiderstand_l2_1']"
+          />
+        </div>
+        <div>
+          <InputNumber
+            class="wb_motor-resistance-data2-input"
+            :useGrouping="false"
+            :minFractionDigits="0"
+            :maxFractionDigits="10"
+            size="small"
+            v-model="inputValues['wicklungswiderstand_l2_2']"
+          />
+          <span>Ω</span>
+        </div>
+      </div>
+      <div class="wb_motor-resistance-data2">
+        <div>
+          <span>L3</span>
+          <InputNumber
+            class="wb_motor-resistance-data2-input"
+            :useGrouping="false"
+            :minFractionDigits="0"
+            :maxFractionDigits="10"
+            size="small"
+            v-model="inputValues['wicklungswiderstand_l3_1']"
+          />
+        </div>
+        <div>
+          <InputNumber
+            class="wb_motor-resistance-data2-input"
+            :useGrouping="false"
+            :minFractionDigits="0"
+            :maxFractionDigits="10"
+            size="small"
+            v-model="inputValues['wicklungswiderstand_l3_2']"
+          />
+          <span>Ω</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
 import { useInputStore } from '@/stores/inputStore'
-import { Checkbox, Column, ColumnGroup, DataTable, Divider, InputText, RadioButton } from 'primevue'
+import {
+  Checkbox,
+  Column,
+  ColumnGroup,
+  DataTable,
+  Divider,
+  InputNumber,
+  InputText,
+  RadioButton,
+} from 'primevue'
 
 export default {
   components: {
@@ -60,6 +220,7 @@ export default {
     RadioButton,
     Checkbox,
     InputText,
+    InputNumber,
   },
 
   data() {
@@ -108,6 +269,42 @@ export default {
 
   &-subheader {
     margin: 0.3rem 0;
+  }
+
+  &-resistance {
+    display: grid;
+    grid-template-columns: 3fr 3fr 4fr;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-auto-flow: column;
+
+    span {
+      align-self: center;
+    }
+
+    &-data {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+
+      &-input input {
+        max-width: 5rem;
+      }
+    }
+
+    &-data2 {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      div {
+        display: flex;
+        gap: 0.3rem;
+      }
+
+      &-input input {
+        max-width: 6rem;
+      }
+    }
   }
 
   &-multinputs {
