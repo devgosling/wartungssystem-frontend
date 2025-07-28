@@ -12,14 +12,18 @@
   },
   "dependencies": {
     "@primeuix/themes": "^1.2.1",
+    "@primevue/core": "^4.3.6",
     "appwrite": "^18.1.1",
+    "axios": "^1.11.0",
     "email-validator": "^2.0.4",
     "fs": "^0.0.1-security",
     "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^5.3.93",
     "pinia": "^3.0.3",
     "primevue": "^4.3.6",
     "signature_pad": "^5.0.10",
     "vue": "^3.5.17",
+    "vue-confetti-explosion": "^1.0.2",
     "vue-router": "^4.5.1"
   },
   "devDependencies": {

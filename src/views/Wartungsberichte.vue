@@ -3,7 +3,12 @@
     <div class="wartungsberichte-header">
       <h1>Wartungsberichte</h1>
       <div class="wartungsberichte-header-btns">
-        <Button icon="fa-regular fa-plus" label="Wartungsbericht" severity="contrast" />
+        <Button
+          icon="fa-regular fa-plus"
+          @click="tab = 1"
+          label="Wartungsbericht"
+          severity="contrast"
+        />
         <Button icon="fa-regular fa-upload" label="Hochladen" severity="secondary" />
       </div>
     </div>
@@ -272,7 +277,7 @@
           </StepItem>
           <StepItem value="3">
             <Step>Wartungsbericht Unterschreiben</Step>
-            <StepPanel v-slot="{ activateCallback }">
+            <StepPanel v-slot="{ activateCallback }" id="step3">
               <div class="wartungsberichte-sign-panel">
                 <Button
                   class="wartungsberichte-sign-panel-btn"
@@ -282,6 +287,7 @@
                   size="small"
                   iconPos="left"
                   @click="activateCallback('2')"
+                  :disabled="generatingPDF"
                 />
                 <div class="wartungsberichte-sign-panel-main">
                   <label for="signpad">Signatur hier Zeichnen</label>
@@ -334,7 +340,8 @@
                       severity="success"
                       icon="fa-regular fa-check"
                       :disabled="isSignpadEmpty"
-                      @click="submit"
+                      @click="submit(activateCallback)"
+                      :loading="generatingPDF"
                     />
                   </div>
                 </div>
@@ -360,16 +367,99 @@
           </StepItem>
           <StepItem value="4">
             <Step>Wartungsbericht Speichern</Step>
-            <StepPanel v-slot="{ activateCallback }"> </StepPanel>
+            <StepPanel v-slot="{ activateCallback }">
+              <div class="wartungsberichte-finish-panel">
+                <Button
+                  class="wartungsberichte-finish-panel-btn"
+                  severity="secondary"
+                  label="Zurück"
+                  icon="fa-regular fa-arrow-left"
+                  size="small"
+                  iconPos="left"
+                  @click="activateCallback('3')"
+                  :disabled="isSending"
+                />
+                <canvas id="pdfCanvas" hidden></canvas>
+                <div class="wartungsberichte-finish-panel-preview">
+                  <div class="wartungsberichte-finish-panel-preview-board">
+                    <h3>🎉 Der Wartungsbericht ist fertig!</h3>
+                    <p>
+                      Überprüfe gegebenfalls nocheinmal alle eingaben und speichere den
+                      Wartungsbericht.
+                    </p>
+                    <Divider />
+                    <div>
+                      <Button
+                        icon="fa-regular fa-eyes"
+                        :disabled="isSending"
+                        label="Eingaben überprüfen"
+                        severity="contrast"
+                        @click="activateCallback('2')"
+                      ></Button>
+                      <Button
+                        icon="fa-regular fa-paper-plane"
+                        :loading="isSending"
+                        label="Speichen und versenden"
+                        severity="success"
+                        @click="saveAndSend()"
+                      ></Button>
+                    </div>
+                  </div>
+                  <img :src="pdfImg" alt="" />
+                </div>
+              </div>
+            </StepPanel>
           </StepItem>
         </Stepper>
       </template>
     </Card>
-    <DataTable v-else> </DataTable>
+    <Card>
+      <template #content>
+        <DataTable
+          v-model:filters="filters"
+          :value="wartungsberichte?.documents"
+          :loading="!wartungsberichte"
+          :globalFilterFields="['erstellungsdatum', 'mitarbeiter', 'kunde.name']"
+        >
+          <template #header>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h4 style="margin: 0;">{{ wartungsberichte?.total }} Wartungsberichte</h4>
+              <IconField>
+                <InputIcon>
+                  <i class="fa-regular fa-search" />
+                </InputIcon>
+                <InputText v-model="filters['global'].value" placeholder="Suchen..." />
+              </IconField>
+            </div>
+          </template>
+          <Column field="" header="#">
+            <template #body="slotProps">
+              {{ slotProps.index + 1 }}
+            </template>
+          </Column>
+          <Column field="erstellungsdatum" header="Erstellungsdatum"> </Column>
+          <Column field="mitarbeiter" header="Mitarbeiter"></Column>
+          <Column field="kunde" header="Kunde">
+            <template #body="slotProps">
+              {{ slotProps.data.kunde.name }}
+            </template>
+          </Column>
+          <Column field="actions" header="Aktionen">
+            <template #body="slotProps">
+              <div style="display: flex; gap: 0.2rem">
+                <Button icon="fa-regular fa-eye" severity="info" size="small"></Button>
+                <Button icon="fa-regular fa-download" severity="contrast" size="small"></Button>
+                <Button icon="fa-regular fa-trash" severity="danger" size="small"></Button>
+              </div>
+            </template>
+          </Column>
+        </DataTable>
+      </template>
+    </Card>
   </div>
 </template>
 <script>
-import { account } from '@/lib/appwrite'
+import { ID, account, databases, functions, storage } from '@/lib/appwrite'
 import {
   Toolbar,
   Button,
@@ -379,6 +469,12 @@ import {
   Select,
   InputText,
   DatePicker,
+  Splitter,
+  SplitterPanel,
+  Divider,
+  Column,
+  IconField,
+  InputIcon,
 } from 'primevue'
 import StepPanel from 'primevue/steppanel'
 import StepItem from 'primevue/stepitem'
@@ -386,8 +482,13 @@ import Stepper from 'primevue/stepper'
 import Step from 'primevue/step'
 import Motor_Filler from '@/components/Motor_Filler.vue'
 import SignaturePad from 'signature_pad'
-import { useInputStore } from '@/stores/inputStore'
 import { fillMotorPDF } from '@/lib/pdf-lib'
+import * as pdfjsLib from 'pdfjs-dist'
+import axios from 'axios'
+import { useInputStore } from '@/stores/inputStore'
+import ConfettiExplosion from 'vue-confetti-explosion'
+import { Query } from 'appwrite'
+import { FilterMatchMode } from '@primevue/core'
 
 export default {
   components: {
@@ -404,28 +505,51 @@ export default {
     InputText,
     DatePicker,
     Motor_Filler,
+    Splitter,
+    SplitterPanel,
+    Divider,
+    ConfettiExplosion,
+    Column,
+    IconField,
+    InputIcon,
   },
 
   data() {
     return {
+      wartungsberichte: null,
+      filters: {
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      },
+
       inputValues: {
         berichtType: '',
         employee: '',
         date: '',
         customer: null,
       },
-      tab: 1, // 0 = DataView, 1 = Create, 2 = Upload
+      tab: 0, // 0 = DataView, 1 = Create, 2 = Upload
       berichte: [
-        { name: 'Lüfter', id: 'lüfter', icon: 'fa-regular fa-fan' },
-        { name: 'Motor', id: 'motor', icon: 'fa-regular fa-engine' },
+        { name: 'Lüfter', id: 'lüfter', icon: 'fa-regular fa-fan', filekey: 'Lüfter' },
+        { name: 'Motor', id: 'motor', icon: 'fa-regular fa-engine', filekey: 'Motor' },
         {
           name: 'Schmutzwasser-/Fäkalienhebeanlagen, Tauchmotorpumpenschmutzwasser',
           id: 'schmutzwasser',
           icon: 'fa-regular fa-manhole',
+          filekey: 'Schmutzwasser',
         },
-        { name: 'Müllanlage', id: 'müllanlage', icon: 'fa-regular fa-trash' },
-        { name: 'Pumpe', id: 'pumpe', icon: 'fa-regular fa-pump' },
-        { name: 'Wärmetauscher', id: 'wärmetauscher', icon: 'fa-regular fa-heat' },
+        {
+          name: 'Müllanlage',
+          id: 'müllanlage',
+          icon: 'fa-regular fa-trash',
+          filekey: 'Müllanlage',
+        },
+        { name: 'Pumpe', id: 'pumpe', icon: 'fa-regular fa-pump', filekey: 'Pumpe' },
+        {
+          name: 'Wärmetauscher',
+          id: 'wärmetauscher',
+          icon: 'fa-regular fa-heat',
+          filekey: 'Wärmetauscher',
+        },
       ],
       mitarbeiter: [
         'Steven Kukla',
@@ -456,8 +580,34 @@ export default {
        * @returns SignaturePad
        */
       signpad: null,
+      signature: null,
       isSignpadEmpty: true,
+      generatingPDF: false,
+
+      pdfBytes: null,
+      pdfImg: null,
+      isSending: false,
     }
+  },
+
+  async mounted() {
+    const documentList = await databases.listDocuments(
+      '6878f5900032addce7e5',
+      '68866dc60038038dbe27',
+      [Query.orderDesc('erstellungsdatum')],
+    )
+    documentList.documents.forEach(function (doc, index, theArray) {
+      doc.kunde = JSON.parse(doc.kunde)
+      doc.erstellungsdatum = new Date(doc.erstellungsdatum).toLocaleString('de-DE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        minute: '2-digit',
+        hour: '2-digit',
+      })
+    })
+
+    this.wartungsberichte = documentList
   },
 
   methods: {
@@ -465,6 +615,12 @@ export default {
       account.deleteSession('current')
     },
     activateSignPad() {
+      if (this.signature) {
+        this.signpad.fromDataURL(this.signature)
+        return
+      }
+      if (this.signpad) return
+
       let canvas = document.getElementById('signpad')
       canvas.setAttribute('width', getComputedStyle(canvas).width.replace('px', ''))
       canvas.setAttribute('height', getComputedStyle(canvas).height.replace('px', ''))
@@ -472,21 +628,84 @@ export default {
 
       this.signpad.addEventListener('beginStroke', () => {
         this.isSignpadEmpty = !this.signpad.isEmpty
+        this.signature = this.signpad.toDataURL()
       })
     },
-    submit() {
+    async submit(stepCallback) {
+      this.generatingPDF = true
       let signature = this.signpad.toDataURL()
+      let pdf
       this.$refs.filler.broadcastInputsToStore()
       console.log(signature)
 
       switch (this.inputValues.berichtType.id) {
         case 'motor':
-          fillMotorPDF(this.inputValues, signature)
+          pdf = await fillMotorPDF(this.inputValues, signature)
+          console.log(pdf[0])
           break
 
         default:
           break
       }
+
+      this.pdfImg = await this.turnPDFToPNG(pdf[0])
+      this.pdfBytes = pdf
+
+      stepCallback('4')
+      this.generatingPDF = false
+    },
+    async turnPDFToPNG(pdfBuffer) {
+      let pdf = await pdfjsLib.getDocument(pdfBuffer).promise
+      let page = await pdf.getPage(1)
+      let canvas = document.getElementById('pdfCanvas')
+
+      const viewport = page.getViewport({ scale: 3.0 })
+      const height = viewport.height
+      const width = viewport.width
+      canvas.height = height
+      canvas.width = width
+
+      const renderContext = {
+        canvasContext: canvas.getContext('2d'),
+        viewport: viewport,
+      }
+
+      await page.render(renderContext).promise
+      return canvas.toDataURL('image/png')
+    },
+    async saveAndSend() {
+      this.isSending = true
+
+      /*var formData = new FormData()
+      formData.append('application/pdf', this.pdfBytes[1])
+      formData.append('')
+      axios({
+        method: "POST",
+        url: "https://68855ff60023522aa71d.fra.appwrite.run/v1/functions/68855ff6001c1613dade/executions",
+        
+        data: {
+          async: true,
+          method: "POST",
+
+        },
+      })*/
+      let url = await fetch('data:application/pdf;base64,' + this.pdfBytes[1])
+      let blob = await url.blob()
+      const fileID = ID.unique()
+      let file = new File(
+        [blob],
+        `Wartungsbericht_${this.inputValues.berichtType.filekey}_${new Date(this.inputValues.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}_${this.inputValues.employee.replace(' ', '_')}.pdf`,
+        { type: 'application/pdf' },
+      )
+      await storage.createFile('6878f5cf00166fde91eb', fileID, file)
+      await databases.createDocument('6878f5900032addce7e5', '68866dc60038038dbe27', ID.unique(), {
+        mitarbeiter: this.inputValues.employee,
+        erstellungsdatum: new Date(),
+        kunde: JSON.stringify(this.inputValues.customer),
+        wartungsberichtid: fileID,
+      })
+
+      this.isSending = false
     },
   },
 }
@@ -585,6 +804,54 @@ export default {
       height: 7.5rem;
       border-radius: 0.5rem;
       border: 1px solid var(--p-surface-300);
+    }
+  }
+
+  &-finish-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+
+    &-preview {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.3rem;
+
+      &-board {
+        display: flex;
+        flex-direction: column;
+
+        div {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+
+        p {
+          margin-bottom: 0;
+        }
+
+        h3 {
+          margin-top: 0;
+          margin-bottom: 0;
+        }
+      }
+
+      img {
+        justify-self: end;
+        width: 100%;
+        max-width: 40rem;
+        border-radius: 0.5rem;
+        border: 1px solid var(--p-surface-300);
+      }
+    }
+
+    &-btn {
+      width: fit-content;
+    }
+
+    &-iframe {
+      height: 800rem;
     }
   }
 }

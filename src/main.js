@@ -8,6 +8,8 @@ import { palette, updatePrimaryPalette } from '@primeuix/themes'
 import Aura from '@primeuix/themes/aura'
 import ToastService from 'primevue/toastservice'
 import * as DE from './assets/de.json'
+import * as pdfjs from 'pdfjs-dist/build/pdf'
+import * as pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs'
 
 import App from './App.vue'
 import router from './router'

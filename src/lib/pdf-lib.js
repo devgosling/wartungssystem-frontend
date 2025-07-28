@@ -61,10 +61,13 @@ export const fillMotorPDF = async (inputValues, signatureBase64) => {
 
   // SAVE PDF
   const pdfBytes = await pdfDoc.save()
+  const pdfBase64 = await pdfDoc.saveAsBase64()
 
-  var blob = new Blob([pdfBytes], { type: 'application/pdf' })
+  return [pdfBytes, pdfBase64]
+
+  /*var blob = new Blob([pdfBytes], { type: 'application/pdf' })
   var link = document.createElement('a')
   link.href = window.URL.createObjectURL(blob)
   link.download = 'Motor_Form_' + Math.round(Math.random() * 10000) + '.pdf'
-  link.click()
+  link.click()*/
 }

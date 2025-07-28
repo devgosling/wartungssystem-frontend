@@ -48,6 +48,8 @@ export default {
       tabs: [
         { title: 'Dashboard', icon: 'fa-regular fa-objects-column', path: '/' },
         { title: 'Wartungsberichte', icon: 'fa-regular fa-file-pdf', path: '/wartungsberichte' },
+        { title: 'Kundenstammdaten', icon: 'fa-solid fa-user-tie', path: '/customers' },
+        { title: 'Mitarbeiter', icon: 'fa-regular fa-users', path: '/employees' },
       ],
     }
   },
