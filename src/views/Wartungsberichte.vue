@@ -9,408 +9,446 @@
           label="Wartungsbericht"
           severity="contrast"
         />
-        <Button icon="fa-regular fa-upload" label="Hochladen" severity="secondary" />
+        <Button
+          icon="fa-regular fa-upload"
+          label="Hochladen"
+          severity="secondary"
+          @click="tab = 2"
+        />
       </div>
     </div>
     <transition @before-enter="beforeEnter" @enter="enter" @after-enter="afterEnter">
-      <Card v-if="tab == 1 || tab == 2">
+      <Card v-if="tab == 1 || tab == 2" class="wartungsberichte-uppercard">
         <template #title>
           {{ tab == 1 ? 'Wartungsbericht erstellen' : 'Wartungsbericht hochladen' }}
         </template>
         <template #content>
-          <Stepper v-if="tab == 1" value="1" linear>
-            <StepItem value="1">
-              <Step>Wartungsbericht Auswahl</Step>
-              <StepPanel v-slot="{ activateCallback }">
-                <div class="wartungsberichte-create-panel">
-                  <!--<Button severity="secondary" label="Zurück" icon="fa-regular fa-arrow-left" />-->
-                  <div class="wartungsberichte-create-panel-grid">
-                    <div class="wartungsberichte-create-panel-grid-inpt">
-                      <label for="wartungsbericht-slct">Wartungsberichtsart</label>
-                      <Select
-                        id="wartungsbericht-slct"
-                        placeholder="Keine Art ausgewählt"
-                        :options="berichte"
-                        class="wartungsberichte-create-panel-grid-slct-type"
-                        v-model="inputValues.berichtType"
-                      >
-                        <template #value="slotProps">
-                          <div
-                            v-if="slotProps.value"
-                            style="display: flex; align-items: center; gap: 0.4rem"
+          <div id="wartungsberichte-uppercard-container" style="overflow-x: hidden; position: relative;">
+            <transition @before-enter="beforeEnterCard" @enter="enterCard" @leave="leaveCard" @before-leave="beforeLeaveCard">
+              <Stepper v-if="tab == 1" value="1" linear>
+                <StepItem value="1">
+                  <Step>Wartungsbericht Auswahl</Step>
+                  <StepPanel v-slot="{ activateCallback }">
+                    <div class="wartungsberichte-create-panel">
+                      <!--<Button severity="secondary" label="Zurück" icon="fa-regular fa-arrow-left" />-->
+                      <div class="wartungsberichte-create-panel-grid">
+                        <div class="wartungsberichte-create-panel-grid-inpt">
+                          <label for="wartungsbericht-slct">Wartungsberichtsart</label>
+                          <Select
+                            id="wartungsbericht-slct"
+                            placeholder="Keine Art ausgewählt"
+                            :options="berichte"
+                            class="wartungsberichte-create-panel-grid-slct-type"
+                            v-model="inputValues.berichtType"
                           >
-                            <i :class="'fa-regular fa-' + slotProps.value.icon" />{{
-                              slotProps.value.name
-                            }}
-                          </div>
-                          <div v-else>
-                            {{ slotProps.placeholder }}
-                          </div>
-                        </template>
-                        <template #option="slotProps">
-                          <div
-                            style="
-                              width: 19rem;
-                              text-wrap: wrap;
-                              word-wrap: normal;
-                              display: grid;
-                              grid-template-columns: 1.2rem auto;
-                              gap: 0.5rem;
-                              align-items: center;
-                            "
+                            <template #value="slotProps">
+                              <div
+                                v-if="slotProps.value"
+                                style="display: flex; align-items: center; gap: 0.4rem"
+                              >
+                                <i :class="'fa-regular fa-' + slotProps.value.icon" />{{
+                                  slotProps.value.name
+                                }}
+                              </div>
+                              <div v-else>
+                                {{ slotProps.placeholder }}
+                              </div>
+                            </template>
+                            <template #option="slotProps">
+                              <div
+                                style="
+                                  width: 19rem;
+                                  text-wrap: wrap;
+                                  word-wrap: normal;
+                                  display: grid;
+                                  grid-template-columns: 1.2rem auto;
+                                  gap: 0.5rem;
+                                  align-items: center;
+                                "
+                              >
+                                <i :class="'fa-regular fa-' + slotProps.option.icon" />{{
+                                  slotProps.option.name
+                                }}
+                              </div>
+                            </template>
+                            <template #header>
+                              <div
+                                style="
+                                  font-weight: 500;
+                                  padding: 0.75rem 1rem;
+                                  padding-bottom: 0.25rem;
+                                "
+                              >
+                                Verfügbare Wartungsberichte
+                              </div>
+                            </template>
+                          </Select>
+                        </div>
+                        <div class="wartungsberichte-create-panel-grid-inpt">
+                          <label for="wartungsbericht-slct">Bearbeitender Mitarbeiter</label>
+                          <Select
+                            id="wartungsbericht-slct"
+                            placeholder="Kein Mitarbeiter ausgewählt"
+                            :options="mitarbeiter.sort()"
+                            class="wartungsberichte-create-panel-grid-slct-type"
+                            v-model="inputValues.employee"
                           >
-                            <i :class="'fa-regular fa-' + slotProps.option.icon" />{{
-                              slotProps.option.name
-                            }}
-                          </div>
-                        </template>
-                        <template #header>
-                          <div
-                            style="font-weight: 500; padding: 0.75rem 1rem; padding-bottom: 0.25rem"
+                            <template #value="slotProps">
+                              <div
+                                v-if="slotProps.value"
+                                style="display: flex; align-items: center; gap: 0.4rem"
+                              >
+                                <i :class="'fa-solid fa-user-tie'" />{{ slotProps.value }}
+                              </div>
+                              <div v-else>
+                                {{ slotProps.placeholder }}
+                              </div>
+                            </template>
+                            <template #option="slotProps">
+                              <div
+                                style="
+                                  text-wrap: wrap;
+                                  word-wrap: normal;
+                                  display: grid;
+                                  grid-template-columns: 1.2rem auto;
+                                  gap: 0.5rem;
+                                  align-items: center;
+                                "
+                              >
+                                <i
+                                  :class="
+                                    'fa-regular fa-' + slotProps.option.charAt(0).toLowerCase()
+                                  "
+                                />{{ slotProps.option }}
+                              </div>
+                            </template>
+                            <template #header>
+                              <div
+                                style="
+                                  font-weight: 500;
+                                  padding: 0.75rem 1rem;
+                                  padding-bottom: 0.25rem;
+                                "
+                              >
+                                Verfügbare Mitarbeiter
+                              </div>
+                            </template>
+                          </Select>
+                        </div>
+                        <div class="wartungsberichte-create-panel-grid-inpt">
+                          <label for="wartungsbericht-slct">Datum</label>
+                          <!-- TODO: Nachfragen ob es das heutige Datum sein soll oder das Datum der Wartung -->
+                          <DatePicker
+                            id="wartungsbericht-slct"
+                            date-format="dd.mm.yy"
+                            showIcon
+                            fluid
+                            iconDisplay="input"
+                            showButtonBar
+                            v-model="inputValues.date"
+                          />
+                        </div>
+                        <div class="wartungsberichte-create-panel-grid-inpt">
+                          <label for="wartungsbericht-slct">Kunde</label>
+                          <Select
+                            id="wartungsbericht-slct"
+                            placeholder="Kein Kunde Augewählt"
+                            :options="kunden"
+                            class="wartungsberichte-create-panel-grid-slct-type"
+                            filter
+                            optionLabel="name"
+                            v-model="inputValues.customer"
+                            showClear
                           >
-                            Verfügbare Wartungsberichte
-                          </div>
-                        </template>
-                      </Select>
-                    </div>
-                    <div class="wartungsberichte-create-panel-grid-inpt">
-                      <label for="wartungsbericht-slct">Bearbeitender Mitarbeiter</label>
-                      <Select
-                        id="wartungsbericht-slct"
-                        placeholder="Kein Mitarbeiter ausgewählt"
-                        :options="mitarbeiter.sort()"
-                        class="wartungsberichte-create-panel-grid-slct-type"
-                        v-model="inputValues.employee"
-                      >
-                        <template #value="slotProps">
-                          <div
-                            v-if="slotProps.value"
-                            style="display: flex; align-items: center; gap: 0.4rem"
-                          >
-                            <i :class="'fa-solid fa-user-tie'" />{{ slotProps.value }}
-                          </div>
-                          <div v-else>
-                            {{ slotProps.placeholder }}
-                          </div>
-                        </template>
-                        <template #option="slotProps">
-                          <div
-                            style="
-                              text-wrap: wrap;
-                              word-wrap: normal;
-                              display: grid;
-                              grid-template-columns: 1.2rem auto;
-                              gap: 0.5rem;
-                              align-items: center;
-                            "
-                          >
-                            <i
-                              :class="'fa-regular fa-' + slotProps.option.charAt(0).toLowerCase()"
-                            />{{ slotProps.option }}
-                          </div>
-                        </template>
-                        <template #header>
-                          <div
-                            style="font-weight: 500; padding: 0.75rem 1rem; padding-bottom: 0.25rem"
-                          >
-                            Verfügbare Mitarbeiter
-                          </div>
-                        </template>
-                      </Select>
-                    </div>
-                    <div class="wartungsberichte-create-panel-grid-inpt">
-                      <label for="wartungsbericht-slct">Datum</label>
-                      <!-- TODO: Nachfragen ob es das heutige Datum sein soll oder das Datum der Wartung -->
-                      <DatePicker
-                        id="wartungsbericht-slct"
-                        date-format="dd.mm.yy"
-                        showIcon
-                        fluid
-                        iconDisplay="input"
-                        showButtonBar
-                        v-model="inputValues.date"
+                            <template #value="slotProps">
+                              <div v-if="slotProps.value">
+                                {{ slotProps.value.name }}
+                              </div>
+                              <div v-else>
+                                {{ slotProps.placeholder }}
+                              </div>
+                            </template>
+                            <template #option="slotProps">
+                              <div
+                                style="
+                                  text-wrap: wrap;
+                                  word-wrap: normal;
+                                  display: grid;
+                                  grid-template-columns: 0.9rem auto;
+                                  gap: 0.5rem;
+                                  align-items: center;
+                                "
+                              >
+                                <i :class="'fa-solid fa-user-tie'" />{{ slotProps.option.name }}
+                              </div>
+                            </template>
+                            <template #header>
+                              <div
+                                style="
+                                  font-weight: 500;
+                                  padding: 0.75rem 1rem;
+                                  padding-bottom: 0.1rem;
+                                "
+                              >
+                                Verfügbare Kunden
+                              </div>
+                            </template>
+                            <template #footer>
+                              <div style="padding: 0.75rem">
+                                <Button
+                                  label="Kunde hinzufügen"
+                                  size="small"
+                                  fluid
+                                  severity="secondary"
+                                  text
+                                  icon="fa-solid fa-plus"
+                                />
+                              </div>
+                            </template>
+                          </Select>
+                        </div>
+                        <div class="wartungsberichte-create-panel-grid-inpt">
+                          <label for="wartungsbericht-slct">Straße und Hausnummer</label>
+                          <InputText
+                            id="wartungsbericht-slct"
+                            disabled
+                            placeholder="Kein Kunde ausgewählt"
+                            :value="inputValues.customer?.address?.street"
+                          />
+                        </div>
+                        <div class="wartungsberichte-create-panel-grid-inpt">
+                          <label for="wartungsbericht-slct">Postleitzahl</label>
+                          <InputText
+                            id="wartungsbericht-slct"
+                            disabled
+                            placeholder="Kein Kunde ausgewählt"
+                            :value="inputValues.customer?.address?.zipcode"
+                          />
+                        </div>
+                        <div class="wartungsberichte-create-panel-grid-inpt">
+                          <label for="wartungsbericht-slct">Stadt</label>
+                          <InputText
+                            id="wartungsbericht-slct"
+                            disabled
+                            placeholder="Kein Kunde ausgewählt"
+                            :value="inputValues.customer?.address?.city"
+                          />
+                        </div>
+                      </div>
+                      <Button
+                        class="wartungsberichte-create-panel-btn"
+                        severity="contrast"
+                        label="Weiter"
+                        icon="fa-regular fa-arrow-right"
+                        size="small"
+                        iconPos="right"
+                        :disabled="
+                          !(
+                            inputValues.berichtType &&
+                            inputValues.customer &&
+                            inputValues.date &&
+                            inputValues.employee
+                          )
+                        "
+                        @click="activateCallback('2')"
                       />
                     </div>
-                    <div class="wartungsberichte-create-panel-grid-inpt">
-                      <label for="wartungsbericht-slct">Kunde</label>
-                      <Select
-                        id="wartungsbericht-slct"
-                        placeholder="Kein Kunde Augewählt"
-                        :options="kunden"
-                        class="wartungsberichte-create-panel-grid-slct-type"
-                        filter
-                        optionLabel="name"
-                        v-model="inputValues.customer"
-                        showClear
-                      >
-                        <template #value="slotProps">
-                          <div v-if="slotProps.value">
-                            {{ slotProps.value.name }}
-                          </div>
-                          <div v-else>
-                            {{ slotProps.placeholder }}
-                          </div>
-                        </template>
-                        <template #option="slotProps">
-                          <div
-                            style="
-                              text-wrap: wrap;
-                              word-wrap: normal;
-                              display: grid;
-                              grid-template-columns: 0.9rem auto;
-                              gap: 0.5rem;
-                              align-items: center;
-                            "
-                          >
-                            <i :class="'fa-solid fa-user-tie'" />{{ slotProps.option.name }}
-                          </div>
-                        </template>
-                        <template #header>
-                          <div
-                            style="font-weight: 500; padding: 0.75rem 1rem; padding-bottom: 0.1rem"
-                          >
-                            Verfügbare Kunden
-                          </div>
-                        </template>
-                        <template #footer>
-                          <div style="padding: 0.75rem">
-                            <Button
-                              label="Kunde hinzufügen"
-                              size="small"
-                              fluid
-                              severity="secondary"
-                              text
-                              icon="fa-solid fa-plus"
-                            />
-                          </div>
-                        </template>
-                      </Select>
-                    </div>
-                    <div class="wartungsberichte-create-panel-grid-inpt">
-                      <label for="wartungsbericht-slct">Straße und Hausnummer</label>
-                      <InputText
-                        id="wartungsbericht-slct"
-                        disabled
-                        placeholder="Kein Kunde ausgewählt"
-                        :value="inputValues.customer?.address?.street"
+                  </StepPanel>
+                </StepItem>
+                <StepItem value="2">
+                  <Step>Wartungsbericht Ausfüllen</Step>
+                  <StepPanel v-slot="{ activateCallback }">
+                    <div class="wartungsberichte-fill-panel">
+                      <Button
+                        class="wartungsberichte-fill-panel-btn"
+                        severity="secondary"
+                        label="Zurück"
+                        icon="fa-regular fa-arrow-left"
+                        size="small"
+                        iconPos="left"
+                        @click="activateCallback('1')"
+                      />
+                      <Motor_Filler ref="filler" v-if="inputValues.berichtType.id == 'motor'" />
+                      <h2 style="margin: 3rem 8rem; text-align: center" v-else>
+                        Für diese Art von Wartungsbericht gibt es noch nichts zum ausfüllen... :(
+                      </h2>
+                      <Button
+                        class="wartungsberichte-fill-panel-btn"
+                        severity="contrast"
+                        label="Weiter"
+                        icon="fa-regular fa-arrow-right"
+                        size="small"
+                        iconPos="right"
+                        :disabled="
+                          !(
+                            inputValues.berichtType &&
+                            inputValues.customer &&
+                            inputValues.date &&
+                            inputValues.employee
+                          )
+                        "
+                        @click="
+                          function () {
+                            activateCallback('3')
+                            activateSignPad()
+                          }
+                        "
                       />
                     </div>
-                    <div class="wartungsberichte-create-panel-grid-inpt">
-                      <label for="wartungsbericht-slct">Postleitzahl</label>
-                      <InputText
-                        id="wartungsbericht-slct"
-                        disabled
-                        placeholder="Kein Kunde ausgewählt"
-                        :value="inputValues.customer?.address?.zipcode"
+                  </StepPanel>
+                </StepItem>
+                <StepItem value="3">
+                  <Step>Wartungsbericht Unterschreiben</Step>
+                  <StepPanel v-slot="{ activateCallback }" id="step3">
+                    <div class="wartungsberichte-sign-panel">
+                      <Button
+                        class="wartungsberichte-sign-panel-btn"
+                        severity="secondary"
+                        label="Zurück"
+                        icon="fa-regular fa-arrow-left"
+                        size="small"
+                        iconPos="left"
+                        @click="activateCallback('2')"
+                        :disabled="generatingPDF"
                       />
-                    </div>
-                    <div class="wartungsberichte-create-panel-grid-inpt">
-                      <label for="wartungsbericht-slct">Stadt</label>
-                      <InputText
-                        id="wartungsbericht-slct"
-                        disabled
-                        placeholder="Kein Kunde ausgewählt"
-                        :value="inputValues.customer?.address?.city"
-                      />
-                    </div>
-                  </div>
-                  <Button
-                    class="wartungsberichte-create-panel-btn"
-                    severity="contrast"
-                    label="Weiter"
-                    icon="fa-regular fa-arrow-right"
-                    size="small"
-                    iconPos="right"
-                    :disabled="
-                      !(
-                        inputValues.berichtType &&
-                        inputValues.customer &&
-                        inputValues.date &&
-                        inputValues.employee
-                      )
-                    "
-                    @click="activateCallback('2')"
-                  />
-                </div>
-              </StepPanel>
-            </StepItem>
-            <StepItem value="2">
-              <Step>Wartungsbericht Ausfüllen</Step>
-              <StepPanel v-slot="{ activateCallback }">
-                <div class="wartungsberichte-fill-panel">
-                  <Button
-                    class="wartungsberichte-fill-panel-btn"
-                    severity="secondary"
-                    label="Zurück"
-                    icon="fa-regular fa-arrow-left"
-                    size="small"
-                    iconPos="left"
-                    @click="activateCallback('1')"
-                  />
-                  <Motor_Filler ref="filler" v-if="inputValues.berichtType.id == 'motor'" />
-                  <h2 style="margin: 3rem 8rem; text-align: center" v-else>
-                    Für diese Art von Wartungsbericht gibt es noch nichts zum ausfüllen... :(
-                  </h2>
-                  <Button
-                    class="wartungsberichte-fill-panel-btn"
-                    severity="contrast"
-                    label="Weiter"
-                    icon="fa-regular fa-arrow-right"
-                    size="small"
-                    iconPos="right"
-                    :disabled="
-                      !(
-                        inputValues.berichtType &&
-                        inputValues.customer &&
-                        inputValues.date &&
-                        inputValues.employee
-                      )
-                    "
-                    @click="
-                      function () {
-                        activateCallback('3')
-                        activateSignPad()
-                      }
-                    "
-                  />
-                </div>
-              </StepPanel>
-            </StepItem>
-            <StepItem value="3">
-              <Step>Wartungsbericht Unterschreiben</Step>
-              <StepPanel v-slot="{ activateCallback }" id="step3">
-                <div class="wartungsberichte-sign-panel">
-                  <Button
-                    class="wartungsberichte-sign-panel-btn"
-                    severity="secondary"
-                    label="Zurück"
-                    icon="fa-regular fa-arrow-left"
-                    size="small"
-                    iconPos="left"
-                    @click="activateCallback('2')"
-                    :disabled="generatingPDF"
-                  />
-                  <div class="wartungsberichte-sign-panel-main">
-                    <label for="signpad">Signatur hier Zeichnen</label>
-                    <canvas id="signpad" class="wartungsberichte-sign-panel-signpad"></canvas>
+                      <div class="wartungsberichte-sign-panel-main">
+                        <label for="signpad">Signatur hier Zeichnen</label>
+                        <canvas id="signpad" class="wartungsberichte-sign-panel-signpad"></canvas>
 
-                    <div class="wartungsberichte-sign-panel-main-btns">
-                      <Button
-                        rounded
-                        :disabled="isSignpadEmpty"
-                        size="small"
-                        severity="danger"
-                        icon="fa-regular fa-trash"
-                        @click="
-                          function () {
-                            signpad.clear()
-                            isSignpadEmpty = true
-                          }
-                        "
-                      />
-                      <Button
-                        rounded
-                        size="small"
+                        <div class="wartungsberichte-sign-panel-main-btns">
+                          <Button
+                            rounded
+                            :disabled="isSignpadEmpty"
+                            size="small"
+                            severity="danger"
+                            icon="fa-regular fa-trash"
+                            @click="
+                              function () {
+                                signpad.clear()
+                                isSignpadEmpty = true
+                              }
+                            "
+                          />
+                          <Button
+                            rounded
+                            size="small"
+                            severity="contrast"
+                            icon="fa-regular fa-arrow-down-left-and-arrow-up-right-to-center"
+                            @click="
+                              function () {
+                                if (signpad.minWidth <= 0.1) return
+                                signpad.minWidth -= 0.1
+                                signpad.maxWidth -= 0.5
+                              }
+                            "
+                          />
+                          <Button
+                            rounded
+                            size="small"
+                            severity="contrast"
+                            icon="fa-regular fa-arrow-up-right-and-arrow-down-left-from-center"
+                            @click="
+                              function () {
+                                if (signpad.minWidth >= 1) return
+                                signpad.minWidth += 0.1
+                                signpad.maxWidth += 0.5
+                              }
+                            "
+                          />
+                          <Button
+                            rounded
+                            label="Bestätigen"
+                            size="small"
+                            severity="success"
+                            icon="fa-regular fa-check"
+                            :disabled="isSignpadEmpty"
+                            @click="submit(activateCallback)"
+                            :loading="generatingPDF"
+                          />
+                        </div>
+                      </div>
+                      <!--<Button
+                        class="wartungsberichte-sign-panel-btn"
                         severity="contrast"
-                        icon="fa-regular fa-arrow-down-left-and-arrow-up-right-to-center"
-                        @click="
-                          function () {
-                            if (signpad.minWidth <= 0.1) return
-                            signpad.minWidth -= 0.1
-                            signpad.maxWidth -= 0.5
-                          }
-                        "
-                      />
-                      <Button
-                        rounded
+                        label="Weiter"
+                        icon="fa-regular fa-arrow-right"
                         size="small"
-                        severity="contrast"
-                        icon="fa-regular fa-arrow-up-right-and-arrow-down-left-from-center"
-                        @click="
-                          function () {
-                            if (signpad.minWidth >= 1) return
-                            signpad.minWidth += 0.1
-                            signpad.maxWidth += 0.5
-                          }
+                        iconPos="right"
+                        :disabled="
+                          !(
+                            inputValues.berichtType &&
+                            inputValues.customer &&
+                            inputValues.date &&
+                            inputValues.employee
+                          )
                         "
-                      />
-                      <Button
-                        rounded
-                        label="Bestätigen"
-                        size="small"
-                        severity="success"
-                        icon="fa-regular fa-check"
-                        :disabled="isSignpadEmpty"
-                        @click="submit(activateCallback)"
-                        :loading="generatingPDF"
-                      />
+                        @click="activateCallback('3')"
+                      />-->
                     </div>
-                  </div>
-                  <!--<Button
-                    class="wartungsberichte-sign-panel-btn"
-                    severity="contrast"
-                    label="Weiter"
-                    icon="fa-regular fa-arrow-right"
-                    size="small"
-                    iconPos="right"
-                    :disabled="
-                      !(
-                        inputValues.berichtType &&
-                        inputValues.customer &&
-                        inputValues.date &&
-                        inputValues.employee
-                      )
-                    "
-                    @click="activateCallback('3')"
-                  />-->
-                </div>
-              </StepPanel>
-            </StepItem>
-            <StepItem value="4">
-              <Step>Wartungsbericht Speichern</Step>
-              <StepPanel v-slot="{ activateCallback }">
-                <div class="wartungsberichte-finish-panel">
-                  <Button
-                    class="wartungsberichte-finish-panel-btn"
-                    severity="secondary"
-                    label="Zurück"
-                    icon="fa-regular fa-arrow-left"
-                    size="small"
-                    iconPos="left"
-                    @click="activateCallback('3')"
-                    :disabled="isSending"
-                  />
-                  <div class="wartungsberichte-finish-panel-preview">
-                    <div class="wartungsberichte-finish-panel-preview-board">
-                      <h3>🎉 Der Wartungsbericht ist fertig!</h3>
-                      <p>
-                        Überprüfe gegebenfalls nocheinmal alle eingaben und speichere den
-                        Wartungsbericht.
-                      </p>
-                      <Divider />
-                      <div>
-                        <Button
-                          icon="fa-regular fa-eyes"
-                          :disabled="isSending"
-                          label="Eingaben überprüfen"
-                          severity="contrast"
-                          @click="activateCallback('2')"
-                        ></Button>
-                        <Button
-                          icon="fa-regular fa-paper-plane"
-                          :loading="isSending"
-                          label="Speichen und versenden"
-                          severity="success"
-                          @click="saveAndSend()"
-                        ></Button>
+                  </StepPanel>
+                </StepItem>
+                <StepItem value="4">
+                  <Step>Wartungsbericht Speichern</Step>
+                  <StepPanel v-slot="{ activateCallback }">
+                    <div class="wartungsberichte-finish-panel">
+                      <Button
+                        class="wartungsberichte-finish-panel-btn"
+                        severity="secondary"
+                        label="Zurück"
+                        icon="fa-regular fa-arrow-left"
+                        size="small"
+                        iconPos="left"
+                        @click="activateCallback('3')"
+                        :disabled="isSending"
+                      />
+                      <div class="wartungsberichte-finish-panel-preview">
+                        <div class="wartungsberichte-finish-panel-preview-board">
+                          <h3>🎉 Der Wartungsbericht ist fertig!</h3>
+                          <p>
+                            Überprüfe gegebenfalls nocheinmal alle eingaben und speichere den
+                            Wartungsbericht.
+                          </p>
+                          <Divider />
+                          <div>
+                            <Button
+                              icon="fa-regular fa-eyes"
+                              :disabled="isSending"
+                              label="Eingaben überprüfen"
+                              severity="contrast"
+                              @click="activateCallback('2')"
+                            ></Button>
+                            <Button
+                              icon="fa-regular fa-paper-plane"
+                              :loading="isSending"
+                              label="Speichen und versenden"
+                              severity="success"
+                              @click="saveAndSend()"
+                            ></Button>
+                          </div>
+                        </div>
+                        <img :src="pdfImg" alt="" />
                       </div>
                     </div>
-                    <img :src="pdfImg" alt="" />
-                  </div>
-                </div>
-              </StepPanel>
-            </StepItem>
-          </Stepper>
+                  </StepPanel>
+                </StepItem>
+              </Stepper>
+            </transition>
+            <transition @before-enter="beforeEnterCard" @enter="enterCard" @leave="leaveCard" @before-leave="beforeLeaveCard">
+              <div
+                v-if="tab == 2"
+                style="
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  text-align: center;
+                  height: 10rem;
+                  width: 100%;
+                "
+              >
+                <h1>Hello World!</h1>
+              </div>
+            </transition>
+          </div>
         </template>
       </Card>
     </transition>
@@ -635,6 +673,45 @@ export default {
   },
 
   methods: {
+    // #region Fadein & -out animations
+    modifyCardHeight(height) {
+      let cardContainer = document.getElementById('wartungsberichte-uppercard-container')
+      cardContainer.style.overflowY = 'hidden'
+      cardContainer.style.transition = 'height 0.4s ease-out'
+      requestAnimationFrame(() => {
+        cardContainer.style.height = height + 'px'
+      })
+    },
+    beforeLeaveCard(el) {
+      el.style.position = 'absolute'
+      el.style.top = "0"
+      el.style.left = "0"
+
+      let cardContainer = document.getElementById('wartungsberichte-uppercard-container')
+      cardContainer.style.height = el.scrollHeight + "px"
+    },
+    leaveCard(el) { 
+      el.style.transition = 'transform 0.4s ease'
+      requestAnimationFrame(() => {
+        el.style.transform = 'translateX(100%)'
+      })
+
+      let cardContainer = document.getElementById('wartungsberichte-uppercard-container')
+      cardContainer.style.overflowY = ''
+      setTimeout(() => {
+        cardContainer.style.height = ''
+      }, 400)
+    },
+    beforeEnterCard(el) {
+      el.style.transform = 'translateX(-100%)'
+    },
+    enterCard(el) {
+      el.style.transition = 'transform 0.4s ease'
+      this.modifyCardHeight(el.scrollHeight)
+      requestAnimationFrame(() => {
+        el.style.transform = 'translateX(0%)'
+      })
+    },
     beforeEnter(el) {
       el.style.height = '0'
       el.style.opacity = '0'
@@ -652,6 +729,8 @@ export default {
       el.style.height = 'auto'
       el.style.overflow = ''
     },
+    // #endregion
+
     async viewBericht(data, berichtIndex) {
       this.viewingBericht.loading = berichtIndex
       let fileDownload = await storage.getFileDownload(
@@ -777,24 +856,7 @@ export default {
   gap: 1rem;
 
   &-uppercard {
-    &-enter-from {
-      transform: scaleY(0);
-      opacity: 0;
-      transform-origin: top;
-    }
-
-    &-enter-active {
-      transition:
-        transform 0.4s ease-out,
-        opacity 0.4s ease-out;
-      overflow: hidden;
-    }
-
-    &-enter-to {
-      transform: scaleY(1);
-      opacity: 1;
-      transform-origin: top;
-    }
+    overflow-x: hidden;
   }
 
   &-header {
