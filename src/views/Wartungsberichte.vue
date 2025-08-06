@@ -5,7 +5,12 @@
       <div class="wartungsberichte-header-btns">
         <Button
           icon="fa-regular fa-plus"
-          @click="tab = 1"
+          @click="
+            function () {
+              tab = 1
+              setTabtext()
+            }
+          "
           label="Wartungsbericht"
           severity="contrast"
         />
@@ -13,18 +18,31 @@
           icon="fa-regular fa-upload"
           label="Hochladen"
           severity="secondary"
-          @click="tab = 2"
+          @click="
+            function () {
+              tab = 2
+              setTabtext()
+            }
+          "
         />
       </div>
     </div>
     <transition @before-enter="beforeEnter" @enter="enter" @after-enter="afterEnter">
       <Card v-if="tab == 1 || tab == 2" class="wartungsberichte-uppercard">
         <template #title>
-          {{ tab == 1 ? 'Wartungsbericht erstellen' : 'Wartungsbericht hochladen' }}
+          {{ tabtext }}
         </template>
         <template #content>
-          <div id="wartungsberichte-uppercard-container" style="overflow-x: hidden; position: relative;">
-            <transition @before-enter="beforeEnterCard" @enter="enterCard" @leave="leaveCard" @before-leave="beforeLeaveCard">
+          <div
+            id="wartungsberichte-uppercard-container"
+            style="overflow-x: hidden; position: relative"
+          >
+            <transition
+              @before-enter="beforeEnterCard"
+              @enter="enterCard"
+              @leave="leaveCard"
+              @before-leave="beforeLeaveCard"
+            >
               <Stepper v-if="tab == 1" value="1" linear>
                 <StepItem value="1">
                   <Step>Wartungsbericht Auswahl</Step>
@@ -433,7 +451,12 @@
                 </StepItem>
               </Stepper>
             </transition>
-            <transition @before-enter="beforeEnterCard" @enter="enterCard" @leave="leaveCard" @before-leave="beforeLeaveCard">
+            <transition
+              @before-enter="beforeEnterCard"
+              @enter="enterCard"
+              @leave="leaveCard"
+              @before-leave="beforeLeaveCard"
+            >
               <div
                 v-if="tab == 2"
                 style="
@@ -581,7 +604,8 @@ export default {
         date: '',
         customer: null,
       },
-      tab: 0, // 0 = DataView, 1 = Create, 2 = Upload
+      tab: 0, // 0 = Nothing, 1 = Create, 2 = Upload
+      tabtext: '',
       berichte: [
         { name: 'Lüfter', id: 'lüfter', icon: 'fa-regular fa-fan', filekey: 'Lüfter' },
         { name: 'Motor', id: 'motor', icon: 'fa-regular fa-engine', filekey: 'Motor' },
@@ -674,6 +698,46 @@ export default {
 
   methods: {
     // #region Fadein & -out animations
+    async setTabtext() {
+      let tabTexts = {
+        1: 'Wartungsbericht erstellen',
+        2: 'Wartungsbericht hochladen',
+      }
+      if (this.tabtext == '') {
+        this.tabtext = this.tab == 1 ? tabTexts['1'] : tabTexts['2']
+        return
+      } else if (
+        (this.tab == 1 && this.tabtext == tabTexts['1']) ||
+        (this.tab == 2 && this.tabtext == tabTexts['2'])
+      )
+        return
+
+      // Remove chars after "Wartungsbericht"
+      let text = this.tabtext
+      await new Promise((resolve, reject) => {
+        let removerInterval = setInterval(() => {
+          text = text.substring(0, text.length - 1)
+          this.tabtext = text
+          if (text == 'Wartungsbericht ') {
+            resolve()
+            clearInterval(removerInterval)
+          }
+        }, 15) // 15ms
+      })
+
+      let lettersToAdd = this.tab == 1 ? 'erstellen' : 'hochladen'
+      let letterString = lettersToAdd.split('')
+
+      letterString.forEach(async (ltr, index) => {
+        setTimeout(
+          () => {
+            text += ltr
+            this.tabtext = text
+          },
+          (index + 1) * 15,
+        )
+      })
+    },
     modifyCardHeight(height) {
       let cardContainer = document.getElementById('wartungsberichte-uppercard-container')
       cardContainer.style.overflowY = 'hidden'
@@ -684,13 +748,13 @@ export default {
     },
     beforeLeaveCard(el) {
       el.style.position = 'absolute'
-      el.style.top = "0"
-      el.style.left = "0"
+      el.style.top = '0'
+      el.style.left = '0'
 
       let cardContainer = document.getElementById('wartungsberichte-uppercard-container')
-      cardContainer.style.height = el.scrollHeight + "px"
+      cardContainer.style.height = el.scrollHeight + 'px'
     },
-    leaveCard(el) { 
+    leaveCard(el) {
       el.style.transition = 'transform 0.4s ease'
       requestAnimationFrame(() => {
         el.style.transform = 'translateX(100%)'
