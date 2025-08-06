@@ -7,8 +7,11 @@
           icon="fa-regular fa-plus"
           @click="
             function () {
-              tab = 1
-              setTabtext()
+              if (tabCooldown < Date.now()) {
+                tab = 1
+                setTabtext()
+                tabCooldown = Date.now() + 400
+              }
             }
           "
           label="Wartungsbericht"
@@ -20,8 +23,11 @@
           severity="secondary"
           @click="
             function () {
-              tab = 2
-              setTabtext()
+              if (tabCooldown < Date.now()) {
+                tab = 2
+                setTabtext()
+                tabCooldown = Date.now() + 400
+              }
             }
           "
         />
@@ -604,6 +610,7 @@ export default {
         date: '',
         customer: null,
       },
+      tabCooldown: -1,
       tab: 0, // 0 = Nothing, 1 = Create, 2 = Upload
       tabtext: '',
       berichte: [
@@ -748,6 +755,7 @@ export default {
     },
     beforeLeaveCard(el) {
       el.style.position = 'absolute'
+      el.style.width = '100%'
       el.style.top = '0'
       el.style.left = '0'
 
