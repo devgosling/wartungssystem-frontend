@@ -379,7 +379,6 @@
                   @click="activateCallback('3')"
                   :disabled="isSending"
                 />
-                <canvas id="pdfCanvas" hidden></canvas>
                 <div class="wartungsberichte-finish-panel-preview">
                   <div class="wartungsberichte-finish-panel-preview-board">
                     <h3>🎉 Der Wartungsbericht ist fertig!</h3>
@@ -422,8 +421,8 @@
           :globalFilterFields="['erstellungsdatum', 'mitarbeiter', 'kunde.name']"
         >
           <template #header>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <h4 style="margin: 0;">{{ wartungsberichte?.total }} Wartungsberichte</h4>
+            <div style="display: flex; justify-content: space-between; align-items: center">
+              <h4 style="margin: 0">{{ wartungsberichte?.total }} Wartungsberichte</h4>
               <IconField>
                 <InputIcon>
                   <i class="fa-regular fa-search" />
@@ -447,7 +446,13 @@
           <Column field="actions" header="Aktionen">
             <template #body="slotProps">
               <div style="display: flex; gap: 0.2rem">
-                <Button icon="fa-regular fa-eye" severity="info" size="small"></Button>
+                <Button
+                  icon="fa-regular fa-eye"
+                  severity="info"
+                  @click="viewBericht(slotProps.data, slotProps.index)"
+                  size="small"
+                  :loading="viewingBericht.loading == slotProps.index"
+                ></Button>
                 <Button icon="fa-regular fa-download" severity="contrast" size="small"></Button>
                 <Button icon="fa-regular fa-trash" severity="danger" size="small"></Button>
               </div>
@@ -457,9 +462,16 @@
       </template>
     </Card>
   </div>
+  <Dialog maximizable v-model:visible="viewingBericht.open" style="width: min(50vw, 800px)">
+    <template #header>
+      <div><i class="fa-regular fa-file-pdf"></i> {{ viewingBericht.name }}</div>
+    </template>
+    <img :src="viewingBericht.img" alt="" style="width: 100%" />
+  </Dialog>
+  <canvas id="pdfCanvas" hidden></canvas>
 </template>
 <script>
-import { ID, account, databases, functions, storage } from '@/lib/appwrite'
+import { ID, account, client, databases, functions, storage } from '@/lib/appwrite'
 import {
   Toolbar,
   Button,
@@ -475,6 +487,7 @@ import {
   Column,
   IconField,
   InputIcon,
+  Dialog,
 } from 'primevue'
 import StepPanel from 'primevue/steppanel'
 import StepItem from 'primevue/stepitem'
@@ -512,6 +525,7 @@ export default {
     Column,
     IconField,
     InputIcon,
+    Dialog,
   },
 
   data() {
@@ -587,6 +601,14 @@ export default {
       pdfBytes: null,
       pdfImg: null,
       isSending: false,
+
+      viewingBericht: {
+        data: null,
+        name: null,
+        img: null,
+        open: false,
+        loading: null,
+      },
     }
   },
 
@@ -611,6 +633,25 @@ export default {
   },
 
   methods: {
+    async viewBericht(data, berichtIndex) {
+      this.viewingBericht.loading = berichtIndex
+      let fileDownload = await storage.getFileDownload(
+        '6878f5cf00166fde91eb',
+        data.wartungsberichtid,
+      )
+      let fileData = await storage.getFile('6878f5cf00166fde91eb', data.wartungsberichtid)
+      let jwtObject = await account.createJWT()
+      let fileResponse = await fetch(fileDownload, { headers: { 'x-appwrite-jwt': jwtObject.jwt } })
+      let blob = await fileResponse.blob()
+      let buffer = await blob.arrayBuffer()
+      let fileBytes = new Uint8Array(buffer)
+
+      this.viewingBericht.name = fileData.name
+      this.viewingBericht.data = data
+      this.viewingBericht.img = await this.turnPDFToPNG(fileBytes)
+      this.viewingBericht.open = true
+      this.viewingBericht.loading = null
+    },
     logout() {
       account.deleteSession('current')
     },
@@ -694,7 +735,7 @@ export default {
       const fileID = ID.unique()
       let file = new File(
         [blob],
-        `Wartungsbericht_${this.inputValues.berichtType.filekey}_${new Date(this.inputValues.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}_${this.inputValues.employee.replace(' ', '_')}.pdf`,
+        `Wartungsbericht_${this.inputValues.berichtType.filekey}_${new Date(this.inputValues.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}_${this.inputValues.employee.replaceAll(' ', '_')}.pdf`,
         { type: 'application/pdf' },
       )
       await storage.createFile('6878f5cf00166fde91eb', fileID, file)
