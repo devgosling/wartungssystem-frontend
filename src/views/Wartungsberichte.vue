@@ -423,7 +423,7 @@
                         size="small"
                         iconPos="left"
                         @click="activateCallback('3')"
-                        :disabled="isSending"
+                        :disabled="isSending || isSent"
                       />
                       <div class="wartungsberichte-finish-panel-preview">
                         <div class="wartungsberichte-finish-panel-preview-board">
@@ -436,15 +436,17 @@
                           <div>
                             <Button
                               icon="fa-regular fa-eyes"
-                              :disabled="isSending"
+                              :disabled="isSending || isSent"
                               label="Eingaben überprüfen"
                               severity="contrast"
                               @click="activateCallback('2')"
                             ></Button>
                             <Button
-                              icon="fa-regular fa-paper-plane"
+                              id="saveandsendbtn"
+                              :icon="isSent ? 'fa-regular fa-check' : 'fa-regular fa-paper-plane'"
                               :loading="isSending"
-                              label="Speichen und versenden"
+                              :disabled="isSent"
+                              :label="isSent ? 'Erfolgreich versendet' : 'Speichen und versenden'"
                               severity="success"
                               @click="saveAndSend()"
                             ></Button>
@@ -672,6 +674,7 @@ export default {
       pdfBytes: null,
       pdfImg: null,
       isSending: false,
+      isSent: false,
 
       viewingBericht: {
         data: null,
@@ -679,6 +682,23 @@ export default {
         img: null,
         open: false,
         loading: null,
+      },
+
+      // CONFETTI
+      confetti: {
+        emmitterSize: 100,
+        dotQuantity: 250,
+        dotSizeMin: 6,
+        dotSizeMax: 8,
+        speed: 4.4,
+        gravity: 0.5,
+        explosionQuantity: 1,
+        emitter: null,
+        explosions: [],
+        currentExplosion: 0,
+        container: null,
+        i: null,
+        move: null,
       },
     }
   },
@@ -701,9 +721,127 @@ export default {
     })
 
     this.wartungsberichte = documentList
+
+    this.confetti_setup()
   },
 
   methods: {
+    // #region Confetti Effect Logic
+    confetti_createExplosion(container) {
+      var tl = new TimelineLite({ paused: true }),
+        dots = [],
+        angle,
+        duration,
+        length,
+        dot,
+        i,
+        size,
+        r,
+        g,
+        b
+      for (i = 0; i < this.confetti.dotQuantity; i++) {
+        dot = document.createElement('div')
+        dots.push(dot)
+        dot.className = 'dot'
+        r = this.confetti_getRandom(30, 255)
+        g = this.confetti_getRandom(30, 230)
+        b = this.confetti_getRandom(30, 230)
+        TweenLite.set(dot, {
+          backgroundColor: 'rgb(' + r + ',' + g + ',' + b + ')',
+          visibility: 'hidden',
+        })
+        size = this.confetti_getRandom(this.confetti.dotSizeMin, this.confetti.dotSizeMax)
+        container.appendChild(dot)
+        angle = this.confetti_getRandom(0.65, 0.85) * Math.PI * 2 // a vector pointed up
+        // get maximum distance from the center, factoring in size of dot, and then pick a random spot along that vector to plot a point
+        length = Math.random() * (this.confetti.emitterSize / 2 - size / 2)
+        duration = 3 + Math.random()
+        // place the dot at a random spot within the emitter, and set its size
+        TweenLite.set(dot, {
+          x: Math.cos(angle) * length,
+          y: Math.sin(angle) * length,
+          width: size,
+          height: size,
+          xPercent: -50,
+          yPercent: -50,
+          visibility: 'hidden',
+          force3D: true,
+        })
+        tl.to(
+          dot,
+          duration / 2,
+          {
+            opacity: 0,
+            ease: RoughEase.ease.config({
+              points: 20,
+              strength: 1.75,
+              clamp: true,
+            }),
+          },
+          0,
+        )
+          .to(
+            dot,
+            duration,
+            {
+              visibility: 'visible',
+              rotationX: '-=' + this.confetti_getRandom(720, 1440),
+              rotationZ: '+=' + this.confetti_getRandom(720, 1440),
+              physics2D: {
+                angle: (angle * 180) / Math.PI, // translate radians to degrees
+                velocity: (100 + Math.random() * 250) * this.confetti.speed, // initial velocity
+                gravity: 700 * this.confetti.gravity,
+                friction: this.confetti_getRandom(0.1, 0.15),
+              },
+            },
+            0,
+          )
+          .to(
+            dot,
+            1.25 + Math.random(),
+            {
+              opacity: 0,
+            },
+            duration / 2,
+          )
+      }
+      // hide the dots at the end for improved performance (better than opacity: 0 because the browser can ignore the elements)
+      // console.log('setting', dots);
+      // tl.set(dots, {visibility: 'hidden'});
+      return tl
+    },
+    confetti_explode(element) {
+      var bounds = element.getBoundingClientRect(),
+        explosion
+      if (++this.confetti.currentExplosion === this.confetti.explosions.length) {
+        this.confetti.currentExplosion = 0
+      }
+      explosion = this.confetti.explosions[this.confetti.currentExplosion]
+      TweenLite.set(explosion.container, {
+        x: bounds.left + bounds.width / 2,
+        y: bounds.top + bounds.height / 2,
+      })
+      explosion.animation.restart()
+    },
+    confetti_setup() {
+      this.confetti.container = document.createElement('div')
+      this.confetti.container.className = 'dot-container'
+      document.body.appendChild(this.confetti.container)
+      this.confetti.explosions.push({
+        container: this.confetti.container,
+        animation: this.confetti_createExplosion(this.confetti.container),
+      })
+    },
+    confetti_getRandom(min, max) {
+      var rand = min + Math.random() * (max - min)
+      return rand
+    },
+    confetti_play() {
+      this.confetti.emitter = document.getElementById('saveandsendbtn')
+      this.confetti_explode(this.confetti.emitter)
+    },
+    // #endregion
+
     // #region Fadein & -out animations
     async setTabtext() {
       let tabTexts = {
@@ -893,7 +1031,7 @@ export default {
       axios({
         method: "POST",
         url: "https://68855ff60023522aa71d.fra.appwrite.run/v1/functions/68855ff6001c1613dade/executions",
-        
+
         data: {
           async: true,
           method: "POST",
@@ -915,8 +1053,10 @@ export default {
         kunde: JSON.stringify(this.inputValues.customer),
         wartungsberichtid: fileID,
       })
+      await this.confetti_play()
 
       this.isSending = false
+      this.isSent = true
     },
   },
 }
@@ -1069,5 +1209,17 @@ export default {
       height: 800rem;
     }
   }
+}
+.dot-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  z-index: 5000;
+  pointer-events: none;
+}
+.dot {
+  position: absolute;
+  pointer-events: none; /*performance optimization*/
 }
 </style>
