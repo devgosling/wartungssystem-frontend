@@ -477,6 +477,7 @@
                 v-if="tab == 2"
                 style="
                   display: flex;
+                  flex-direction: column;
                   align-items: center;
                   justify-content: center;
                   text-align: center;
@@ -484,7 +485,8 @@
                   width: 100%;
                 "
               >
-                <h1>Hello World!</h1>
+                <h1>Diese Funktion gibt es leider noch nicht :(</h1>
+                <span>Wartungsberichte können derzeit noch nicht hochgeladen werden.</span>
               </div>
             </transition>
           </div>
@@ -512,7 +514,7 @@
           </template>
           <Column field="" header="#">
             <template #body="slotProps">
-              {{ slotProps.index + 1 }}
+              {{ slotProps.data.$sequence }}
             </template>
           </Column>
           <Column field="erstellungsdatum" header="Erstellungsdatum"> </Column>
@@ -532,8 +534,20 @@
                   size="small"
                   :loading="viewingBericht.loading == slotProps.index"
                 ></Button>
-                <Button icon="fa-regular fa-download" severity="contrast" size="small"></Button>
-                <Button icon="fa-regular fa-trash" severity="danger" size="small"></Button>
+                <Button
+                  icon="fa-regular fa-download"
+                  :loading="downloadingBericht == slotProps.index"
+                  @click="downloadBericht(slotProps.data, slotProps.index)"
+                  severity="contrast"
+                  size="small"
+                ></Button>
+                <Button
+                  icon="fa-regular fa-trash"
+                  :loading="deletingBericht == slotProps.index"
+                  @click="deleteBericht(slotProps.data, slotProps.index)"
+                  severity="danger"
+                  size="small"
+                ></Button>
               </div>
             </template>
           </Column>
@@ -579,7 +593,7 @@ import * as pdfjsLib from 'pdfjs-dist'
 import axios from 'axios'
 import { useInputStore } from '@/stores/inputStore'
 import ConfettiExplosion from 'vue-confetti-explosion'
-import { Query } from 'appwrite'
+import { AppwriteException, Query } from 'appwrite'
 import { FilterMatchMode } from '@primevue/core'
 
 export default {
@@ -692,6 +706,9 @@ export default {
         loading: null,
       },
 
+      deletingBericht: null,
+      downloadingBericht: null,
+
       // CONFETTI
       confetti: {
         emmitterSize: 100,
@@ -712,24 +729,7 @@ export default {
   },
 
   async mounted() {
-    const documentList = await databases.listDocuments(
-      '6878f5900032addce7e5',
-      '68866dc60038038dbe27',
-      [Query.orderDesc('erstellungsdatum')],
-    )
-    documentList.documents.forEach(function (doc, index, theArray) {
-      doc.kunde = JSON.parse(doc.kunde)
-      doc.erstellungsdatum = new Date(doc.erstellungsdatum).toLocaleString('de-DE', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        minute: '2-digit',
-        hour: '2-digit',
-      })
-    })
-
-    this.wartungsberichte = documentList
-
+    this.fetchWartungsberichte()
     this.confetti_setup()
   },
 
@@ -875,7 +875,7 @@ export default {
             resolve()
             clearInterval(removerInterval)
           }
-        }, 15) // 15ms
+        }, 10) // 15ms
       })
 
       let lettersToAdd = this.tab == 1 ? 'erstellen' : 'hochladen'
@@ -887,7 +887,7 @@ export default {
             text += ltr
             this.tabtext = text
           },
-          (index + 1) * 15,
+          (index + 1) * 10,
         )
       })
     },
@@ -949,17 +949,35 @@ export default {
     },
     // #endregion
 
+    async fetchWartungsberichte() {
+      const documentList = await databases.listDocuments(
+        '6878f5900032addce7e5',
+        '68866dc60038038dbe27',
+        [Query.orderDesc('erstellungsdatum')],
+      )
+      documentList.documents.forEach(function (doc, index, theArray) {
+        doc.kunde = JSON.parse(doc.kunde)
+        doc.erstellungsdatum = new Date(doc.erstellungsdatum).toLocaleString('de-DE', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          minute: '2-digit',
+          hour: '2-digit',
+        })
+      })
+
+      this.wartungsberichte = documentList
+    },
     async resetDataAndCreateNew(callback) {
-      
       this.inputValues = {
         berichtType: '',
         employee: '',
         date: '',
         customer: null,
       }
-      
+
       await callback('1')
-      
+
       useInputStore().resetInputData()
 
       this.signpad = null
@@ -971,26 +989,141 @@ export default {
       this.pdfImg = null
       this.isSending = false
       this.isSent = false
-
     },
     async viewBericht(data, berichtIndex) {
       this.viewingBericht.loading = berichtIndex
-      let fileDownload = await storage.getFileDownload(
-        '6878f5cf00166fde91eb',
-        data.wartungsberichtid,
-      )
-      let fileData = await storage.getFile('6878f5cf00166fde91eb', data.wartungsberichtid)
-      let jwtObject = await account.createJWT()
-      let fileResponse = await fetch(fileDownload, { headers: { 'x-appwrite-jwt': jwtObject.jwt } })
-      let blob = await fileResponse.blob()
-      let buffer = await blob.arrayBuffer()
-      let fileBytes = new Uint8Array(buffer)
+      try {
+        let fileDownload = await storage.getFileDownload(
+          '6878f5cf00166fde91eb',
+          data.wartungsberichtid,
+        )
+        let fileData = await storage.getFile('6878f5cf00166fde91eb', data.wartungsberichtid)
+        let jwtObject = await account.createJWT()
+        let fileResponse = await fetch(fileDownload, {
+          headers: { 'x-appwrite-jwt': jwtObject.jwt },
+        })
+        let blob = await fileResponse.blob()
+        let buffer = await blob.arrayBuffer()
+        let fileBytes = new Uint8Array(buffer)
 
-      this.viewingBericht.name = fileData.name
-      this.viewingBericht.data = data
-      this.viewingBericht.img = await this.turnPDFToPNG(fileBytes)
-      this.viewingBericht.open = true
+        this.viewingBericht.name = fileData.name
+        this.viewingBericht.data = data
+        this.viewingBericht.img = await this.turnPDFToPNG(fileBytes)
+        this.viewingBericht.open = true
+      } catch (err) {
+        if (err instanceof AppwriteException) {
+          switch (err.code) {
+            case 404:
+              this.$toast.add({
+                severity: 'error',
+                summary: 'Datei nicht gefunden',
+                detail: 'Die Datei wurde nicht gefunden',
+                life: 5000,
+              })
+              break
+            default:
+              break
+          }
+        }
+      }
       this.viewingBericht.loading = null
+    },
+    async downloadBericht(data, berichtIndex) {
+      this.downloadingBericht = berichtIndex
+      try {
+        let fileDownload = await storage.getFileDownload(
+          '6878f5cf00166fde91eb',
+          data.wartungsberichtid,
+        )
+
+        let fileData = await storage.getFile('6878f5cf00166fde91eb', data.wartungsberichtid)
+        let jwtObject = await account.createJWT()
+        let fileResponse = await fetch(fileDownload, {
+          headers: { 'x-appwrite-jwt': jwtObject.jwt },
+        })
+        let blob = await fileResponse.blob()
+        let blobURL = URL.createObjectURL(blob)
+
+        const a = document.createElement('a')
+        a.setAttribute('href', blobURL)
+        a.setAttribute('download', fileData.name)
+        a.style.display = 'none'
+        document.body.appendChild(a)
+
+        a.click()
+
+        document.body.removeChild(a)
+        URL.revokeObjectURL(blobURL)
+
+        this.$toast.add({
+          severity: 'success',
+          summary: 'Bericht heruntergeladen',
+          detail: 'Der Download für die Datei des PDFs hat begonnen',
+          life: 5000,
+        })
+      } catch (err) {
+        if (err instanceof AppwriteException) {
+          switch (err.code) {
+            case 404:
+              this.$toast.add({
+                severity: 'error',
+                summary: 'Datei nicht gefunden',
+                detail: 'Die Datei wurde nicht gefunden',
+                life: 5000,
+              })
+              break
+            default:
+              break
+          }
+        }
+      }
+
+      this.downloadingBericht = null
+    },
+    async deleteBericht(data, berichtIndex) {
+      this.deletingBericht = berichtIndex
+
+      try {
+        await storage.deleteFile('6878f5cf00166fde91eb', data.wartungsberichtid)
+        await databases.deleteDocument('6878f5900032addce7e5', '68866dc60038038dbe27', data.$id)
+      } catch (err) {
+        if (err instanceof AppwriteException) {
+          switch (err.code) {
+            case 404:
+              this.$toast.add({
+                severity: 'error',
+                summary: 'Datei nicht gefunden',
+                detail: 'Die Datei wurde nicht gefunden',
+                life: 5000,
+              })
+              break
+            case 401:
+              this.$toast.add({
+                severity: 'error',
+                summary: 'Keine Berechtigungen',
+                detail:
+                  'Du bist nicht dazu berichtigt Wartungsberichte zu löschen, bist du auf dem richtigen Konto angemeldet?',
+                life: 5000,
+              })
+              break
+            default:
+              break
+          }
+        }
+        this.deletingBericht = null
+        return
+      }
+
+      this.$toast.add({
+        severity: 'success',
+        summary: 'Bericht gelöscht',
+        detail: 'Wartungsbericht #' + data.$sequence + ' wurde erfolgreich gelöscht.',
+        life: 5000,
+      })
+
+      this.fetchWartungsberichte()
+
+      this.deletingBericht = null
     },
     logout() {
       account.deleteSession('current')
@@ -1086,6 +1219,7 @@ export default {
         wartungsberichtid: fileID,
       })
       await this.confetti_play()
+      this.fetchWartungsberichte()
 
       this.isSending = false
       this.isSent = true
