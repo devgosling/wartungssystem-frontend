@@ -7,7 +7,7 @@
     "fabrikant": "Textfeld 58",
     "typnr": "Textfeld 59",
     "typ": "Textfeld 60",
-    "drehzahl": "Textfeld 61",
+    "drehzahl_alg": "Textfeld 61",
     "leistung": "Textfeld 62",
     "maschinennr": "Textfeld 63",
     "ort": "Textfeld 64",

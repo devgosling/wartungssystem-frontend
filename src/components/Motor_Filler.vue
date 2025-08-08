@@ -320,7 +320,7 @@ export default {
           { label: 'Fabrikant', id: 'fabrikant' },
           { label: 'Typ-Nr.', id: 'typnr' },
           { label: 'Typ', id: 'typ' },
-          { label: 'Drehzahl', id: 'drehzahl' },
+          { label: 'Drehzahl', id: 'drehzahl_alg' },
           { label: 'Leistung', id: 'leistung' },
           { label: 'Maschinen-Nr.', id: 'maschinennr' },
           { label: 'Ort', id: 'ort' },
