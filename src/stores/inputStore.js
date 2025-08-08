@@ -12,5 +12,8 @@ export const useInputStore = defineStore('inputstore', {
     setInputData(inputdata) {
       this.inputData = inputdata
     },
+    resetInputData() {
+      this.inputData = {}
+    },
   },
 })

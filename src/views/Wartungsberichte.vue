@@ -435,11 +435,19 @@
                           <Divider />
                           <div>
                             <Button
+                              v-if="!isSent"
                               icon="fa-regular fa-eyes"
-                              :disabled="isSending || isSent"
+                              :disabled="isSending"
                               label="Eingaben überprüfen"
                               severity="contrast"
                               @click="activateCallback('2')"
+                            ></Button>
+                            <Button
+                              v-else
+                              severity="contrast"
+                              label="Weiteren Wartungsbericht"
+                              icon="fa-regular fa-plus"
+                              @click="resetDataAndCreateNew(activateCallback)"
                             ></Button>
                             <Button
                               id="saveandsendbtn"
@@ -941,6 +949,30 @@ export default {
     },
     // #endregion
 
+    async resetDataAndCreateNew(callback) {
+      
+      this.inputValues = {
+        berichtType: '',
+        employee: '',
+        date: '',
+        customer: null,
+      }
+      
+      await callback('1')
+      
+      useInputStore().resetInputData()
+
+      this.signpad = null
+      this.signature = null
+      this.isSignpadEmpty = true
+      this.generatingPDF = false
+
+      this.pdfBytes = null
+      this.pdfImg = null
+      this.isSending = false
+      this.isSent = false
+
+    },
     async viewBericht(data, berichtIndex) {
       this.viewingBericht.loading = berichtIndex
       let fileDownload = await storage.getFileDownload(
