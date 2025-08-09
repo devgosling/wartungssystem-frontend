@@ -544,7 +544,7 @@
                 <Button
                   icon="fa-regular fa-trash"
                   :loading="deletingBericht == slotProps.index"
-                  @click="deleteBericht(slotProps.data, slotProps.index)"
+                  @click="deleteBericht($event, slotProps.data, slotProps.index)"
                   severity="danger"
                   size="small"
                 ></Button>
@@ -1080,50 +1080,66 @@ export default {
 
       this.downloadingBericht = null
     },
-    async deleteBericht(data, berichtIndex) {
-      this.deletingBericht = berichtIndex
+    async deleteBericht(event, data, berichtIndex) {
+      this.$confirm.require({
+        target: event.currentTarget,
+        message: 'Bist du dir sicher, dass du diesen Wartungsbericht löschen willst?',
+        icon: 'fa-regular fa-exclamation-triangle',
+        rejectProps: {
+          label: 'Abbrechen',
+          severity: 'secondary',
+          outlined: true,
+        },
+        acceptProps: {
+          label: 'Löschen',
+          severity: 'danger',
+        },
+        accept: async () => {
+          this.deletingBericht = berichtIndex
 
-      try {
-        await storage.deleteFile('6878f5cf00166fde91eb', data.wartungsberichtid)
-        await databases.deleteDocument('6878f5900032addce7e5', '68866dc60038038dbe27', data.$id)
-      } catch (err) {
-        if (err instanceof AppwriteException) {
-          switch (err.code) {
-            case 404:
-              this.$toast.add({
-                severity: 'error',
-                summary: 'Datei nicht gefunden',
-                detail: 'Die Datei wurde nicht gefunden',
-                life: 5000,
-              })
-              break
-            case 401:
-              this.$toast.add({
-                severity: 'error',
-                summary: 'Keine Berechtigungen',
-                detail:
-                  'Du bist nicht dazu berichtigt Wartungsberichte zu löschen, bist du auf dem richtigen Konto angemeldet?',
-                life: 5000,
-              })
-              break
-            default:
-              break
+          try {
+            await storage.deleteFile('6878f5cf00166fde91eb', data.wartungsberichtid)
+            await databases.deleteDocument('6878f5900032addce7e5', '68866dc60038038dbe27', data.$id)
+          } catch (err) {
+            if (err instanceof AppwriteException) {
+              switch (err.code) {
+                case 404:
+                  this.$toast.add({
+                    severity: 'error',
+                    summary: 'Datei nicht gefunden',
+                    detail: 'Die Datei wurde nicht gefunden',
+                    life: 5000,
+                  })
+                  break
+                case 401:
+                  this.$toast.add({
+                    severity: 'error',
+                    summary: 'Keine Berechtigungen',
+                    detail:
+                      'Du bist nicht dazu berichtigt Wartungsberichte zu löschen, bist du auf dem richtigen Konto angemeldet?',
+                    life: 5000,
+                  })
+                  break
+                default:
+                  break
+              }
+            }
+            this.deletingBericht = null
+            return
           }
-        }
-        this.deletingBericht = null
-        return
-      }
 
-      this.$toast.add({
-        severity: 'success',
-        summary: 'Bericht gelöscht',
-        detail: 'Wartungsbericht #' + data.$sequence + ' wurde erfolgreich gelöscht.',
-        life: 5000,
+          this.$toast.add({
+            severity: 'success',
+            summary: 'Bericht gelöscht',
+            detail: 'Wartungsbericht #' + data.$sequence + ' wurde erfolgreich gelöscht.',
+            life: 5000,
+          })
+
+          this.fetchWartungsberichte()
+
+          this.deletingBericht = null
+        },
       })
-
-      this.fetchWartungsberichte()
-
-      this.deletingBericht = null
     },
     logout() {
       account.deleteSession('current')

@@ -8,11 +8,12 @@ import { palette, updatePrimaryPalette } from '@primeuix/themes'
 import Aura from '@primeuix/themes/aura'
 import ToastService from 'primevue/toastservice'
 import * as DE from './assets/de.json'
-import * as pdfjs from 'pdfjs-dist/build/pdf'
-import * as pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs'
+import * as pdfjs from 'pdfjs-dist/build/pdf' // KEEP - Builder
+import * as pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs' // KEEP - Worker COPY
 
 import App from './App.vue'
 import router from './router'
+import { ConfirmationService } from 'primevue'
 
 const app = createApp(App)
 
@@ -29,6 +30,7 @@ app.use(PrimeVue, {
   locale: DE.de,
 })
 app.use(ToastService)
+app.use(ConfirmationService)
 
 updatePrimaryPalette(palette('#5ebae6')) //OLD: #6bd0ff
 

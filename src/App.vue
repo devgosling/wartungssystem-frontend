@@ -1,5 +1,6 @@
 <template>
   <Toast />
+  <ConfirmPopup></ConfirmPopup>
   <main>
     <Sidebar v-if="!hideSidebar" />
     <div id="router-view-main">
@@ -12,10 +13,12 @@ import { RouterView, useRouter } from 'vue-router'
 import Toast from 'primevue/toast'
 import Sidebar from './components/Sidebar.vue'
 import router from './router'
+import { ConfirmPopup } from 'primevue'
 
 export default {
   components: {
     Toast,
+    ConfirmPopup,
     Sidebar,
   },
 
