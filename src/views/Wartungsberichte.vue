@@ -660,7 +660,7 @@ export default {
           filekey: 'Wärmetauscher',
         },
       ],
-      mitarbeiter: [
+      /*mitarbeiter: [ <----------- OLD
         'Steven Kukla',
         'Steffen Volkmer',
         'Kevin Kromholz',
@@ -674,7 +674,9 @@ export default {
         'Blauer Hai',
         'Mark Forster',
         'Mark Rene Frank',
-      ],
+      ],*/
+      mitarbeiter: [],
+
       kunden: [
         {
           name: 'Gate Gourmet GmbH',
@@ -731,6 +733,7 @@ export default {
   async mounted() {
     this.fetchWartungsberichte()
     this.confetti_setup()
+    this.fetchEmployees()
   },
 
   methods: {
@@ -948,6 +951,18 @@ export default {
       el.style.overflow = ''
     },
     // #endregion
+
+    async fetchEmployees() {
+      const mitarbeiterList = await databases.listDocuments(
+        '6878f5900032addce7e5',
+        '68866db100220a383390',
+        [Query.orderAsc('$sequence')],
+      )
+
+      mitarbeiterList.documents.forEach((doc) => {
+        this.mitarbeiter.push(doc.name)
+      })
+    },
 
     async fetchWartungsberichte() {
       const documentList = await databases.listDocuments(
