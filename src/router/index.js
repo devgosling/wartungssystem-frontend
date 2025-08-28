@@ -6,6 +6,7 @@ import FourOFourPage from '../views/404.vue'
 import FourOOnePage from '../views/401.vue'
 import WartungsberichteView from '@/views/Wartungsberichte.vue'
 import MitarbeiterView from '@/views/Mitarbeiter.vue'
+import CustomersView from '@/views/Kunden.vue'
 import { AppwriteException } from 'appwrite'
 import { isUserLoggedIn } from '@/lib/utils'
 
@@ -38,6 +39,15 @@ const router = createRouter({
         requiresAuth: true,
         requiresTeam: 'administration',
         title: 'Mitarbeiter',
+      },
+    },
+    {
+      path: '/customers',
+      name: 'customer',
+      component: CustomersView,
+      meta: {
+        requiresAuth: true,
+        title: 'Kunden',
       },
     },
     {

@@ -1,28 +1,22 @@
 <template>
-  <div class="mitarbeiter">
-    <div class="mitarbeiter-header">
-      <h1>Mitarbeiterverwaltung</h1>
+  <div class="customers">
+    <div class="customers-header">
+      <h1>Kundenverwaltung</h1>
       <div>
         <Button
           icon="fa-regular fa-plus"
           @click="openDialog = true"
-          label="Mitarbeiter erstellen"
+          label="Neuen Kunde anlegen"
           severity="contrast"
-          :disabled="!permission"
         />
       </div>
     </div>
     <Card>
       <template #content>
-        <DataTable
-          v-if="permission"
-          v-model:filters="filters"
-          :value="mitarbeiter?.documents"
-          :loading="!mitarbeiter"
-        >
+        <DataTable v-model:filters="filters" :value="customers?.documents" :loading="!customers">
           <template #header>
             <div style="display: flex; justify-content: space-between; align-items: center">
-              <h4 style="margin: 0">{{ mitarbeiter?.total }} Mitarbeiter</h4>
+              <h4 style="margin: 0">{{ customers?.total }} Kunden</h4>
               <IconField>
                 <InputIcon>
                   <i class="fa-regular fa-search" />
@@ -37,11 +31,7 @@
             </template>
           </Column>
           <Column field="name" header="Name"> </Column>
-          <Column field="" header="Erstellungsdatum">
-            <template #body="slotProps">
-              {{ new Date(slotProps.data.$createdAt).toLocaleString('de-DE') }}
-            </template>
-          </Column>
+          <Column field="email" header="Buchaltungs Email-Addresse"> </Column>
           <Column field="wartungsberichte" header="Wartungen">
             <template #body="slotProps">
               {{
@@ -57,60 +47,36 @@
           </Column>
           <Column field="" header="Aktionen">
             <template #body="slotProps">
-              <Button
-                icon="fa-regular fa-trash"
-                :loading="deletingEmployee == slotProps.index"
-                @click="deleteEmployee($event, slotProps.data, slotProps.index)"
-                severity="danger"
-                label="Löschen"
-                size="small"
-              ></Button>
+              <div style="display: flex; gap: 0.2rem">
+                <Button
+                  icon="fa-regular fa-eye"
+                  @click=""
+                  severity="info"
+                  size="small"
+                ></Button
+                ><Button
+                  icon="fa-regular fa-trash"
+                  :loading="deletingCustomer == slotProps.index"
+                  @click="deleteCustomer($event, slotProps.data, slotProps.index)"
+                  severity="danger"
+                  label="Löschen"
+                  size="small"
+                ></Button>
+              </div>
             </template>
           </Column>
         </DataTable>
-        <div
-          style="height: 6rem; display: flex; justify-content: center; align-items: center"
-          v-else
-        >
-          <h2>Du hast keine Berechtigungen Mitarbeiter einzusehen</h2>
-        </div>
       </template>
     </Card>
   </div>
-  <Dialog
-    v-model:visible="openDialog"
-    modal
-    header="Neuen Mitarbeiter erstellen"
-    :style="{ width: '25rem' }"
-  >
-    <p class="mitarbeiter-dialog-desc">Erstelle einen neuen Mitarbeiter</p>
-    <div class="mitarbeiter-dialog-inputgroup">
-      <label for="firstname">Vorname</label>
-      <InputText v-model="dialogValues.firstname" id="firstname"></InputText>
-    </div>
-    <div class="mitarbeiter-dialog-inputgroup">
-      <label for="lastname">Nachname</label>
-      <InputText v-model="dialogValues.lastname" id="lastname"></InputText>
-    </div>
-    <div class="mitarbeiter-dialog-btns">
-      <Button
-        severity="secondary"
-        size="medium"
-        @click="openDialog = false"
-        label="Abbrechen"
-      ></Button>
-      <Button
-        severity="contrast"
-        size="medium"
-        :disabled="!(dialogValues.firstname && dialogValues.lastname)"
-        label="Erstellen"
-        :loading="creatingUser"
-        @click="createUser"
-      ></Button>
-    </div>
-  </Dialog>
+  <CreateCustomerDialog
+    :open="openDialog"
+    @close="openDialog = false"
+    @createdcustomer="retrieveCustomers"
+  ></CreateCustomerDialog>
 </template>
 <script>
+import CreateCustomerDialog from '@/components/CreateCustomerDialog.vue'
 import { databases } from '@/lib/appwrite'
 import { FilterMatchMode } from '@primevue/core'
 import { AppwriteException, ID, Query } from 'appwrite'
@@ -126,6 +92,7 @@ export default {
     InputText,
     Column,
     Dialog,
+    CreateCustomerDialog,
   },
 
   data() {
@@ -134,8 +101,7 @@ export default {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       },
 
-      permission: true,
-      mitarbeiter: null,
+      customers: null,
       openDialog: false,
       creatingUser: false,
       dialogValues: {
@@ -143,15 +109,15 @@ export default {
         lastname: null,
       },
 
-      deletingEmployee: -1,
+      deletingCustomer: -1,
     }
   },
 
   methods: {
-    async deleteEmployee(event, data, employeeIndex) {
+    async deleteCustomer(event, data, customerIndex) {
       this.$confirm.require({
         target: event.currentTarget,
-        message: 'Bist du dir sicher, dass du diesen Mitarbeiter löschen willst?',
+        message: 'Bist du dir sicher, dass du diesen Kunden löschen willst?',
         icon: 'fa-regular fa-exclamation-triangle',
         rejectProps: {
           label: 'Abbrechen',
@@ -163,18 +129,18 @@ export default {
           severity: 'danger',
         },
         accept: async () => {
-          this.deletingEmployee = employeeIndex
+          this.deletingCustomer = customerIndex
 
           try {
-            await databases.deleteDocument('6878f5900032addce7e5', '68866db100220a383390', data.$id)
+            await databases.deleteDocument('6878f5900032addce7e5', '68866dbd002a081f337a', data.$id)
           } catch (err) {
             if (err instanceof AppwriteException) {
               switch (err.code) {
                 case 404:
                   this.$toast.add({
                     severity: 'error',
-                    summary: 'Mitarbeiter nicht gefunden',
-                    detail: 'Der Mitarbeiter wurde nicht gefunden',
+                    summary: 'Kunde nicht gefunden',
+                    detail: 'Der Kunde wurde nicht gefunden',
                     life: 5000,
                   })
                   break
@@ -183,7 +149,7 @@ export default {
                     severity: 'error',
                     summary: 'Keine Berechtigungen',
                     detail:
-                      'Du bist nicht dazu berichtigt Mitarbeiter zu löschen, bist du auf dem richtigen Konto angemeldet?',
+                      'Du bist nicht dazu berichtigt Kunden zu löschen, bist du auf dem richtigen Konto angemeldet?',
                     life: 5000,
                   })
                   break
@@ -191,18 +157,18 @@ export default {
                   break
               }
             }
-            this.deletingEmployee = -1
+            this.deletingCustomer = -1
             return
           }
 
           this.$toast.add({
             severity: 'success',
-            summary: 'Mitarbeiter gelöscht',
-            detail: 'Mitarbeiter ' + data.name + ' wurde erfolgreich gelöscht.',
+            summary: 'Kunde gelöscht',
+            detail: 'Kunde ' + data.name + ' wurde erfolgreich gelöscht.',
             life: 5000,
           })
 
-          this.retrieveMitarbeiter()
+          this.retrieveCustomers()
 
           this.deletingBericht = null
         },
@@ -259,11 +225,11 @@ export default {
 
       return table
     },
-    async retrieveMitarbeiter() {
+    async retrieveCustomers() {
       try {
-        const mitarbeiterList = await databases.listDocuments(
+        const customerList = await databases.listDocuments(
           '6878f5900032addce7e5',
-          '68866db100220a383390',
+          '68866dbd002a081f337a',
           [Query.orderAsc('$sequence')],
         )
 
@@ -275,14 +241,15 @@ export default {
         let berichtCountRegistry = {}
 
         wartungsberichteList.documents.forEach((doc) => {
-          if (berichtCountRegistry[doc.mitarbeiter]) {
-            berichtCountRegistry[doc.mitarbeiter] += 1
+          var kundeJSON = JSON.parse(doc.kunde)
+          if (berichtCountRegistry[kundeJSON.name]) {
+            berichtCountRegistry[kundeJSON.name] += 1
           } else {
-            berichtCountRegistry[doc.mitarbeiter] = 1
+            berichtCountRegistry[kundeJSON.name] = 1
           }
         })
 
-        mitarbeiterList.documents.forEach((doc) => {
+        customerList.documents.forEach((doc) => {
           if (berichtCountRegistry[doc.name]) {
             doc.wartungsberichte = berichtCountRegistry[doc.name]
           } else {
@@ -290,8 +257,7 @@ export default {
           }
         })
 
-        this.mitarbeiter = mitarbeiterList
-        console.log(mitarbeiterList)
+        this.customers = customerList
       } catch (error) {
         if (error instanceof AppwriteException) {
           if (error.code == 401) {
@@ -303,12 +269,12 @@ export default {
   },
 
   mounted() {
-    this.retrieveMitarbeiter()
+    this.retrieveCustomers()
   },
 }
 </script>
 <style lang="scss">
-.mitarbeiter {
+.customers {
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -316,29 +282,6 @@ export default {
   &-header {
     display: flex;
     justify-content: space-between;
-  }
-
-  &-dialog {
-    &-desc {
-      margin-top: 0;
-      color: var(--p-surface-500);
-    }
-    &-inputgroup {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.3rem;
-
-      label {
-        font-weight: 600;
-      }
-    }
-    &-btns {
-      display: flex;
-      gap: 0.5rem;
-      justify-content: end;
-      margin-top: 0.6rem;
-    }
   }
 }
 </style>
