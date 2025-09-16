@@ -1,0 +1,29 @@
+{
+  "textfields": {
+    "customerdata": "Textfeld 110",
+    "employee": "Textfeld 136",
+    "date": "Textfeld 135",
+
+    "fabrikant": "Textfeld 100",
+    "typnr": "Textfeld 101",
+    "typ": "Textfeld 102",
+    "drehzahl_alg": "Textfeld 103",
+    "leistung": "Textfeld 104",
+    "maschinennr": "Textfeld 105",
+    "ort": "Textfeld 106",
+    "gebauede": "Textfeld 107",
+    "raum": "Textfeld 108",
+    "anlage": "Textfeld 109",
+
+    "kontrollgang.kw": "Textfeld 267",
+    "kontrollgang.jahr": "Textfeld 268",
+
+    "sonstiges": "Textfeld 134"
+  },
+
+  "radiogroups": {
+  },
+
+  "checkboxes": {
+  }
+}

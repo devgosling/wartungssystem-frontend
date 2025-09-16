@@ -43,8 +43,10 @@
         v-model="dialogValues.identifiers"
         multiple
         fluid
-        :typeahead="false"
+        :typeahead="true"
         id="indentifiers"
+        :suggestions="suggestions"
+        @input="keydown($event)"
       ></AutoComplete>
       <span>Benutze Enter um einen Identifikater hinzuzufügen.</span>
     </div>
@@ -87,6 +89,8 @@ export default {
     return {
       invalidEmail: false,
 
+      suggestions: [],
+
       creatingCustomer: false,
       dialogValues: {
         businessname: null,
@@ -112,6 +116,10 @@ export default {
   },
 
   methods: {
+    keydown(event) {
+      console.log(event.target.value)
+      this.suggestions = [event.target.value]
+    },
     async createCustomer() {
       this.creatingCustomer = true
       if (!validate(this.dialogValues.email)) {
@@ -135,9 +143,20 @@ export default {
         identifiers: this.dialogValues.identifiers,
       })
 
-      this.$emit("close")
-      this.$emit("createdcustomer")
+      this.$emit('close')
+      this.$emit('createdcustomer')
       this.creatingCustomer = false
+
+      setTimeout(() => {
+        this.dialogValues = {
+          businessname: null,
+          street: null,
+          zipcode: null,
+          city: null,
+          email: null,
+          identifiers: [],
+        }
+      }, 100)
     },
   },
 }

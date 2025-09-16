@@ -2,7 +2,6 @@ import './assets/main.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import Ripple from 'primevue/ripple'
 import PrimeVue from 'primevue/config'
 import { palette, updatePrimaryPalette } from '@primeuix/themes'
 import Aura from '@primeuix/themes/aura'

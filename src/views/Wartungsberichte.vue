@@ -224,6 +224,7 @@
                                   size="small"
                                   fluid
                                   severity="secondary"
+                                  @click="openDialog = true"
                                   text
                                   icon="fa-solid fa-plus"
                                 />
@@ -237,7 +238,7 @@
                             id="wartungsbericht-slct"
                             disabled
                             placeholder="Kein Kunde ausgewählt"
-                            :value="inputValues.customer?.address?.street"
+                            :value="inputValues.customer?.['address.street']"
                           />
                         </div>
                         <div class="wartungsberichte-create-panel-grid-inpt">
@@ -246,7 +247,7 @@
                             id="wartungsbericht-slct"
                             disabled
                             placeholder="Kein Kunde ausgewählt"
-                            :value="inputValues.customer?.address?.zipcode"
+                            :value="inputValues.customer?.['address.zipcode']"
                           />
                         </div>
                         <div class="wartungsberichte-create-panel-grid-inpt">
@@ -255,8 +256,59 @@
                             id="wartungsbericht-slct"
                             disabled
                             placeholder="Kein Kunde ausgewählt"
-                            :value="inputValues.customer?.address?.city"
+                            :value="inputValues.customer?.['address.city']"
                           />
+                        </div>
+                        <div class="wartungsberichte-create-panel-grid-inpt">
+                          <label for="wartungsbericht-slct">Identifikator (Optional)</label>
+                          <Select
+                            id="wartungsbericht-slct"
+                            placeholder="Kein Kunde Augewählt"
+                            :disabled="!inputValues.customer"
+                            :options="inputValues.customer?.identifiers"
+                            class="wartungsberichte-create-panel-grid-slct-type"
+                            filter
+                            optionLabel="name"
+                            v-model="inputValues.identifier"
+                            showClear
+                          >
+                            <template #value="slotProps">
+                              <div v-if="slotProps.value">
+                                <Tag :value="slotProps.value" />
+                                <!--{{ slotProps.value }}-->
+                              </div>
+                              <div v-else>
+                                {{ slotProps.placeholder }}
+                              </div>
+                            </template>
+                            <template #option="slotProps">
+                              {{ slotProps.option }}
+                            </template>
+                            <template #header>
+                              <div
+                                style="
+                                  font-weight: 500;
+                                  padding: 0.75rem 1rem;
+                                  padding-bottom: 0.1rem;
+                                "
+                              >
+                                Verfügbare Identifikatoren
+                              </div>
+                            </template>
+                            <template #footer>
+                              <div style="padding: 0.75rem">
+                                <Button
+                                  label="Identifikator hinzufügen"
+                                  size="small"
+                                  fluid
+                                  severity="secondary"
+                                  @click="openIdfDialog = true"
+                                  text
+                                  icon="fa-solid fa-plus"
+                                />
+                              </div>
+                            </template>
+                          </Select>
                         </div>
                       </div>
                       <Button
@@ -293,6 +345,10 @@
                         @click="activateCallback('1')"
                       />
                       <Motor_Filler ref="filler" v-if="inputValues.berichtType.id == 'motor'" />
+                      <Muellanlage_Filler
+                        ref="filler"
+                        v-if="inputValues.berichtType.id == 'müllanlage'"
+                      />
                       <h2 style="margin: 3rem 8rem; text-align: center" v-else>
                         Für diese Art von Wartungsbericht gibt es noch nichts zum ausfüllen... :(
                       </h2>
@@ -429,7 +485,7 @@
                         <div class="wartungsberichte-finish-panel-preview-board">
                           <h3>🎉 Der Wartungsbericht ist fertig!</h3>
                           <p>
-                            Überprüfe gegebenfalls nocheinmal alle eingaben und speichere den
+                            Überprüfe gegebenenfalls nocheinmal alle eingaben und speichere den
                             Wartungsbericht.
                           </p>
                           <Divider />
@@ -458,9 +514,24 @@
                               severity="success"
                               @click="saveAndSend()"
                             ></Button>
+                            <Divider />
+                            <span>
+                              Der Wartungsbericht wird an die E-Mail Adresse
+                              <b>{{ inputValues.customer?.email }}</b> versendet.<br /><br />
+                              Ist diese E-Mail Adresse richtig?<br />
+                            </span>
+                            <Button
+                              size="small"
+                              icon="fa-solid fa-at"
+                              :disabled="isSent || isSending"
+                              label="E-Mail Adresse ändern"
+                              severity="secondary"
+                              rounded
+                            />
                           </div>
                         </div>
                         <img :src="pdfImg" alt="" />
+                        <img v-if="pdfImg2" style="grid-column: 2;" :src="pdfImg2" alt="" />
                       </div>
                     </div>
                   </StepPanel>
@@ -499,7 +570,13 @@
           v-model:filters="filters"
           :value="wartungsberichte?.documents"
           :loading="!wartungsberichte"
-          :globalFilterFields="['erstellungsdatum', 'mitarbeiter', 'kunde.name']"
+          :globalFilterFields="[
+            'erstellungsdatum',
+            'mitarbeiter',
+            'kunde.name',
+            'identifikator',
+            '$sequence',
+          ]"
         >
           <template #header>
             <div style="display: flex; justify-content: space-between; align-items: center">
@@ -522,6 +599,12 @@
           <Column field="kunde" header="Kunde">
             <template #body="slotProps">
               {{ slotProps.data.kunde.name }}
+            </template>
+          </Column>
+          <Column field="identifikator" header="Identifikator">
+            <template #body="slotProps">
+              <Tag v-if="slotProps.data.identifikator" :value="slotProps.data.identifikator"></Tag>
+              <div v-else>-</div>
             </template>
           </Column>
           <Column field="actions" header="Aktionen">
@@ -562,6 +645,17 @@
     <img :src="viewingBericht.img" alt="" style="width: 100%" />
   </Dialog>
   <canvas id="pdfCanvas" hidden></canvas>
+  <CreateCustomerDialog
+    :open="openDialog"
+    @close="openDialog = false"
+    @createdcustomer="fetchCustomers"
+  ></CreateCustomerDialog>
+  <CreateIdentifierDialog
+    :open="openIdfDialog"
+    :customerID="inputValues.customer?.$id"
+    @close="openIdfDialog = false"
+    @createdidentifiers="fetchCustomers"
+  ></CreateIdentifierDialog>
 </template>
 <script>
 import { ID, account, client, databases, functions, storage } from '@/lib/appwrite'
@@ -581,6 +675,7 @@ import {
   IconField,
   InputIcon,
   Dialog,
+  Tag,
 } from 'primevue'
 import StepPanel from 'primevue/steppanel'
 import StepItem from 'primevue/stepitem'
@@ -588,13 +683,16 @@ import Stepper from 'primevue/stepper'
 import Step from 'primevue/step'
 import Motor_Filler from '@/components/Motor_Filler.vue'
 import SignaturePad from 'signature_pad'
-import { fillMotorPDF } from '@/lib/pdf-lib'
+import { fillMotorPDF, fillMüllanlagePDF } from '@/lib/pdf-lib'
 import * as pdfjsLib from 'pdfjs-dist'
 import axios from 'axios'
 import { useInputStore } from '@/stores/inputStore'
 import ConfettiExplosion from 'vue-confetti-explosion'
 import { AppwriteException, Query } from 'appwrite'
 import { FilterMatchMode } from '@primevue/core'
+import CreateCustomerDialog from '@/components/CreateCustomerDialog.vue'
+import CreateIdentifierDialog from '@/components/CreateIdentifierDialog.vue'
+import Muellanlage_Filler from '@/components/Muellanlage_Filler.vue'
 
 export default {
   components: {
@@ -611,6 +709,7 @@ export default {
     InputText,
     DatePicker,
     Motor_Filler,
+    Muellanlage_Filler,
     Splitter,
     SplitterPanel,
     Divider,
@@ -619,10 +718,16 @@ export default {
     IconField,
     InputIcon,
     Dialog,
+    CreateCustomerDialog,
+    CreateIdentifierDialog,
+    Tag,
   },
 
   data() {
     return {
+      openDialog: false,
+      openIdfDialog: false,
+
       wartungsberichte: null,
       filters: {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -632,6 +737,7 @@ export default {
         berichtType: '',
         employee: '',
         date: '',
+        identifier: null,
         customer: null,
       },
       tabCooldown: -1,
@@ -677,16 +783,7 @@ export default {
       ],*/
       mitarbeiter: [],
 
-      kunden: [
-        {
-          name: 'Gate Gourmet GmbH',
-          address: {
-            street: 'Jean-Gardner-Batten-Str. 5',
-            zipcode: '60549',
-            city: 'Frankfurt am Main',
-          },
-        },
-      ],
+      kunden: [],
       /**
        * @returns SignaturePad
        */
@@ -697,6 +794,7 @@ export default {
 
       pdfBytes: null,
       pdfImg: null,
+      pdfImg2: null,
       isSending: false,
       isSent: false,
 
@@ -734,6 +832,7 @@ export default {
     this.fetchWartungsberichte()
     this.confetti_setup()
     this.fetchEmployees()
+    this.fetchCustomers()
   },
 
   methods: {
@@ -963,6 +1062,21 @@ export default {
         this.mitarbeiter.push(doc.name)
       })
     },
+    async fetchCustomers() {
+      this.kunden = []
+
+      const customerList = await databases.listDocuments(
+        '6878f5900032addce7e5',
+        '68866dbd002a081f337a',
+        [Query.orderAsc('$sequence')],
+      )
+
+      customerList.documents.forEach((doc) => {
+        this.kunden.push(doc)
+
+        if (this.inputValues.customer?.name == doc.name) this.inputValues.customer = doc
+      })
+    },
 
     async fetchWartungsberichte() {
       const documentList = await databases.listDocuments(
@@ -1180,6 +1294,7 @@ export default {
       this.generatingPDF = true
       let signature = this.signpad.toDataURL()
       let pdf
+      let has2Pages = false
       this.$refs.filler.broadcastInputsToStore()
       console.log(signature)
 
@@ -1188,20 +1303,27 @@ export default {
           pdf = await fillMotorPDF(this.inputValues, signature)
           console.log(pdf[0])
           break
-
+        case 'müllanlage':
+          pdf = await fillMüllanlagePDF(this.inputValues, signature)
+          has2Pages = true
+          console.log(pdf[0])
+          break
         default:
           break
       }
 
+      let pdfBufferClone = pdf[0]
+      let pdfBufferCopy = new Uint8Array(pdfBufferClone)
+      if (has2Pages) this.pdfImg2 = await this.turnPDFToPNG(pdfBufferCopy, 2)
       this.pdfImg = await this.turnPDFToPNG(pdf[0])
       this.pdfBytes = pdf
 
       stepCallback('4')
       this.generatingPDF = false
     },
-    async turnPDFToPNG(pdfBuffer) {
+    async turnPDFToPNG(pdfBuffer, pageNumber = 1) {
       let pdf = await pdfjsLib.getDocument(pdfBuffer).promise
-      let page = await pdf.getPage(1)
+      let page = await pdf.getPage(pageNumber)
       let canvas = document.getElementById('pdfCanvas')
 
       const viewport = page.getViewport({ scale: 3.0 })
@@ -1248,6 +1370,7 @@ export default {
         erstellungsdatum: new Date(),
         kunde: JSON.stringify(this.inputValues.customer),
         wartungsberichtid: fileID,
+        identifikator: this.inputValues.identifier ?? null,
       })
       await this.confetti_play()
       this.fetchWartungsberichte()
