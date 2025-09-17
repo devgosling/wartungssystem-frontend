@@ -18,12 +18,65 @@
     "kontrollgang.kw": "Textfeld 267",
     "kontrollgang.jahr": "Textfeld 268",
 
+    "bemerkung.vakuumpumpe1": "Textfeld 111",
+    "bemerkung.zyklone1": "Textfeld 112",
+    "bemerkung.filter1": "Textfeld 113",
+    "bemerkung.muellabwurf_zyklone_schnecke1": "Textfeld 114",
+    "bemerkung.vakuumpumpe2": "Textfeld 115",
+    "bemerkung.vakuumpumpe3": "Textfeld 116",
+    "bemerkung.zyklone2": "Textfeld 117",
+    "bemerkung.filter2": "Textfeld 118",
+    "bemerkung.muellabwurf_zyklone_schnecke2": "Textfeld 119",
+    "bemerkung.weiche_system_1+2": "Textfeld 120",
+    "bemerkung.schaltschraenke_pumpen_wopit": "Textfeld 121",
+    "bemerkung.vakuumpumpe4": "Textfeld 122",
+    "bemerkung.schaltschrank": "Textfeld 123",
+    "bemerkung.macerator": "Textfeld 124",
+    "bemerkung.absaugstationen": "Textfeld 125",
+    "bemerkung.rohrsystem": "Textfeld 126",
+    "bemerkung.abwurfschacht1": "Textfeld 127",
+    "bemerkung.abwurfschacht2": "Textfeld 128",
+    "bemerkung.abwurf": "Textfeld 129",
+    "bemerkung.wastebox_absaugung": "Textfeld 130",
+    "bemerkung.abwurf_ts2": "Textfeld 131",
+    "bemerkung.abwurf_ts1": "Textfeld 132",
+    "bemerkung.pet_schlitzer": "Textfeld 133",
+
     "sonstiges": "Textfeld 134"
   },
 
   "radiogroups": {
+    "vakuumpumpe1": "Optionsfeld 35",
+    "zyklone1": "Optionsfeld 36",
+    "filter1": "Optionsfeld 37",
+    "muellabwurf_zyklone_schnecke1": "Optionsfeld 38",
+
+    "vakuumpumpe2": "Optionsfeld 39",
+
+    "vakuumpumpe3": "Optionsfeld 40",
+    "zyklone2": "Optionsfeld 41",
+    "filter2": "Optionsfeld 42",
+    "muellabwurf_zyklone_schnecke2": "Optionsfeld 43",
+
+    "weiche_system_1+2": "Optionsfeld 44",
+    "schaltschraenke_pumpen_wopit": "Optionsfeld 45",
+
+    "vakuumpumpe4": "Optionsfeld 46",
+    "schaltschrank": "Optionsfeld 47",
+    "macerator": "Optionsfeld 48",
+    "absaugstationen": "Optionsfeld 49",
+
+    "rohrsystem": "Optionsfeld 50",
+    "abwurfschacht1": "Optionsfeld 51",
+
+    "abwurfschacht2": "Optionsfeld 52",
+    "abwurf": "Optionsfeld 53",
+    "wastebox_absaugung": "Optionsfeld 54",
+    "abwurf_ts2": "Optionsfeld 55",
+    "abwurf_ts1": "Optionsfeld 56",
+
+    "pet_schlitzer": "Optionsfeld 57"
   },
 
-  "checkboxes": {
-  }
+  "checkboxes": {}
 }

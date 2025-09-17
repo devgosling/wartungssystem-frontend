@@ -1,0 +1,30 @@
+# Diff Summary
+
+Date : 2025-09-17 21:42:03
+
+Directory c:\\Users\\Steve\\Desktop\\Kromholz-Wassertechnik\\wartungssystem-frontend
+
+Total : 4 files,  601 codes, 13 comments, 40 blanks, all 654 lines
+
+[Summary](results.md) / [Details](details.md) / Diff Summary / [Diff Details](diff-details.md)
+
+## Languages
+| language | files | code | comment | blank | total |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| vue | 2 | 529 | 1 | 23 | 553 |
+| JavaScript | 1 | 48 | 12 | 11 | 71 |
+| JSON | 1 | 24 | 0 | 6 | 30 |
+
+## Directories
+| path | files | code | comment | blank | total |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| . | 4 | 601 | 13 | 40 | 654 |
+| src | 4 | 601 | 13 | 40 | 654 |
+| src\\assets | 1 | 24 | 0 | 6 | 30 |
+| src\\assets\\wartungsberichte | 1 | 24 | 0 | 6 | 30 |
+| src\\assets\\wartungsberichte\\fillers | 1 | 24 | 0 | 6 | 30 |
+| src\\components | 1 | 492 | 0 | 24 | 516 |
+| src\\lib | 1 | 48 | 12 | 11 | 71 |
+| src\\views | 1 | 37 | 1 | -1 | 37 |
+
+[Summary](results.md) / [Details](details.md) / Diff Summary / [Diff Details](diff-details.md)
