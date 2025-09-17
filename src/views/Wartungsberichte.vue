@@ -531,7 +531,7 @@
                           </div>
                         </div>
                         <img :src="pdfImg" alt="" />
-                        <img v-if="pdfImg2" style="grid-column: 2;" :src="pdfImg2" alt="" />
+                        <img v-if="pdfImg2" style="grid-column: 2" :src="pdfImg2" alt="" />
                       </div>
                     </div>
                   </StepPanel>
@@ -643,6 +643,7 @@
       <div><i class="fa-regular fa-file-pdf"></i> {{ viewingBericht.name }}</div>
     </template>
     <img :src="viewingBericht.img" alt="" style="width: 100%" />
+    <img v-if="viewingBericht.img2" :src="viewingBericht.img2" alt="" style="width: 100%" />
   </Dialog>
   <canvas id="pdfCanvas" hidden></canvas>
   <CreateCustomerDialog
@@ -683,7 +684,7 @@ import Stepper from 'primevue/stepper'
 import Step from 'primevue/step'
 import Motor_Filler from '@/components/Motor_Filler.vue'
 import SignaturePad from 'signature_pad'
-import { fillMotorPDF, fillMüllanlagePDF } from '@/lib/pdf-lib'
+import { fillMotorPDF, fillMüllanlagePDF, getAmountOfPagesInPDF } from '@/lib/pdf-lib'
 import * as pdfjsLib from 'pdfjs-dist'
 import axios from 'axios'
 import { useInputStore } from '@/stores/inputStore'
@@ -802,6 +803,7 @@ export default {
         data: null,
         name: null,
         img: null,
+        img2: null,
         open: false,
         loading: null,
       },
@@ -1133,10 +1135,16 @@ export default {
         })
         let blob = await fileResponse.blob()
         let buffer = await blob.arrayBuffer()
+        let buffer2 = await blob.arrayBuffer()
+        let fileBytes2 = new Uint8Array(buffer2)
         let fileBytes = new Uint8Array(buffer)
+
+        let pages = await getAmountOfPagesInPDF(buffer)
 
         this.viewingBericht.name = fileData.name
         this.viewingBericht.data = data
+        if (pages > 1) this.viewingBericht.img2 = await this.turnPDFToPNG(fileBytes2, 2)
+        else this.viewingBericht.img2 = null
         this.viewingBericht.img = await this.turnPDFToPNG(fileBytes)
         this.viewingBericht.open = true
       } catch (err) {
@@ -1153,6 +1161,8 @@ export default {
             default:
               break
           }
+        } else {
+          throw err
         }
       }
       this.viewingBericht.loading = null

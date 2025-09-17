@@ -142,3 +142,8 @@ export const fillMüllanlagePDF = async (inputValues, signatureBase64) => {
   link.download = 'Motor_Form_' + Math.round(Math.random() * 10000) + '.pdf'
   link.click()*/
 }
+
+export const getAmountOfPagesInPDF = async (pdfBytes) => {
+  const pdfDoc = await PDFDocument.load(pdfBytes)
+  return pdfDoc.getPageCount()
+}
