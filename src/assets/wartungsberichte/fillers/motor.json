@@ -4,7 +4,7 @@
     "employee": "Textfeld 98",
     "date": "Textfeld 97",
 
-    "fabrikant": "Textfeld 58",
+    "fabrikat": "Textfeld 58",
     "typnr": "Textfeld 59",
     "typ": "Textfeld 60",
     "drehzahl_alg": "Textfeld 61",
@@ -43,7 +43,7 @@
     "bemerkung.drehzahl": "Textfeld 91",
 
     "geforderte_fettmenge": "Textfeld 92",
-    "fettsort": "Textfeld 93",
+    "fettsorte": "Textfeld 93",
     "intervall": "Textfeld 94",
     "fettnachschmierung_bemerkung": "Textfeld 95",
 

@@ -1,0 +1,75 @@
+{
+  "textfields": {
+    "customerdata": "Textfeld 148",
+    "employee": "Textfeld 171",
+    "date": "Textfeld 170",
+
+    "fabrikat": "Textfeld 210",
+    "typnr": "Textfeld 211",
+    "typ": "Textfeld 212",
+    "maschinennr": "Textfeld 213",
+    "ort": "Textfeld 214",
+    "anlage": "Textfeld 215",
+
+    "bemerkung.verschmutzung": "Textfeld 217",
+    "bemerkung.beschaedigungen": "Textfeld 218",
+    "bemerkung.leichtgaengigkeit_schott": "Textfeld 219",
+    "bemerkung.handrad_betrieb": "Textfeld 220",
+    "bemerkung.zahnstange": "Textfeld 221",
+    "bemerkung.zahnstange_gefettet": "Textfeld 222",
+    "bemerkung.endschalter": "Textfeld 223",
+    "bemerkung.schottzustand": "Textfeld 224",
+    "bemerkung.gummilippe_schott": "Textfeld 225",
+    "bemerkung.rutschkupplung": "Textfeld 226",
+    "bemerkung.antrieb_aufabfahren": "Textfeld 227",
+    "bemerkung.endschalter2": "Textfeld 228",
+    "bemerkung.handbetrieb": "Textfeld 229",
+    "bemerkung.automatik": "Textfeld 230",
+    "bemerkung.rutschkupplung2": "Textfeld 231",
+
+    "geforderte_fettmenge": "Textfeld 166",
+    "fettsorte": "Textfeld 167",
+    "intervall": "Textfeld 168",
+    "fettnachschmierung_bemerkung": "Textfeld 165",
+
+    "sonstiges": "Textfeld 169"
+  },
+
+  "radiogroups": {
+    "verschmutzung": "Optionsfeld 102",
+    "beschaedigungen": "Optionsfeld 103",
+    "leichtgaengigkeit_schott": "Optionsfeld 104",
+    "handrad_betrieb": "Optionsfeld 105",
+    "zahnstange": "Optionsfeld 106",
+    "zahnstange_gefettet": "Optionsfeld 107",
+    "endschalter": "Optionsfeld 108",
+    "schottzustand": "Optionsfeld 109",
+    "gummilippe_schott": "Optionsfeld 110",
+    "rutschkupplung": "Optionsfeld 111",
+    "antrieb_aufabfahren": "Optionsfeld 112",
+    "endschalter2": "Optionsfeld 113",
+    "handbetrieb": "Optionsfeld 114",
+    "automatik": "Optionsfeld 115",
+    "rutschkupplung2": "Optionsfeld 116",
+
+    "fettnachschmierung_ausgefuehrt": "Optionsfeld 117"
+  },
+
+  "checkboxes": {
+    "verschmutzung": "Kontrollkästchen 78",
+    "beschaedigungen": "Kontrollkästchen 79",
+    "leichtgaengigkeit_schott": "Kontrollkästchen 80",
+    "handrad_betrieb": "Kontrollkästchen 81",
+    "zahnstange": "Kontrollkästchen 82",
+    "zahnstange_gefettet": "Kontrollkästchen 83",
+    "endschalter": "Kontrollkästchen 84",
+    "schottzustand": "Kontrollkästchen 85",
+    "gummilippe_schott": "Kontrollkästchen 86",
+    "rutschkupplung": "Kontrollkästchen 87",
+    "antrieb_aufabfahren": "Kontrollkästchen 88",
+    "endschalter2": "Kontrollkästchen 89",
+    "handbetrieb": "Kontrollkästchen 90",
+    "automatik": "Kontrollkästchen 91",
+    "rutschkupplung2": "Kontrollkästchen 92"
+  }
+}

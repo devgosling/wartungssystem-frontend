@@ -317,7 +317,7 @@ export default {
       inputValues: {},
       inputs: [
         [
-          { label: 'Fabrikant', id: 'fabrikant' },
+          { label: 'Fabrikat', id: 'fabrikat' },
           { label: 'Typ-Nr.', id: 'typnr' },
           { label: 'Typ', id: 'typ' },
           { label: 'Drehzahl', id: 'drehzahl_alg' },

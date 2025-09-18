@@ -1,0 +1,86 @@
+{
+  "textfields": {
+    "customerdata": "Textfeld 148",
+    "employee": "Textfeld 171",
+    "date": "Textfeld 170",
+
+    "fabrikat": "Textfeld 137",
+    "typnr": "Textfeld 138",
+    "typ": "Textfeld 139",
+    "drehzahl_alg": "Textfeld 140",
+    "foerdermenge": "Textfeld 142",
+    "average.foerdermenge": "Textfeld 141",
+    "maschinennr": "Textfeld 143",
+    "ort": "Textfeld 144",
+    "gebauede": "Textfeld 145",
+    "raum": "Textfeld 146",
+    "anlage": "Textfeld 147",
+
+    "bemerkung.verschmutzung": "Textfeld 149",
+    "bemerkung.ablagerung_luefter": "Textfeld 150",
+    "bemerkung.fluegelstellung": "Textfeld 151",
+    "bemerkung.beschaedigungen": "Textfeld 152",
+    "bemerkung.rundlauf": "Textfeld 153",
+    "bemerkung.spaltmasse_luftleitring": "Textfeld 154",
+    "bemerkung.schwingungsdaempfer": "Textfeld 155",
+    "bemerkung.riemen": "Textfeld 156",
+    "bemerkung.riemenscheibe": "Textfeld 157",
+    "bemerkung.kompensator": "Textfeld 158",
+    "bemerkung.luftleitung": "Textfeld 159",
+    "bemerkung.laufgeraeusche": "Textfeld 160",
+    "bemerkung.schwingungen": "Textfeld 161",
+    "bemerkung.drehzahl": "Textfeld 162",
+    "bemerkung.lagerblock_zustand": "Textfeld 163",
+    "bemerkung.lagerblock_abdichtung": "Textfeld 164",
+
+    "geforderte_fettmenge": "Textfeld 166",
+    "fettsorte": "Textfeld 167",
+    "intervall": "Textfeld 168",
+    "fettnachschmierung_bemerkung": "Textfeld 165",
+
+    "sonstiges": "Textfeld 169"
+  },
+
+  "radiogroups": {
+    "sichtpruefung": "Optionsfeld 58",
+    "verschmutzung": "Optionsfeld 59",
+    "ablagerung_luefter": "Optionsfeld 60",
+    "fluegelstellung": "Optionsfeld 61",
+    "beschaedigungen": "Optionsfeld 62",
+    "rundlauf": "Optionsfeld 63",
+    "spaltmasse_luftleitring": "Optionsfeld 64",
+    "schwingungsdaempfer": "Optionsfeld 65",
+    "riemen": "Optionsfeld 66",
+    "riemenscheibe": "Optionsfeld 67",
+    "kompensator": "Optionsfeld 68",
+    "luftleitung": "Optionsfeld 69",
+
+    "lagerung": "Optionsfeld 70",
+    "laufgeraeusche": "Optionsfeld 71",
+    "schwingungen": "Optionsfeld 72",
+    "drehzahl": "Optionsfeld 73",
+    "lagerblock_zustand": "Optionsfeld 74",
+    "lagerblock_abdichtung": "Optionsfeld 75",
+
+    "fettnachschmierung_ausgefuehrt": "Optionsfeld 76"
+  },
+
+  "checkboxes": {
+    "fixed.verschmutzung": "Kontrollkästchen 38",
+    "fixed.ablagerung_luefter": "Kontrollkästchen 39",
+    "fixed.fluegelstellung": "Kontrollkästchen 40",
+    "fixed.beschaedigungen": "Kontrollkästchen 41",
+    "fixed.rundlauf": "Kontrollkästchen 42",
+    "fixed.spaltmasse_luftleitring": "Kontrollkästchen 43",
+    "fixed.schwingungsdaempfer": "Kontrollkästchen 44",
+    "fixed.riemen": "Kontrollkästchen 45",
+    "fixed.riemenscheibe": "Kontrollkästchen 46",
+    "fixed.kompensator": "Kontrollkästchen 47",
+    "fixed.luftleitung": "Kontrollkästchen 48",
+    "fixed.laufgeraeusche": "Kontrollkästchen 49",
+    "fixed.schwingungen": "Kontrollkästchen 50",
+    "fixed.drehzahl": "Kontrollkästchen 51",
+    "fixed.lagerblock_zustand": "Kontrollkästchen 52",
+    "fixed.lagerblock_abdichtung": "Kontrollkästchen 53"
+  }
+}

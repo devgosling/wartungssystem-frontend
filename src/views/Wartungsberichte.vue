@@ -180,6 +180,7 @@
                             :options="kunden"
                             class="wartungsberichte-create-panel-grid-slct-type"
                             filter
+                            @change="inputValues.identifier = null"
                             optionLabel="name"
                             v-model="inputValues.customer"
                             showClear
@@ -263,7 +264,11 @@
                           <label for="wartungsbericht-slct">Identifikator (Optional)</label>
                           <Select
                             id="wartungsbericht-slct"
-                            placeholder="Kein Kunde Augewählt"
+                            :placeholder="
+                              inputValues.customer
+                                ? 'Kein Identifikator ausgewählt'
+                                : 'Kein Kunde ausgewählt'
+                            "
                             :disabled="!inputValues.customer"
                             :options="inputValues.customer?.identifiers"
                             class="wartungsberichte-create-panel-grid-slct-type"
@@ -347,7 +352,23 @@
                       <Motor_Filler ref="filler" v-if="inputValues.berichtType.id == 'motor'" />
                       <Muellanlage_Filler
                         ref="filler"
-                        v-if="inputValues.berichtType.id == 'müllanlage'"
+                        v-else-if="inputValues.berichtType.id == 'müllanlage'"
+                      />
+                      <Pumpe_Filler
+                        ref="filler"
+                        v-else-if="inputValues.berichtType.id == 'pumpe'"
+                      />
+                      <Wehrtor_Filler
+                        ref="filler"
+                        v-else-if="inputValues.berichtType.id == 'wehrtor'"
+                      />
+                      <Luefter_Filler
+                        ref="filler"
+                        v-else-if="inputValues.berichtType.id == 'luefter'"
+                      />
+                      <Schmutzwasser_Filler
+                        ref="filler"
+                        v-else-if="inputValues.berichtType.id == 'schmutzwasser'"
                       />
                       <h2 style="margin: 3rem 8rem; text-align: center" v-else>
                         Für diese Art von Wartungsbericht gibt es noch nichts zum ausfüllen... :(
@@ -684,7 +705,15 @@ import Stepper from 'primevue/stepper'
 import Step from 'primevue/step'
 import Motor_Filler from '@/components/Motor_Filler.vue'
 import SignaturePad from 'signature_pad'
-import { fillMotorPDF, fillMüllanlagePDF, getAmountOfPagesInPDF } from '@/lib/pdf-lib'
+import {
+  fillLüfterPDF,
+  fillMotorPDF,
+  fillMüllanlagePDF,
+  fillPumpePDF,
+  fillSchmutzwasserPDF,
+  fillWehrtorPDF,
+  getAmountOfPagesInPDF,
+} from '@/lib/pdf-lib'
 import * as pdfjsLib from 'pdfjs-dist'
 import axios from 'axios'
 import { useInputStore } from '@/stores/inputStore'
@@ -694,6 +723,10 @@ import { FilterMatchMode } from '@primevue/core'
 import CreateCustomerDialog from '@/components/CreateCustomerDialog.vue'
 import CreateIdentifierDialog from '@/components/CreateIdentifierDialog.vue'
 import Muellanlage_Filler from '@/components/Muellanlage_Filler.vue'
+import Pumpe_Filler from '@/components/Pumpe_Filler.vue'
+import Wehrtor_Filler from '@/components/Wehrtor_Filler.vue'
+import Luefter_Filler from '@/components/Luefter_Filler.vue'
+import Schmutzwasser_Filler from '@/components/Schmutzwasser_Filler.vue'
 
 export default {
   components: {
@@ -711,6 +744,10 @@ export default {
     DatePicker,
     Motor_Filler,
     Muellanlage_Filler,
+    Pumpe_Filler,
+    Wehrtor_Filler,
+    Luefter_Filler,
+    Schmutzwasser_Filler,
     Splitter,
     SplitterPanel,
     Divider,
@@ -745,7 +782,7 @@ export default {
       tab: 0, // 0 = Nothing, 1 = Create, 2 = Upload
       tabtext: '',
       berichte: [
-        { name: 'Lüfter', id: 'lüfter', icon: 'fa-regular fa-fan', filekey: 'Lüfter' },
+        { name: 'Lüfter', id: 'luefter', icon: 'fa-regular fa-fan', filekey: 'Lüfter' },
         { name: 'Motor', id: 'motor', icon: 'fa-regular fa-engine', filekey: 'Motor' },
         {
           name: 'Schmutzwasser-/Fäkalienhebeanlagen, Tauchmotorpumpenschmutzwasser',
@@ -765,6 +802,12 @@ export default {
           id: 'wärmetauscher',
           icon: 'fa-regular fa-heat',
           filekey: 'Wärmetauscher',
+        },
+        {
+          name: 'Wehrtor',
+          id: 'wehrtor',
+          icon: 'fa-regular fa-bridge-water',
+          filekey: 'Wehrtor',
         },
       ],
       /*mitarbeiter: [ <----------- OLD
@@ -1311,12 +1354,22 @@ export default {
       switch (this.inputValues.berichtType.id) {
         case 'motor':
           pdf = await fillMotorPDF(this.inputValues, signature)
-          console.log(pdf[0])
+          break
+        case 'pumpe':
+          pdf = await fillPumpePDF(this.inputValues, signature)
+          break
+        case 'wehrtor':
+          pdf = await fillWehrtorPDF(this.inputValues, signature)
+          break
+        case 'luefter':
+          pdf = await fillLüfterPDF(this.inputValues, signature)
+          break
+        case 'schmutzwasser':
+          pdf = await fillSchmutzwasserPDF(this.inputValues, signature)
           break
         case 'müllanlage':
           pdf = await fillMüllanlagePDF(this.inputValues, signature)
           has2Pages = true
-          console.log(pdf[0])
           break
         default:
           break

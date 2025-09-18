@@ -1,0 +1,68 @@
+{
+  "textfields": {
+    "customerdata": "Textfeld 249",
+    "employee": "Textfeld 266",
+    "date": "Textfeld 265",
+
+    "fabrikat": "Textfeld 239",
+    "typnr": "Textfeld 240",
+    "typ": "Textfeld 241",
+    "foerdermenge": "Textfeld 242",
+    "foerderhoehe": "Textfeld 243",
+    "maschinennr": "Textfeld 244",
+    "ort": "Textfeld 245",
+    "gebauede": "Textfeld 246",
+    "raum": "Textfeld 247",
+    "anlage": "Textfeld 248",
+
+    "bemerkung.verschmutzung": "Textfeld 250",
+    "bemerkung.beschaedigungen": "Textfeld 251",
+    "bemerkung.schrauben+bolzen": "Textfeld 252",
+    "bemerkung.rohrleitung": "Textfeld 253",
+    "bemerkung.gleitringdichtung": "Textfeld 254",
+    "bemerkung.packung": "Textfeld 255",
+    "bemerkung.entlueftungsschraube": "Textfeld 256",
+    "bemerkung.oel+kuehlmittel": "Textfeld 257",
+    "bemerkung.laufgeraeusche": "Textfeld 258",
+    "bemerkung.schwingungen": "Textfeld 259",
+
+    "geforderte_fettmenge": "Textfeld 264",
+    "fettsort": "Textfeld 263",
+    "intervall": "Textfeld 262",
+    "fettnachschmierung_bemerkung": "Textfeld 260",
+
+    "sonstiges": "Textfeld 261"
+  },
+
+  "radiogroups": {
+    "sichtpruefung": "Optionsfeld 118",
+    "verschmutzung": "Optionsfeld 119",
+    "beschaedigungen": "Optionsfeld 120",
+    "schrauben+bolzen": "Optionsfeld 121",
+    "rohrleitung": "Optionsfeld 122",
+
+    "gleitringdichtung": "Optionsfeld 123",
+    "packung": "Optionsfeld 124",
+    "entlueftungsschraube": "Optionsfeld 125",
+    "oel+kuehlmittel": "Optionsfeld 126",
+
+    "lagerung": "Optionsfeld 127",
+    "laufgeraeusche": "Optionsfeld 128",
+    "schwingungen": "Optionsfeld 129",
+
+    "fettnachschmierung_ausgefuehrt": "Optionsfeld 130"
+  },
+
+  "checkboxes": {
+    "verschmutzung": "Kontrollkästchen 94",
+    "beschaedigungen": "Kontrollkästchen 93",
+    "schrauben+bolzen": "Kontrollkästchen 95",
+    "rohrleitung": "Kontrollkästchen 96",
+    "gleitringdichtung": "Kontrollkästchen 98",
+    "packung": "Kontrollkästchen 97",
+    "entlueftungsschraube": "Kontrollkästchen 99",
+    "oel+kuehlmittel": "Kontrollkästchen 100",
+    "laufgeraeusche": "Kontrollkästchen 101",
+    "schwingungen": "Kontrollkästchen 102"
+  }
+}
