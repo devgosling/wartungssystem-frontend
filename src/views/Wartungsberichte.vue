@@ -370,6 +370,10 @@
                         ref="filler"
                         v-else-if="inputValues.berichtType.id == 'schmutzwasser'"
                       />
+                      <Waermetauscher_Filler
+                        ref="filler"
+                        v-else-if="inputValues.berichtType.id == 'waermetauscher'"
+                      />
                       <h2 style="margin: 3rem 8rem; text-align: center" v-else>
                         Für diese Art von Wartungsbericht gibt es noch nichts zum ausfüllen... :(
                       </h2>
@@ -712,6 +716,7 @@ import {
   fillPumpePDF,
   fillSchmutzwasserPDF,
   fillWehrtorPDF,
+  fillWärmetauscherPDF,
   getAmountOfPagesInPDF,
 } from '@/lib/pdf-lib'
 import * as pdfjsLib from 'pdfjs-dist'
@@ -727,6 +732,7 @@ import Pumpe_Filler from '@/components/Pumpe_Filler.vue'
 import Wehrtor_Filler from '@/components/Wehrtor_Filler.vue'
 import Luefter_Filler from '@/components/Luefter_Filler.vue'
 import Schmutzwasser_Filler from '@/components/Schmutzwasser_Filler.vue'
+import Waermetauscher_Filler from '@/components/Waermetauscher_Filler.vue'
 
 export default {
   components: {
@@ -748,6 +754,7 @@ export default {
     Wehrtor_Filler,
     Luefter_Filler,
     Schmutzwasser_Filler,
+    Waermetauscher_Filler,
     Splitter,
     SplitterPanel,
     Divider,
@@ -799,7 +806,7 @@ export default {
         { name: 'Pumpe', id: 'pumpe', icon: 'fa-regular fa-pump', filekey: 'Pumpe' },
         {
           name: 'Wärmetauscher',
-          id: 'wärmetauscher',
+          id: 'waermetauscher',
           icon: 'fa-regular fa-heat',
           filekey: 'Wärmetauscher',
         },
@@ -1366,6 +1373,9 @@ export default {
           break
         case 'schmutzwasser':
           pdf = await fillSchmutzwasserPDF(this.inputValues, signature)
+          break
+        case 'waermetauscher':
+          pdf = await fillWärmetauscherPDF(this.inputValues, signature)
           break
         case 'müllanlage':
           pdf = await fillMüllanlagePDF(this.inputValues, signature)

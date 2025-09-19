@@ -1,0 +1,73 @@
+{
+  "textfields": {
+    "customerdata": "Textfeld 30",
+    "employee": "Textfeld 57",
+    "date": "Textfeld 56",
+
+    "fabrikat": "Textfeld 20",
+    "typnr": "Textfeld 21",
+    "typ": "Textfeld 22",
+    "kw": "Textfeld 23",
+    "medium": "Textfeld 24",
+    "maschinennr": "Textfeld 25",
+    "ort": "Textfeld 26",
+    "gebauede": "Textfeld 27",
+    "raum": "Textfeld 28",
+    "anlage": "Textfeld 29",
+
+    "bemerkung.verschmutzung": "Textfeld 31",
+    "bemerkung.beschaedigungen": "Textfeld 32",
+    "bemerkung.schrauben+bolzen": "Textfeld 33",
+    "bemerkung.rohrleitung": "Textfeld 34",
+    "bemerkung.ventile": "Textfeld 39",
+    "bemerkung.platten": "Textfeld 40",
+    "bemerkung.entlueftungsschraube": "Textfeld 41",
+    "bemerkung.flansch": "Textfeld 42",
+    "bemerkung.verschraubung": "Textfeld 43",
+    "bemerkung.isolierung": "Textfeld 44",
+    "bemerkung.mantel": "Textfeld 45",
+
+    "temperatur.primaryvorlauf": "Textfeld 46",
+    "druck.primaryvorlauf": "Textfeld 47",
+    "temperatur.primaryrucklauf": "Textfeld 48",
+    "druck.primaryrucklauf": "Textfeld 49",
+    "temperatur.secondaryvorlauf": "Textfeld 50",
+    "druck.secondaryvorlauf": "Textfeld 51",
+    "temperatur.secondaryrucklauf": "Textfeld 52",
+    "druck.secondaryrucklauf": "Textfeld 53",
+
+    "bemerkung.vorlaufe": "Textfeld 54",
+
+    "sonstiges": "Textfeld 55"
+  },
+
+  "radiogroups": {
+    "sichtpruefung": "Optionsfeld 12",
+
+    "verschmutzung": "Optionsfeld 8",
+    "beschaedigungen": "Optionsfeld 9",
+    "schrauben+bolzen": "Optionsfeld 10",
+    "rohrleitung": "Optionsfeld 11",
+    "ventile": "Optionsfeld 13",
+    "platten": "Optionsfeld 14",
+    "entlueftungsschraube": "Optionsfeld 15",
+    "flansch": "Optionsfeld 16",
+    "verschraubung": "Optionsfeld 17",
+    "isolierung": "Optionsfeld 18",
+    "mantel": "Optionsfeld 19"
+  },
+
+  "checkboxes": {
+    "fixed.verschmutzung": "Kontrollkästchen 16",
+    "fixed.beschaedigungen": "Kontrollkästchen 15",
+    "fixed.schrauben+bolzen": "Kontrollkästchen 17",
+    "fixed.rohrleitung": "Kontrollkästchen 18",
+    "fixed.ventile": "Kontrollkästchen 20",
+    "fixed.platten": "Kontrollkästchen 19",
+    "fixed.entlueftungsschraube": "Kontrollkästchen 21",
+    "fixed.flansch": "Kontrollkästchen 22",
+    "fixed.verschraubung": "Kontrollkästchen 23",
+    "fixed.isolierung": "Kontrollkästchen 24",
+    "fixed.mantel": "Kontrollkästchen 25"
+  }
+}
