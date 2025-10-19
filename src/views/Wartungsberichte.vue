@@ -161,7 +161,6 @@
                         </div>
                         <div class="wartungsberichte-create-panel-grid-inpt">
                           <label for="wartungsbericht-slct">Datum</label>
-                          <!-- TODO: Nachfragen ob es das heutige Datum sein soll oder das Datum der Wartung -->
                           <DatePicker
                             id="wartungsbericht-slct"
                             date-format="dd.mm.yy"
@@ -178,12 +177,13 @@
                             id="wartungsbericht-slct"
                             placeholder="Kein Kunde Augewählt"
                             :options="kunden"
+                            :disabled="kundeLocked"
                             class="wartungsberichte-create-panel-grid-slct-type"
                             filter
                             @change="inputValues.identifier = null"
                             optionLabel="name"
                             v-model="inputValues.customer"
-                            showClear
+                            :showClear="!kundeLocked"
                           >
                             <template #value="slotProps">
                               <div v-if="slotProps.value">
@@ -360,7 +360,7 @@
                       />
                       <Wehrtor_Filler
                         ref="filler"
-                        v-else-if="inputValues.berichtType.id == 'wehrtor'"
+                        v-else-if="inputValues.berichtType.id == 'wehrtore'"
                       />
                       <Luefter_Filler
                         ref="filler"
@@ -373,6 +373,10 @@
                       <Waermetauscher_Filler
                         ref="filler"
                         v-else-if="inputValues.berichtType.id == 'waermetauscher'"
+                      />
+                      <Enthaertungsanlage_Filler
+                        ref="filler"
+                        v-else-if="inputValues.berichtType.id == 'enthaertungsanlage'"
                       />
                       <h2 style="margin: 3rem 8rem; text-align: center" v-else>
                         Für diese Art von Wartungsbericht gibt es noch nichts zum ausfüllen... :(
@@ -551,6 +555,7 @@
                               :disabled="isSent || isSending"
                               label="E-Mail Adresse ändern"
                               severity="secondary"
+                              @click="viewingCustomer = inputValues.customer"
                               rounded
                             />
                           </div>
@@ -665,7 +670,9 @@
   </div>
   <Dialog maximizable v-model:visible="viewingBericht.open" style="width: min(50vw, 800px)">
     <template #header>
-      <div><i class="fa-regular fa-file-pdf"></i> {{ viewingBericht.name }}</div>
+      <div style="word-break: break-all">
+        <i class="fa-regular fa-file-pdf"></i> {{ viewingBericht.name }}
+      </div>
     </template>
     <img :src="viewingBericht.img" alt="" style="width: 100%" />
     <img v-if="viewingBericht.img2" :src="viewingBericht.img2" alt="" style="width: 100%" />
@@ -676,6 +683,12 @@
     @close="openDialog = false"
     @createdcustomer="fetchCustomers"
   ></CreateCustomerDialog>
+  <ViewCustomerDialog
+    :open="viewingCustomer !== null"
+    :data="viewingCustomer"
+    @close="viewingCustomer = null"
+    @editedcustomer="fetchCustomers"
+  ></ViewCustomerDialog>
   <CreateIdentifierDialog
     :open="openIdfDialog"
     :customerID="inputValues.customer?.$id"
@@ -710,12 +723,13 @@ import Step from 'primevue/step'
 import Motor_Filler from '@/components/Motor_Filler.vue'
 import SignaturePad from 'signature_pad'
 import {
+  fillEnthärtungsanlagePDF,
   fillLüfterPDF,
   fillMotorPDF,
   fillMüllanlagePDF,
   fillPumpePDF,
   fillSchmutzwasserPDF,
-  fillWehrtorPDF,
+  fillWehrtorePDF,
   fillWärmetauscherPDF,
   getAmountOfPagesInPDF,
 } from '@/lib/pdf-lib'
@@ -733,6 +747,8 @@ import Wehrtor_Filler from '@/components/Wehrtor_Filler.vue'
 import Luefter_Filler from '@/components/Luefter_Filler.vue'
 import Schmutzwasser_Filler from '@/components/Schmutzwasser_Filler.vue'
 import Waermetauscher_Filler from '@/components/Waermetauscher_Filler.vue'
+import Enthaertungsanlage_Filler from '@/components/Enthaertungsanlage_Filler.vue'
+import ViewCustomerDialog from '@/components/ViewCustomerDialog.vue'
 
 export default {
   components: {
@@ -755,6 +771,7 @@ export default {
     Luefter_Filler,
     Schmutzwasser_Filler,
     Waermetauscher_Filler,
+    Enthaertungsanlage_Filler,
     Splitter,
     SplitterPanel,
     Divider,
@@ -766,12 +783,18 @@ export default {
     CreateCustomerDialog,
     CreateIdentifierDialog,
     Tag,
+    ViewCustomerDialog
   },
 
   data() {
     return {
+
+      viewingCustomer: null,
+
       openDialog: false,
       openIdfDialog: false,
+
+      kundeLocked: false,
 
       wartungsberichte: null,
       filters: {
@@ -811,10 +834,16 @@ export default {
           filekey: 'Wärmetauscher',
         },
         {
-          name: 'Wehrtor',
-          id: 'wehrtor',
+          name: 'Wehrtore',
+          id: 'wehrtore',
           icon: 'fa-regular fa-bridge-water',
-          filekey: 'Wehrtor',
+          filekey: 'Wehrtore',
+        },
+        {
+          name: 'Überprüfung | Enthärtungsanlage',
+          id: 'enthaertungsanlage',
+          icon: 'fa-solid fa-water-arrow-down',
+          filekey: 'Enthärtungsanlage',
         },
       ],
       /*mitarbeiter: [ <----------- OLD
@@ -878,6 +907,15 @@ export default {
         move: null,
       },
     }
+  },
+
+  watch: {
+    'inputValues.berichtType'(newVal) {
+      this.kundeLocked = newVal.id == 'enthaertungsanlage'
+      if (this.kundeLocked) {
+        this.inputValues.customer = this.kunden.find((v, i) => v.$id == '68cd4804000d225bc05c')
+      }
+    },
   },
 
   async mounted() {
@@ -1365,8 +1403,8 @@ export default {
         case 'pumpe':
           pdf = await fillPumpePDF(this.inputValues, signature)
           break
-        case 'wehrtor':
-          pdf = await fillWehrtorPDF(this.inputValues, signature)
+        case 'wehrtore':
+          pdf = await fillWehrtorePDF(this.inputValues, signature)
           break
         case 'luefter':
           pdf = await fillLüfterPDF(this.inputValues, signature)
@@ -1380,6 +1418,9 @@ export default {
         case 'müllanlage':
           pdf = await fillMüllanlagePDF(this.inputValues, signature)
           has2Pages = true
+          break
+        case 'enthaertungsanlage':
+          pdf = await fillEnthärtungsanlagePDF(this.inputValues, signature)
           break
         default:
           break
@@ -1416,27 +1457,11 @@ export default {
     async saveAndSend() {
       this.isSending = true
 
-      /*var formData = new FormData()
-      formData.append('application/pdf', this.pdfBytes[1])
-      formData.append('')
-      axios({
-        method: "POST",
-        url: "https://68855ff60023522aa71d.fra.appwrite.run/v1/functions/68855ff6001c1613dade/executions",
-
-        data: {
-          async: true,
-          method: "POST",
-
-        },
-      })*/
       let url = await fetch('data:application/pdf;base64,' + this.pdfBytes[1])
       let blob = await url.blob()
       const fileID = ID.unique()
-      let file = new File(
-        [blob],
-        `Wartungsbericht_${this.inputValues.berichtType.filekey}_${new Date(this.inputValues.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}_${this.inputValues.employee.replaceAll(' ', '_')}.pdf`,
-        { type: 'application/pdf' },
-      )
+      let filename = `${this.inputValues.berichtType.id == 'enthaertungsanlage' ? 'Überprüfungsbericht' : 'Wartungsbericht'}_${this.inputValues.berichtType.filekey}_${new Date(this.inputValues.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}_${this.inputValues.employee.replaceAll(' ', '_')}.pdf`
+      let file = new File([blob], filename, { type: 'application/pdf' })
       await storage.createFile('6878f5cf00166fde91eb', fileID, file)
       await databases.createDocument('6878f5900032addce7e5', '68866dc60038038dbe27', ID.unique(), {
         mitarbeiter: this.inputValues.employee,
@@ -1445,6 +1470,24 @@ export default {
         wartungsberichtid: fileID,
         identifikator: this.inputValues.identifier ?? null,
       })
+
+      await functions.createExecution(
+        '68f3d2b9001562f115c8',
+        JSON.stringify({
+          email: this.inputValues.customer.email,
+          subject:
+            this.inputValues.berichtType.id == 'enthaertungsanlage'
+              ? 'Überprüfungsbericht'
+              : 'Wartungsbericht' + ' - ' + this.inputValues.berichtType.filekey,
+          type: this.inputValues.berichtType.id == 'enthaertungsanlage' ? 1 : 0,
+          fileID: fileID,
+          fileName: filename,
+          monteur: this.inputValues.employee,
+        }),
+        true,
+        '/sendbericht',
+      )
+
       await this.confetti_play()
       this.fetchWartungsberichte()
 

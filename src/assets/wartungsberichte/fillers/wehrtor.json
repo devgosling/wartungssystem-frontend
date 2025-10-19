@@ -1,8 +1,8 @@
 {
   "textfields": {
-    "customerdata": "Textfeld 148",
-    "employee": "Textfeld 171",
-    "date": "Textfeld 170",
+    "customerdata": "Textfeld 216",
+    "employee": "Textfeld 238",
+    "date": "Textfeld 237",
 
     "fabrikat": "Textfeld 210",
     "typnr": "Textfeld 211",
@@ -27,12 +27,12 @@
     "bemerkung.automatik": "Textfeld 230",
     "bemerkung.rutschkupplung2": "Textfeld 231",
 
-    "geforderte_fettmenge": "Textfeld 166",
-    "fettsorte": "Textfeld 167",
-    "intervall": "Textfeld 168",
-    "fettnachschmierung_bemerkung": "Textfeld 165",
+    "geforderte_fettmenge": "Textfeld 236",
+    "fettsorte": "Textfeld 235",
+    "intervall": "Textfeld 234",
+    "fettnachschmierung_bemerkung": "Textfeld 232",
 
-    "sonstiges": "Textfeld 169"
+    "sonstiges": "Textfeld 233"
   },
 
   "radiogroups": {
@@ -56,8 +56,8 @@
   },
 
   "checkboxes": {
-    "verschmutzung": "Kontrollkästchen 78",
-    "beschaedigungen": "Kontrollkästchen 79",
+    "verschmutzung": "Kontrollkästchen 79",
+    "beschaedigungen": "Kontrollkästchen 78",
     "leichtgaengigkeit_schott": "Kontrollkästchen 80",
     "handrad_betrieb": "Kontrollkästchen 81",
     "zahnstange": "Kontrollkästchen 82",

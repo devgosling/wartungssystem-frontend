@@ -3,56 +3,57 @@
     :visible="open"
     :closable="false"
     modal
-    header="Neuen Kunde anlegen"
+    header="Kunden bearbeiten"
     :style="{ width: '35rem' }"
   >
-    <p class="createcustomerdialog-desc">Erstelle einen neuen Kunde</p>
-    <div class="createcustomerdialog-inputgroup">
+    <p class="viewcustomerdialog-desc">Bearbeite einen existierenden Kunden</p>
+    <div class="viewcustomerdialog-inputgroup">
       <label for="business">Unternehmensname</label>
       <InputText
         fluid
-        v-model="dialogValues.businessname"
+        v-model="dialogValues['name']"
         id="business"
         placeholder="Kromholz Wassertechnik"
       ></InputText>
     </div>
-    <div class="createcustomerdialog-inputgroup">
+    <div class="viewcustomerdialog-inputgroup">
       <label for="street">Straße + Hausnr.</label>
       <InputText
         fluid
-        v-model="dialogValues.street"
+        v-model="dialogValues['address.street']"
         id="street"
         placeholder="Am Werrtor 12a"
       ></InputText>
     </div>
-    <div class="createcustomerdialog-inputgroup">
+    <div class="viewcustomerdialog-inputgroup">
       <label for="zipcode">Postleitzahl</label>
       <InputNumber
+        class="viewcustomerdialog-inputgroup-numinp"
         fluid
         :useGrouping="false"
-        v-model="dialogValues.zipcode"
+        v-model="dialogValues['address.zipcode']"
         id="zipcode"
         placeholder="68647"
       ></InputNumber>
     </div>
-    <div class="createcustomerdialog-inputgroup">
+    <div class="viewcustomerdialog-inputgroup">
       <label for="city">Stadt / Ort</label>
       <InputText
         fluid
-        v-model="dialogValues.city"
+        v-model="dialogValues['address.city']"
         id="city"
         disabled
         placeholder="Biblis"
       ></InputText>
     </div>
-    <div class="createcustomerdialog-inputgroup">
+    <div class="viewcustomerdialog-inputgroup">
       <label for="email">E-Mail Adresse</label>
       <InputText fluid :invalid="invalidEmail" v-model="dialogValues.email" id="email"></InputText>
     </div>
-    <div class="createcustomerdialog-inputchips">
-      <label for="identifiers">Identifikatoren einrichten (Optional)</label>
+    <div class="viewcustomerdialog-inputchips">
+      <label for="identifiers">Identifikatoren bearbeiten</label>
       <AutoComplete
-        class="createcustomerdialog-inputchips-input"
+        class="viewcustomerdialog-inputchips-input"
         v-model="dialogValues.identifiers"
         multiple
         fluid
@@ -63,23 +64,23 @@
       ></AutoComplete>
       <span>Benutze Enter um einen Identifikater hinzuzufügen.</span>
     </div>
-    <div class="createcustomerdialog-btns">
+    <div class="viewcustomerdialog-btns">
       <Button severity="secondary" size="medium" @click="$emit('close')" label="Abbrechen"></Button>
       <Button
         severity="contrast"
         size="medium"
         :disabled="
           !(
-            dialogValues.businessname &&
-            dialogValues.street &&
-            dialogValues.zipcode &&
-            dialogValues.city &&
+            dialogValues.name &&
+            dialogValues['address.street'] &&
+            dialogValues['address.zipcode'] &&
+            dialogValues['address.city'] &&
             dialogValues.email
-          )
+          ) || isEqual(dialogValues, data)
         "
-        label="Kunde erstellen"
-        :loading="creatingCustomer"
-        @click="createCustomer"
+        label="Änderungen Speichern"
+        :loading="editingCustomer"
+        @click="editCustomer"
       ></Button>
     </div>
   </Dialog>
@@ -88,6 +89,7 @@
 import { ID, databases } from '@/lib/appwrite'
 import { validate } from 'email-validator'
 import { AutoComplete, Button, Dialog, InputNumber, InputText } from 'primevue'
+import { isEqual } from 'lodash'
 
 export default {
   components: {
@@ -100,16 +102,18 @@ export default {
 
   data() {
     return {
+      isEqual: isEqual,
+
       invalidEmail: false,
 
       suggestions: [],
 
-      creatingCustomer: false,
+      editingCustomer: false,
       dialogValues: {
-        businessname: null,
-        street: null,
-        zipcode: null,
-        city: null,
+        name: null,
+        'address.street': null,
+        'address.zipcode': null,
+        'address.city': null,
         email: null,
         identifiers: [],
       },
@@ -118,14 +122,37 @@ export default {
 
   props: {
     open: Boolean,
+    data: Object,
   },
 
   watch: {
-    async 'dialogValues.zipcode'(newVal) {
-      let res = await fetch('https://openplzapi.org/de/Localities?postalCode=' + newVal)
-      let json = await res.json()
-      this.dialogValues.city = json[0].name
+    async open(newVal) {
+      if (newVal) {
+        this.dialogValues = JSON.parse(JSON.stringify(this.data))
+      }
     },
+  },
+
+  created() {
+    // watch the computed accessor for the dotted-key path
+    this.$watch(
+      () => this.dialogValues['address.zipcode'],
+      async (newVal) => {
+        if (!newVal) return
+        try {
+          const res = await fetch(
+            `https://openplzapi.org/de/Localities?postalCode=${encodeURIComponent(newVal)}`,
+          )
+          const json = await res.json()
+          if (json && json[0]) {
+            // update dotted-key field
+            this.dialogValues['address.city'] = json[0].name
+          }
+        } catch (err) {
+          console.error(err)
+        }
+      },
+    )
   },
 
   methods: {
@@ -133,8 +160,8 @@ export default {
       console.log(event.target.value)
       this.suggestions = [event.target.value]
     },
-    async createCustomer() {
-      this.creatingCustomer = true
+    async editCustomer() {
+      this.editingCustomer = true
       if (!validate(this.dialogValues.email)) {
         this.$toast.add({
           severity: 'error',
@@ -143,29 +170,34 @@ export default {
           life: 5000,
         })
         this.invalidEmail = true
-        this.creatingCustomer = false
+        this.editingCustomer = false
         return
       }
 
-      await databases.createDocument('6878f5900032addce7e5', '68866dbd002a081f337a', ID.unique(), {
-        name: this.dialogValues.businessname,
-        'address.street': this.dialogValues.street,
-        'address.zipcode': this.dialogValues.zipcode.toString(),
-        'address.city': this.dialogValues.city,
-        email: this.dialogValues.email,
-        identifiers: this.dialogValues.identifiers,
-      })
+      await databases.updateDocument(
+        '6878f5900032addce7e5',
+        '68866dbd002a081f337a',
+        this.data.$id,
+        {
+          name: this.dialogValues.name,
+          'address.street': this.dialogValues['address.street'],
+          'address.zipcode': this.dialogValues['address.zipcode'].toString(),
+          'address.city': this.dialogValues['address.city'],
+          email: this.dialogValues.email,
+          identifiers: this.dialogValues.identifiers,
+        },
+      )
 
       this.$emit('close')
-      this.$emit('createdcustomer')
-      this.creatingCustomer = false
+      this.$emit('editedcustomer')
+      this.editingCustomer = false
 
       setTimeout(() => {
         this.dialogValues = {
-          businessname: null,
-          street: null,
-          zipcode: null,
-          city: null,
+          name: null,
+          'address.street': null,
+          'address.zipcode': null,
+          'address.city': null,
           email: null,
           identifiers: [],
         }
@@ -175,7 +207,7 @@ export default {
 }
 </script>
 <style lang="scss">
-.createcustomerdialog {
+.viewcustomerdialog {
   &-desc {
     margin-top: 0;
     color: var(--p-surface-500);

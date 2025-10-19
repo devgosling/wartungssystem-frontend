@@ -30,8 +30,8 @@
       <circle cx="172.52496" cy="78.09251" r="23.80211" fill="#ffb8b8"></circle>
       <path d="M404.5,249.22353c-23.56616,2.30811-41.52338-1.54606-53-12.52007v-8.8377h51Z" transform="translate(-203.5 -174.13424)" fill="#2f2e41"></path>
     </svg>
-    <span class="f401-title fadein d400ms">Unauthorized</span>
-    <span class="f401-sub fadein d500ms">Du scheinst keine Rechte zu haben diese Seite zu sehen... :(</span>
+    <span class="f401-title fadein d400ms">Error 401</span>
+    <span class="f401-sub fadein d500ms">Du scheinst keine Berechtigung zu haben diese Seite zu sehen... :(</span>
   </div>
 </template>
 <script></script>

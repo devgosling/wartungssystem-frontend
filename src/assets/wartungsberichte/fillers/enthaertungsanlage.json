@@ -1,0 +1,34 @@
+{
+  "textfields": {
+    "customerdata": "Textfeld 99",
+    "employee": "Textfeld 98",
+    "date": "Textfeld 97",
+
+    "fabrikat": "Textfeld 58",
+    "typnr": "Textfeld 59",
+    "typ": "Textfeld 60",
+    "maschinennr": "Textfeld 61",
+    "ort": "Textfeld 63",
+    "gebauede": "Textfeld 64",
+    "raum": "Textfeld 65",
+    "anlage": "Textfeld 66",
+
+    "bemerkung.verschmutzung": "Textfeld 68",
+    "bemerkung.beschaedigung": "Textfeld 69",
+    "bemerkung.dichtheit": "Textfeld 70",
+
+    "sonstiges": "Textfeld 96"
+  },
+
+  "radiogroups": {
+    "verschmutzung": "Optionsfeld 21",
+    "beschaedigung": "Optionsfeld 22",
+    "dichtheit": "Optionsfeld 23"
+  },
+
+  "checkboxes": {
+    "verschmutzung": "Kontrollkästchen 33",
+    "beschaedigung": "Kontrollkästchen 26",
+    "dichheit": "Kontrollkästchen 27"
+  }
+}

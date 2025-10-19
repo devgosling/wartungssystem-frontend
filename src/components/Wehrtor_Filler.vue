@@ -1,6 +1,6 @@
 <template>
   <div class="wb_wehrtor">
-    <h2 class="wb_wehrtor-header">Wartungsbericht — Pumpe</h2>
+    <h2 class="wb_wehrtor-header">Wartungsbericht — Wehrtore</h2>
     <h3 class="wb_wehrtor-subheader">Allgemeines</h3>
     <div class="wb_wehrtor-multinputs">
       <div v-for="(input, index) in inputs[0]" :key="index" class="wb_wehrtor-multinputs-inpt">
@@ -180,6 +180,7 @@ export default {
 
   methods: {
     broadcastInputsToStore() {
+      this.inputValues["identifier"] = this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.inputValues.identifier ?? null
       useInputStore().setInputData(this.inputValues)
     },
   },

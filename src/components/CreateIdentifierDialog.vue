@@ -4,7 +4,7 @@
     :closable="false"
     modal
     header="Neuen Identifikator anlegen"
-    :style="{ width: '27rem' }"
+    :style="{ width: '30rem' }"
   >
     <p class="createidentifierdialog-desc">
       Erstelle einen neuen Identifikator für den Kunden {{ $parent.inputValues.customer.name }}
@@ -12,6 +12,7 @@
     <div class="createidentifierdialog-inputgroup">
       <label for="business">Unternehmensname</label>
       <InputText
+        fluid
         v-model="$parent.inputValues.customer.name"
         id="business"
         disabled
@@ -139,11 +140,18 @@ export default {
   }
   &-inputgroup {
     display: flex;
+    gap: 1rem;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0.3rem;
 
+    .p-inputnumber,
+    > .p-inputtext {
+      max-width: 65%;
+    }
+
     label {
+      min-width: max-content;
       font-weight: 600;
     }
   }

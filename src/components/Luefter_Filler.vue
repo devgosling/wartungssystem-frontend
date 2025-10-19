@@ -214,6 +214,7 @@ export default {
 
   methods: {
     broadcastInputsToStore() {
+      this.inputValues["identifier"] = this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.inputValues.identifier ?? null
       useInputStore().setInputData(this.inputValues)
     },
   },

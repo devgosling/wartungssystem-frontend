@@ -50,7 +50,7 @@
               <div style="display: flex; gap: 0.2rem">
                 <Button
                   icon="fa-regular fa-eye"
-                  @click=""
+                  @click="viewCustomer($event, slotProps.data, slotProps.index)"
                   severity="info"
                   size="small"
                 ></Button
@@ -74,9 +74,16 @@
     @close="openDialog = false"
     @createdcustomer="retrieveCustomers"
   ></CreateCustomerDialog>
+  <ViewCustomerDialog
+    :open="viewingCustomer !== null"
+    :data="viewingCustomer"
+    @close="viewingCustomer = null"
+    @editedcustomer="retrieveCustomers"
+  ></ViewCustomerDialog>
 </template>
 <script>
 import CreateCustomerDialog from '@/components/CreateCustomerDialog.vue'
+import ViewCustomerDialog from '@/components/ViewCustomerDialog.vue'
 import { databases } from '@/lib/appwrite'
 import { FilterMatchMode } from '@primevue/core'
 import { AppwriteException, ID, Query } from 'appwrite'
@@ -93,6 +100,7 @@ export default {
     Column,
     Dialog,
     CreateCustomerDialog,
+    ViewCustomerDialog,
   },
 
   data() {
@@ -110,10 +118,16 @@ export default {
       },
 
       deletingCustomer: -1,
+
+      viewingCustomer: null,
     }
   },
 
   methods: {
+    async viewCustomer(event, data, customerIndex) {
+      console.log(data)
+      this.viewingCustomer = data
+    },
     async deleteCustomer(event, data, customerIndex) {
       this.$confirm.require({
         target: event.currentTarget,
@@ -173,57 +187,6 @@ export default {
           this.deletingBericht = null
         },
       })
-    },
-    async createUser() {
-      this.creatingUser = true
-      let firstname =
-        this.dialogValues.firstname.toUpperCase().slice(0, 1) +
-        this.dialogValues.firstname.toLowerCase().slice(1)
-      let lastname =
-        this.dialogValues.lastname.toUpperCase().slice(0, 1) +
-        this.dialogValues.lastname.toLowerCase().slice(1)
-      let combinedName = `${firstname} ${lastname}`
-
-      let employeeTable = await this.getEmployeeTable()
-      if (employeeTable.indexOf(combinedName) !== -1) {
-        this.$toast.add({
-          severity: 'error',
-          summary: 'Mitarbeiter gibt es bereits',
-          detail: 'Es gibt bereits einen Mitarbeiter mit diesem Namen',
-          life: 5000,
-        })
-        this.creatingUser = false
-        return
-      }
-      await databases.createDocument('6878f5900032addce7e5', '68866db100220a383390', ID.unique(), {
-        name: combinedName,
-      })
-
-      this.$toast.add({
-        severity: 'success',
-        summary: 'Mitarbeiter erstellt',
-        detail: 'Mitarbeiter ' + combinedName + ' wurde erfolgreich erstellt.',
-        life: 5000,
-      })
-
-      this.openDialog = false
-
-      this.retrieveMitarbeiter()
-      this.creatingUser = false
-    },
-    async getEmployeeTable() {
-      const mitarbeiterList = await databases.listDocuments(
-        '6878f5900032addce7e5',
-        '68866db100220a383390',
-        [Query.orderAsc('$sequence')],
-      )
-      var table = []
-
-      mitarbeiterList.documents.forEach((doc) => {
-        table.push(doc.name)
-      })
-
-      return table
     },
     async retrieveCustomers() {
       try {

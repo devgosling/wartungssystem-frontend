@@ -1,6 +1,6 @@
 <template>
   <div class="wb_schmutzwasser">
-    <h2 class="wb_schmutzwasser-header">Wartungsbericht — Müllanlage</h2>
+    <h2 class="wb_schmutzwasser-header">Wartungsbericht — Schmutzwasser</h2>
     <h3 class="wb_schmutzwasser-subheader">Allgemeines</h3>
     <div class="wb_schmutzwasser-multinputs">
       <div
@@ -229,6 +229,7 @@ export default {
 
   methods: {
     broadcastInputsToStore() {
+      this.inputValues["identifier"] = this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.inputValues.identifier ?? null
       useInputStore().setInputData(this.inputValues)
     },
   },
