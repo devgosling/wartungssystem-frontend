@@ -157,7 +157,6 @@ export default {
 
   methods: {
     keydown(event) {
-      console.log(event.target.value)
       this.suggestions = [event.target.value]
     },
     async editCustomer() {

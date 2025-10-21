@@ -9,6 +9,7 @@ import MitarbeiterView from '@/views/Mitarbeiter.vue'
 import CustomersView from '@/views/Kunden.vue'
 import { AppwriteException } from 'appwrite'
 import { isUserLoggedIn } from '@/lib/utils'
+import { useInputStore } from '@/stores/inputStore'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -88,9 +89,7 @@ async function guard(to, from, next) {
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
   const requiresUnauth = to.matched.some((record) => record.meta.requiresUnauth)
   const requiresTeam = to.matched.some((record) => record.meta.requiresTeam)
-
-  document.title = 'KWT | ' + to.meta?.title ?? 'Panel'
-
+  
   if (requiresAuth && !isAuth) next('/login')
   else if (requiresUnauth && isAuth) next('/')
   else if (requiresTeam) {
@@ -104,15 +103,19 @@ async function guard(to, from, next) {
           members.push(membership.userId)
         })
         if (members.indexOf(user.$id) !== -1) hasAccess = true
-        console.log(adminTeamMemberships)
         break
-
-      default:
-        break
-    }
+        
+        default:
+          break
+        }
     if (!hasAccess) next('/401')
-    else next()
+      else next()
   } else next()
+
+  document.title = 'KWT | ' + to.meta?.title ?? 'Panel'
+  if (useInputStore().isEditingSomething) {
+    useInputStore().setIsEditingSomething(false)
+  }
 }
 
 export default router

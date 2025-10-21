@@ -92,7 +92,6 @@ export default {
       )
 
       customerData.identifiers.push(...this.dialogValues.identifiers)
-      console.log(customerData.identifiers)
 
       await databases.updateDocument(
         '6878f5900032addce7e5',

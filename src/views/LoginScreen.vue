@@ -129,7 +129,6 @@ export default {
         router.push('/')
       } catch (e) {
         if (e instanceof AppwriteException) {
-          console.log(e.code)
           switch (e.code) {
             case 400:
               this.$toast.add({

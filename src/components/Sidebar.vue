@@ -12,7 +12,7 @@
         :key="index"
         class="sidebar-tab"
         :data-active="vrouter.currentRoute.path == tab.path ? true : false"
-        @click="vrouter.push(tab.path)"
+        @click="navigate($event, tab.path)"
       >
         <i :class="tab.icon"></i> {{ tab.title }}
       </button>
@@ -35,6 +35,7 @@
 <script>
 import { account } from '@/lib/appwrite'
 import router from '@/router'
+import { useInputStore } from '@/stores/inputStore'
 import { Button } from 'primevue'
 
 export default {
@@ -58,6 +59,30 @@ export default {
     async logout() {
       await account.deleteSession('current')
       router.push('/login')
+    },
+    async navigate(event, path) {
+      if (useInputStore().isEditingSomething) {
+        this.$confirm.require({
+          target: event.currentTarget,
+          message:
+            'Du erstellt gerade einen Wartungsbericht. Bist du dir sicher, dass du hierin Navigieren möchtest? Dein Fortschritt wird nicht gespeichert.',
+          icon: 'fa-regular fa-exclamation-triangle',
+          rejectProps: {
+            label: 'Abbrechen',
+            severity: 'secondary',
+            outlined: true,
+          },
+          acceptProps: {
+            label: 'Navigieren',
+            severity: 'danger',
+          },
+          accept: async () => {
+            router.push(path)
+          },
+        })
+      } else {
+        router.push(path)
+      }
     },
   },
 }

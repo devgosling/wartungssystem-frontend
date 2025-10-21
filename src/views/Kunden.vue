@@ -125,7 +125,6 @@ export default {
 
   methods: {
     async viewCustomer(event, data, customerIndex) {
-      console.log(data)
       this.viewingCustomer = data
     },
     async deleteCustomer(event, data, customerIndex) {

@@ -291,7 +291,6 @@ export default {
         })
 
         this.mitarbeiter = mitarbeiterList
-        console.log(mitarbeiterList)
       } catch (error) {
         if (error instanceof AppwriteException) {
           if (error.code == 401) {

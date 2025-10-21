@@ -12,7 +12,7 @@ import * as pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs' // KEEP - Wor
 
 import App from './App.vue'
 import router from './router'
-import { ConfirmationService } from 'primevue'
+import { ConfirmationService, Ripple } from 'primevue'
 
 const app = createApp(App)
 
@@ -30,6 +30,7 @@ app.use(PrimeVue, {
 })
 app.use(ToastService)
 app.use(ConfirmationService)
+app.directive('ripple', Ripple)
 
 updatePrimaryPalette(palette('#5ebae6')) //OLD: #6bd0ff
 

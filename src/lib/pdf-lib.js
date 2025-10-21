@@ -40,7 +40,6 @@ export const fillMotorPDF = async (inputValues, signatureBase64) => {
     )
 
   // SET FIELDS
-  console.log(inputData)
   for (const [key, value] of Object.entries(inputData)) {
     // SET TEXT FIELDS
     if (fieldDataMotor.textfields[key]) {
@@ -110,7 +109,6 @@ export const fillMüllanlagePDF = async (inputValues, signatureBase64) => {
     )
 
   // SET FIELDS
-  console.log(inputData)
   for (const [key, value] of Object.entries(inputData)) {
     // SET TEXT FIELDS
     if (fieldDataMuell.textfields[key]) {
@@ -180,7 +178,6 @@ export const fillPumpePDF = async (inputValues, signatureBase64) => {
     )
 
   // SET FIELDS
-  console.log(inputData)
   for (const [key, value] of Object.entries(inputData)) {
     // SET TEXT FIELDS
     if (fieldDataPumpe.textfields[key]) {
@@ -250,7 +247,6 @@ export const fillWehrtorePDF = async (inputValues, signatureBase64) => {
     )
 
   // SET FIELDS
-  console.log(inputData)
   for (const [key, value] of Object.entries(inputData)) {
     // SET TEXT FIELDS
     if (fieldDataWehrtor.textfields[key]) {
@@ -320,7 +316,6 @@ export const fillLüfterPDF = async (inputValues, signatureBase64) => {
     )
 
   // SET FIELDS
-  console.log(inputData)
   for (const [key, value] of Object.entries(inputData)) {
     // SET TEXT FIELDS
     if (fieldDataLuefter.textfields[key]) {
@@ -390,7 +385,6 @@ export const fillSchmutzwasserPDF = async (inputValues, signatureBase64) => {
     )
 
   // SET FIELDS
-  console.log(inputData)
   for (const [key, value] of Object.entries(inputData)) {
     // SET TEXT FIELDS
     if (fieldDataSchmutzwasser.textfields[key]) {
@@ -460,7 +454,6 @@ export const fillWärmetauscherPDF = async (inputValues, signatureBase64) => {
     )
 
   // SET FIELDS
-  console.log(inputData)
   for (const [key, value] of Object.entries(inputData)) {
     // SET TEXT FIELDS
     if (fieldDataWaermetauscher.textfields[key]) {
@@ -532,7 +525,6 @@ export const fillEnthärtungsanlagePDF = async (inputValues, signatureBase64) =>
     )
 
   // SET FIELDS
-  console.log(inputData)
   for (const [key, value] of Object.entries(inputData)) {
     // SET TEXT FIELDS
     if (fieldDataEnthaertungsanlage.textfields[key]) {

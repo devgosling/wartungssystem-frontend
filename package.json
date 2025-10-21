@@ -17,6 +17,7 @@
     "axios": "^1.11.0",
     "email-validator": "^2.0.4",
     "fs": "^0.0.1-security",
+    "gsap": "^3.13.0",
     "lodash": "^4.17.21",
     "nodemailer": "^7.0.9",
     "pdf-lib": "^1.17.1",

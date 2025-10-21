@@ -1,6 +1,6 @@
 <template>
   <Toast />
-  <ConfirmPopup></ConfirmPopup>
+  <ConfirmPopup style="max-width: 35rem;"></ConfirmPopup>
   <main>
     <Sidebar v-if="!hideSidebar" />
     <div id="router-view-main">

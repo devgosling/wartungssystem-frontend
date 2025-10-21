@@ -586,8 +586,11 @@
                   width: 100%;
                 "
               >
-                <h1>Diese Funktion gibt es leider noch nicht :(</h1>
-                <span>Wartungsberichte können derzeit noch nicht hochgeladen werden.</span>
+                <h1>Diese Funktion ist noch nicht für dich verfügbar</h1>
+                <span
+                  >Wartungsberichte in Form von PDF-Dateien können derzeit noch nicht hochgeladen
+                  werden.</span
+                >
               </div>
             </transition>
           </div>
@@ -749,6 +752,7 @@ import Schmutzwasser_Filler from '@/components/Schmutzwasser_Filler.vue'
 import Waermetauscher_Filler from '@/components/Waermetauscher_Filler.vue'
 import Enthaertungsanlage_Filler from '@/components/Enthaertungsanlage_Filler.vue'
 import ViewCustomerDialog from '@/components/ViewCustomerDialog.vue'
+import { update } from 'lodash'
 
 export default {
   components: {
@@ -783,12 +787,11 @@ export default {
     CreateCustomerDialog,
     CreateIdentifierDialog,
     Tag,
-    ViewCustomerDialog
+    ViewCustomerDialog,
   },
 
   data() {
     return {
-
       viewingCustomer: null,
 
       openDialog: false,
@@ -910,6 +913,14 @@ export default {
   },
 
   watch: {
+    inputValues: {
+      handler(newVal) {
+        if (!useInputStore().isEditingSomething) {
+          useInputStore().setIsEditingSomething(true)
+        }
+      },
+      deep: true,
+    },
     'inputValues.berichtType'(newVal) {
       this.kundeLocked = newVal.id == 'enthaertungsanlage'
       if (this.kundeLocked) {
@@ -1006,7 +1017,6 @@ export default {
           )
       }
       // hide the dots at the end for improved performance (better than opacity: 0 because the browser can ignore the elements)
-      // console.log('setting', dots);
       // tl.set(dots, {visibility: 'hidden'});
       return tl
     },
@@ -1167,7 +1177,6 @@ export default {
         if (this.inputValues.customer?.name == doc.name) this.inputValues.customer = doc
       })
     },
-
     async fetchWartungsberichte() {
       const documentList = await databases.listDocuments(
         '6878f5900032addce7e5',
@@ -1187,6 +1196,7 @@ export default {
 
       this.wartungsberichte = documentList
     },
+
     async resetDataAndCreateNew(callback) {
       this.inputValues = {
         berichtType: '',
@@ -1368,14 +1378,11 @@ export default {
         },
       })
     },
-    logout() {
-      account.deleteSession('current')
-    },
     activateSignPad() {
-      if (this.signature) {
+      /*if (this.signature) {
         this.signpad.fromDataURL(this.signature)
         return
-      }
+      }*/
       if (this.signpad) return
 
       let canvas = document.getElementById('signpad')
@@ -1394,7 +1401,6 @@ export default {
       let pdf
       let has2Pages = false
       this.$refs.filler.broadcastInputsToStore()
-      console.log(signature)
 
       switch (this.inputValues.berichtType.id) {
         case 'motor':
@@ -1476,9 +1482,11 @@ export default {
         JSON.stringify({
           email: this.inputValues.customer.email,
           subject:
-            this.inputValues.berichtType.id == 'enthaertungsanlage'
+            (this.inputValues.berichtType.id == 'enthaertungsanlage'
               ? 'Überprüfungsbericht'
-              : 'Wartungsbericht' + ' - ' + this.inputValues.berichtType.filekey,
+              : 'Wartungsbericht') +
+            ' - ' +
+            this.inputValues.berichtType.filekey,
           type: this.inputValues.berichtType.id == 'enthaertungsanlage' ? 1 : 0,
           fileID: fileID,
           fileName: filename,
@@ -1493,6 +1501,7 @@ export default {
 
       this.isSending = false
       this.isSent = true
+      useInputStore().setIsEditingSomething(false)
     },
   },
 }
