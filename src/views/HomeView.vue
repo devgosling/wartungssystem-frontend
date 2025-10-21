@@ -161,7 +161,18 @@ export default {
         },
         scales: {
           x: {},
-          y: {},
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function (label) {
+                // show only whole numbers
+                if (Number.isInteger(label)) {
+                  return label
+                }
+                return null // hide non-integer tick
+              },
+            },
+          },
         },
       }
     },
