@@ -600,6 +600,8 @@
     <Card>
       <template #content>
         <DataTable
+          scrollHeight="74vh"
+          scrollable
           v-model:filters="filters"
           :value="wartungsberichte?.documents"
           :loading="!wartungsberichte"
@@ -609,6 +611,7 @@
             'kunde.name',
             'identifikator',
             '$sequence',
+            'type',
           ]"
         >
           <template #header>
@@ -628,19 +631,40 @@
             </template>
           </Column>
           <Column field="erstellungsdatum" header="Erstellungsdatum"> </Column>
-          <Column field="mitarbeiter" header="Mitarbeiter"></Column>
-          <Column field="kunde" header="Kunde">
+          <Column
+            field="mitarbeiter"
+            header="Mitarbeiter"
+            :bodyStyle="{ minWidth: 'max-content', whiteSpace: 'nowrap' }"
+          ></Column>
+          <Column field="kunde" header="Kunde" style="min-width: 15rem">
             <template #body="slotProps">
               {{ slotProps.data.kunde.name }}
             </template>
           </Column>
-          <Column field="identifikator" header="Identifikator">
+          <Column field="type" header="Typ">
+            <template #body="slotProps">
+              <span style="display: flex; align-items: center; gap: 0.35rem"
+                ><i :class="berichte.find((el) => el.filekey == slotProps.data.type).icon"></i
+                >{{ slotProps.data.type }}</span
+              >
+            </template>
+          </Column>
+          <Column
+            field="identifikator"
+            header="Identifikator"
+            :bodyStyle="{ minWidth: 'max-content', whiteSpace: 'nowrap' }"
+          >
             <template #body="slotProps">
               <Tag v-if="slotProps.data.identifikator" :value="slotProps.data.identifikator"></Tag>
               <div v-else>-</div>
             </template>
           </Column>
-          <Column field="actions" header="Aktionen">
+          <Column
+            field="actions"
+            header="Aktionen"
+            frozen
+            alignFrozen="right"
+          >
             <template #body="slotProps">
               <div style="display: flex; gap: 0.2rem">
                 <Button
@@ -1475,6 +1499,7 @@ export default {
         kunde: JSON.stringify(this.inputValues.customer),
         wartungsberichtid: fileID,
         identifikator: this.inputValues.identifier ?? null,
+        type: this.inputValues.berichtType.filekey,
       })
 
       await functions.createExecution(
@@ -1507,6 +1532,26 @@ export default {
 }
 </script>
 <style lang="scss">
+.p-datatable-frozen-column {
+  inset-inline-end: 1px !important;
+  border-left: 1px solid var(--p-surface-200) !important;
+}
+
+.p-datatable {
+  &::after {
+    content: '';
+    display: block;
+    width: 1px;
+    pointer-events: none;
+    height: 100%;
+    background-color: white;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 3;
+  }
+}
+
 .wartungsberichte {
   display: flex;
   flex-direction: column;

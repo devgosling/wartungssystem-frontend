@@ -2,7 +2,12 @@
   <h1>Dashboard</h1>
   <div class="dashboard">
     <div class="dashboard-cards">
-      <Card class="dashboard-cards-card" v-for="item in dashboardItems" @click="router.push({path: item.redirectTo})" v-ripple>
+      <Card
+        class="dashboard-cards-card"
+        v-for="item in dashboardItems"
+        @click="router.push({ path: item.redirectTo })"
+        v-ripple
+      >
         <template #content>
           <div class="dashboard-cards-card-content">
             <div>
@@ -16,21 +21,55 @@
         </template>
       </Card>
     </div>
+    <Card class="dashboard-chart">
+      <template #title>
+        <div class="dashboard-chart-title">
+          <span>Wartungsberichte</span>
+          <SelectButton
+            v-model="rangeDays"
+            optionLabel="name"
+            optionValue="value"
+            :options="[
+              { name: '7 Tage', value: 7 },
+              { name: '30 Tage', value: 30 },
+              { name: '90 Tage', value: 90 },
+            ]"
+          ></SelectButton>
+        </div>
+      </template>
+      <template #content>
+        <Chart
+          type="line"
+          class="dashboard-chart-chart"
+          :data="chartDataObj"
+          :options="chartOptions()"
+          style="height: 20rem; width: 100%"
+        />
+      </template>
+    </Card>
   </div>
 </template>
 <script>
 import { account, databases } from '@/lib/appwrite'
-import { Card } from 'primevue'
+import { Card, SelectButton } from 'primevue'
 import gsap from 'gsap'
-import router from '@/router';
+import router from '@/router'
+import { subDays, format, parseISO } from 'date-fns'
+import Chart from 'primevue/chart'
 
 export default {
   components: {
     Card,
+    SelectButton,
+    Chart,
   },
 
   data() {
     return {
+      rangeDays: 7,
+      files: [],
+      chartDataObj: null,
+
       router: router,
       values: {
         wartungsberichte: { val: 0 },
@@ -66,7 +105,14 @@ export default {
     }
   },
 
+  watch: {
+    rangeDays(newVal) {
+      this.updateChartData()
+    },
+  },
+
   async mounted() {
+    this.loadFiles()
     const counts = await Promise.all(
       this.dashboardItems.map((item) => this.getEntryCount(item.table)),
     )
@@ -82,6 +128,44 @@ export default {
   },
 
   methods: {
+    async loadFiles() {
+      this.files = (
+        await databases.listDocuments('6878f5900032addce7e5', '68866dc60038038dbe27')
+      ).documents
+
+      this.updateChartData()
+    },
+
+    updateChartData() {
+      const counts = this.getCounts(this.files, this.rangeDays)
+      this.chartDataObj = {
+        labels: counts.map((c) => c.date),
+        datasets: [
+          {
+            label: 'Wartungsberichte erstellt',
+            data: counts.map((c) => c.count), // remove *2 unless needed
+            fill: true,
+            borderColor: '#42A5F5',
+            tension: 0.4,
+          },
+        ],
+      }
+    },
+    chartOptions() {
+      return {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'none',
+          },
+        },
+        scales: {
+          x: {},
+          y: {},
+        },
+      }
+    },
+
     async getEntryCount(tableID) {
       try {
         const customerList = await databases.listDocuments('6878f5900032addce7e5', tableID)
@@ -96,12 +180,40 @@ export default {
         throw error
       }
     },
+
+    getCounts(files, days) {
+      const today = new Date()
+      const counts = Array.from({ length: days }, (_, i) => {
+        const date = subDays(today, days - 1 - i)
+        const dateStr = format(date, 'dd.MM.yyy')
+        const count = files.filter(
+          (f) => format(parseISO(f.$createdAt), 'dd.MM.yyyy') === dateStr,
+        ).length
+        return { date: dateStr, count }
+      })
+      return counts
+    },
   },
 }
 </script>
 <style lang="scss">
 .dashboard {
   margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  &-chart {
+    &-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    &-chart canvas {
+      width: max-content !important;
+    }
+  }
 
   &-cards {
     display: flex;
@@ -113,6 +225,7 @@ export default {
       border-width: 1px;
       border-color: var(--p-content-border-color);
       border-style: solid;
+      min-width: max-content;
 
       cursor: pointer;
 
