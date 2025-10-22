@@ -97,12 +97,16 @@ async function guard(to, from, next) {
     var user = await account.get()
     switch (to.meta.requiresTeam) {
       case 'administration':
-        const adminTeamMemberships = await teams.listMemberships('68866cde003207e2fbab')
-        var members = []
-        adminTeamMemberships.memberships.forEach((membership) => {
-          members.push(membership.userId)
-        })
-        if (members.indexOf(user.$id) !== -1) hasAccess = true
+        try {
+          const adminTeamMemberships = await teams.listMemberships('68866cde003207e2fbab')
+          var members = []
+          adminTeamMemberships.memberships.forEach((membership) => {
+            members.push(membership.userId)
+          })
+          if (members.indexOf(user.$id) !== -1) hasAccess = true
+        } catch (err) {
+          hasAccess = false;
+        }
         break
         
         default:
