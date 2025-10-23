@@ -701,7 +701,7 @@
         <i class="fa-regular fa-file-pdf"></i> {{ viewingBericht.name }}
       </div>
     </template>
-    <p style="margin-top: 0;">Dieser Wartungsbericht wurde an die E-Mail Adresse <b>{{ viewingBericht.data.kunde.email }}</b> versendet.</p>
+    <p style="margin-top: 0;">Dieser Wartungsbericht wurde an die E-Mail Adresse <a :href="'mailto:' + viewingBericht.data.kunde.email"><b>{{ viewingBericht.data.kunde.email }}</b></a> versendet.</p>
     <img :src="viewingBericht.img" alt="" style="width: 100%" />
     <img v-if="viewingBericht.img2" :src="viewingBericht.img2" alt="" style="width: 100%" />
   </Dialog>
