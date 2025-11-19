@@ -110,54 +110,7 @@
                         </div>
                         <div class="wartungsberichte-create-panel-grid-inpt">
                           <label for="wartungsbericht-slct">Bearbeitender Mitarbeiter</label>
-                          <Select
-                            id="wartungsbericht-slct"
-                            placeholder="Kein Mitarbeiter ausgewählt"
-                            :options="mitarbeiter.sort()"
-                            class="wartungsberichte-create-panel-grid-slct-type"
-                            v-model="inputValues.employee"
-                          >
-                            <template #value="slotProps">
-                              <div
-                                v-if="slotProps.value"
-                                style="display: flex; align-items: center; gap: 0.4rem"
-                              >
-                                <i :class="'fa-solid fa-user-tie'" />{{ slotProps.value }}
-                              </div>
-                              <div v-else>
-                                {{ slotProps.placeholder }}
-                              </div>
-                            </template>
-                            <template #option="slotProps">
-                              <div
-                                style="
-                                  text-wrap: wrap;
-                                  word-wrap: normal;
-                                  display: grid;
-                                  grid-template-columns: 1.2rem auto;
-                                  gap: 0.5rem;
-                                  align-items: center;
-                                "
-                              >
-                                <i
-                                  :class="
-                                    'fa-regular fa-' + slotProps.option.charAt(0).toLowerCase()
-                                  "
-                                />{{ slotProps.option }}
-                              </div>
-                            </template>
-                            <template #header>
-                              <div
-                                style="
-                                  font-weight: 500;
-                                  padding: 0.75rem 1rem;
-                                  padding-bottom: 0.25rem;
-                                "
-                              >
-                                Verfügbare Mitarbeiter
-                              </div>
-                            </template>
-                          </Select>
+                          <InputText id="wartungsbericht-slct" disabled :value="inputValues.employee" />
                         </div>
                         <div class="wartungsberichte-create-panel-grid-inpt">
                           <label for="wartungsbericht-slct">Datum</label>
@@ -659,12 +612,7 @@
               <div v-else>-</div>
             </template>
           </Column>
-          <Column
-            field="actions"
-            header="Aktionen"
-            frozen
-            alignFrozen="right"
-          >
+          <Column field="actions" header="Aktionen" frozen alignFrozen="right">
             <template #body="slotProps">
               <div style="display: flex; gap: 0.2rem">
                 <Button
@@ -701,7 +649,13 @@
         <i class="fa-regular fa-file-pdf"></i> {{ viewingBericht.name }}
       </div>
     </template>
-    <p style="margin-top: 0;">Dieser Wartungsbericht wurde an die E-Mail Adresse <a :href="'mailto:' + viewingBericht.data.kunde.email"><b>{{ viewingBericht.data.kunde.email }}</b></a> versendet.</p>
+    <p style="margin-top: 0">
+      Dieser Wartungsbericht wurde an die E-Mail Adresse
+      <a :href="'mailto:' + viewingBericht.data.kunde.email"
+        ><b>{{ viewingBericht.data.kunde.email }}</b></a
+      >
+      versendet.
+    </p>
     <img :src="viewingBericht.img" alt="" style="width: 100%" />
     <img v-if="viewingBericht.img2" :src="viewingBericht.img2" alt="" style="width: 100%" />
   </Dialog>
@@ -817,6 +771,7 @@ export default {
 
   data() {
     return {
+      username: null,
       viewingCustomer: null,
 
       openDialog: false,
@@ -959,6 +914,8 @@ export default {
     this.confetti_setup()
     this.fetchEmployees()
     this.fetchCustomers()
+
+    this.inputValues.employee = (await account.get()).name
   },
 
   methods: {
@@ -1229,6 +1186,8 @@ export default {
         date: '',
         customer: null,
       }
+
+      this.inputValues.employee = (await account.get()).name
 
       await callback('1')
 

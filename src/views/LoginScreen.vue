@@ -126,6 +126,8 @@ export default {
 
       try {
         await account.createEmailPasswordSession(this.email, this.password)
+        let prefs = await account.getPrefs()
+        console.log(prefs);
         router.push('/')
       } catch (e) {
         if (e instanceof AppwriteException) {

@@ -17,7 +17,7 @@
         <DataTable
           v-if="permission"
           v-model:filters="filters"
-          :value="mitarbeiter?.documents"
+          :value="mitarbeiter?.users"
           :loading="!mitarbeiter"
         >
           <template #header>
@@ -33,7 +33,7 @@
           </template>
           <Column field="" header="#">
             <template #body="slotProps">
-              {{ slotProps.data.$sequence }}
+              {{ slotProps.index + 1 }}
             </template>
           </Column>
           <Column field="name" header="Name"> </Column>
@@ -111,9 +111,9 @@
   </Dialog>
 </template>
 <script>
-import { databases } from '@/lib/appwrite'
+import { databases, functions } from '@/lib/appwrite'
 import { FilterMatchMode } from '@primevue/core'
-import { AppwriteException, ID, Query } from 'appwrite'
+import { AppwriteException, ExecutionMethod, ID, Query } from 'appwrite'
 import { Button, Card, Column, DataTable, Dialog, IconField, InputIcon, InputText } from 'primevue'
 
 export default {
@@ -164,47 +164,54 @@ export default {
         },
         accept: async () => {
           this.deletingEmployee = employeeIndex
+          let res = await functions.createExecution(
+            '68f3d2b9001562f115c8',
+            JSON.stringify({ userid: 'data.$id' }),
+            false,
+            '/deleteuser',
+          )
 
-          try {
-            await databases.deleteDocument('6878f5900032addce7e5', '68866db100220a383390', data.$id)
-          } catch (err) {
-            if (err instanceof AppwriteException) {
-              switch (err.code) {
-                case 404:
-                  this.$toast.add({
-                    severity: 'error',
-                    summary: 'Mitarbeiter nicht gefunden',
-                    detail: 'Der Mitarbeiter wurde nicht gefunden',
-                    life: 5000,
-                  })
-                  break
-                case 401:
-                  this.$toast.add({
-                    severity: 'error',
-                    summary: 'Keine Berechtigungen',
-                    detail:
-                      'Du bist nicht dazu berichtigt Mitarbeiter zu löschen, bist du auf dem richtigen Konto angemeldet?',
-                    life: 5000,
-                  })
-                  break
-                default:
-                  break
-              }
-            }
-            this.deletingEmployee = -1
-            return
+          switch (res.responseStatusCode) {
+            case 200:
+              this.$toast.add({
+                severity: 'success',
+                summary: 'Mitarbeiter gelöscht',
+                detail: 'Mitarbeiter ' + data.name + ' wurde erfolgreich gelöscht.',
+                life: 5000,
+              })
+              break
+            case 404:
+              this.$toast.add({
+                severity: 'error',
+                summary: 'Mitarbeiter nicht gefunden',
+                detail: 'Der Mitarbeiter wurde nicht gefunden',
+                life: 5000,
+              })
+              break
+            case 401:
+              this.$toast.add({
+                severity: 'error',
+                summary: 'Keine Berechtigungen',
+                detail:
+                  'Du bist nicht dazu berichtigt Mitarbeiter zu löschen, bist du auf dem richtigen Konto angemeldet?',
+                life: 5000,
+              })
+              break
+            default:
+              this.$toast.add({
+                severity: 'error',
+                summary: 'Fehler',
+                detail:
+                  'Es ist ein unbekannter Fehler aufgetreten, bitte wende dich an einen Systemadministrator',
+                life: 5000,
+              })
+              break
           }
-
-          this.$toast.add({
-            severity: 'success',
-            summary: 'Mitarbeiter gelöscht',
-            detail: 'Mitarbeiter ' + data.name + ' wurde erfolgreich gelöscht.',
-            life: 5000,
-          })
 
           this.retrieveMitarbeiter()
 
           this.deletingBericht = null
+          this.deletingEmployee = -1
         },
       })
     },
@@ -229,16 +236,36 @@ export default {
         this.creatingUser = false
         return
       }
-      await databases.createDocument('6878f5900032addce7e5', '68866db100220a383390', ID.unique(), {
-        name: combinedName,
-      })
 
-      this.$toast.add({
-        severity: 'success',
-        summary: 'Mitarbeiter erstellt',
-        detail: 'Mitarbeiter ' + combinedName + ' wurde erfolgreich erstellt.',
-        life: 5000,
-      })
+      let res = await functions.createExecution(
+        '68f3d2b9001562f115c8',
+        JSON.stringify({
+          firstname: firstname,
+          lastname: lastname,
+        }),
+        false,
+        '/createuser',
+      )
+
+      switch (res.responseStatusCode) {
+        case 200:
+          this.$toast.add({
+            severity: 'success',
+            summary: 'Mitarbeiter erstellt',
+            detail: 'Mitarbeiter ' + combinedName + ' wurde erfolgreich erstellt.',
+            life: 5000,
+          })
+          break
+        default:
+          this.$toast.add({
+            severity: 'error',
+            summary: 'Fehler',
+            detail:
+              'Es ist ein unbekannter Fehler aufgetreten, bitte wende dich an einen Systemadministrator',
+            life: 5000,
+          })
+          break
+      }
 
       this.openDialog = false
 
@@ -246,14 +273,20 @@ export default {
       this.creatingUser = false
     },
     async getEmployeeTable() {
-      const mitarbeiterList = await databases.listDocuments(
-        '6878f5900032addce7e5',
-        '68866db100220a383390',
-        [Query.orderAsc('$sequence')],
+      let userList = JSON.parse(
+        (
+          await functions.createExecution(
+            '68f3d2b9001562f115c8',
+            '{}',
+            false,
+            '/listusers',
+            ExecutionMethod.GET,
+          )
+        ).responseBody,
       )
       var table = []
 
-      mitarbeiterList.documents.forEach((doc) => {
+      userList.users.forEach((doc) => {
         table.push(doc.name)
       })
 
@@ -261,11 +294,19 @@ export default {
     },
     async retrieveMitarbeiter() {
       try {
-        const mitarbeiterList = await databases.listDocuments(
-          '6878f5900032addce7e5',
-          '68866db100220a383390',
-          [Query.orderAsc('$sequence')],
+        let userList = JSON.parse(
+          (
+            await functions.createExecution(
+              '68f3d2b9001562f115c8',
+              '{}',
+              false,
+              '/listusers',
+              ExecutionMethod.GET,
+            )
+          ).responseBody,
         )
+
+        console.log(userList)
 
         const wartungsberichteList = await databases.listDocuments(
           '6878f5900032addce7e5',
@@ -282,7 +323,7 @@ export default {
           }
         })
 
-        mitarbeiterList.documents.forEach((doc) => {
+        userList.users.forEach((doc) => {
           if (berichtCountRegistry[doc.name]) {
             doc.wartungsberichte = berichtCountRegistry[doc.name]
           } else {
@@ -290,7 +331,7 @@ export default {
           }
         })
 
-        this.mitarbeiter = mitarbeiterList
+        this.mitarbeiter = userList
       } catch (error) {
         if (error instanceof AppwriteException) {
           if (error.code == 401) {

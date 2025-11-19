@@ -50,12 +50,13 @@
   </div>
 </template>
 <script>
-import { account, databases } from '@/lib/appwrite'
+import { account, databases, functions } from '@/lib/appwrite'
 import { Card, SelectButton } from 'primevue'
 import gsap from 'gsap'
 import router from '@/router'
 import { subDays, format, parseISO } from 'date-fns'
 import Chart from 'primevue/chart'
+import { ExecutionMethod } from 'appwrite'
 
 export default {
   components: {
@@ -90,7 +91,7 @@ export default {
           icon: 'fa-regular fa-user',
           color: 'rgb(192, 132, 252)',
           value: 'mitarbeiter',
-          table: '68866db100220a383390',
+          table: 'none',
           redirectTo: '/employees',
         },
         {
@@ -178,6 +179,11 @@ export default {
     },
 
     async getEntryCount(tableID) {
+      if (tableID == 'none') {
+        let userList = await this.getUserList()
+        return userList.total
+      }
+
       try {
         const customerList = await databases.listDocuments('6878f5900032addce7e5', tableID)
 
@@ -203,6 +209,21 @@ export default {
         return { date: dateStr, count }
       })
       return counts
+    },
+    async getUserList() {
+      let userList = JSON.parse(
+        (
+          await functions.createExecution(
+            '68f3d2b9001562f115c8',
+            '{}',
+            false,
+            '/listusers',
+            ExecutionMethod.GET,
+          )
+        ).responseBody,
+      )
+
+      return userList
     },
   },
 }

@@ -25,10 +25,31 @@
       <Button variant="outlined" severity="secondary" class="sidebar-ctgry-tab">Wärmetaucher</Button>-->
     </div>
 
-    <div class="sidebar-lwr">
-      <button class="sidebar-tab danger" @click="logout">
-        <i class="fa-regular fa-right-from-bracket"></i> Abmelden
-      </button>
+    <div class="sidebar-lwr" style="display: flex; flex-direction: column;">
+      <div style="padding: 0.5rem">
+        <div style="width: 100%; background-color: var(--p-surface-300); height: 1px"></div>
+      </div>
+      <div style="background-color: var(--p-surface-200); padding: 0.5rem; border-radius: 0.5rem; display: flex; flex-direction: column; gap: 0.3rem">
+        <span style="font-size: 0.875rem; color: var(--p-surface-600);">Angemeldet als</span>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <Avatar
+            v-if="username"
+            :label="
+              username
+                .toString()
+                .split(' ')
+                .map((v, i) => v.split('')[0])
+                .join('')
+            "
+            style="background-color: var(--p-primary-300);"
+            shape="circle"
+          />
+          <span style="font-weight: 500; font-size: 1rem; color: var(--p-surface-700);">
+            {{ username }}
+          </span>
+        </div>
+        <Button @click="logout" icon="fa-solid fa-arrow-right-from-bracket" size="small" severity="secondary" label="Abmelden"></Button>
+      </div>
     </div>
   </div>
 </template>
@@ -36,11 +57,14 @@
 import { account } from '@/lib/appwrite'
 import router from '@/router'
 import { useInputStore } from '@/stores/inputStore'
-import { Button } from 'primevue'
+import { toString } from 'lodash'
+import { Avatar, Button, Divider } from 'primevue'
 
 export default {
   components: {
     Button,
+    Avatar,
+    Divider,
   },
 
   data() {
@@ -52,7 +76,13 @@ export default {
         { title: 'Kundenstammdaten', icon: 'fa-solid fa-user-tie', path: '/customers' },
         { title: 'Mitarbeiter', icon: 'fa-regular fa-users', path: '/employees' },
       ],
+      username: null,
     }
+  },
+
+  async mounted() {
+    let userAccount = await account.get()
+    this.username = userAccount.name
   },
 
   methods: {
