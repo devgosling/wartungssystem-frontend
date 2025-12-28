@@ -19,7 +19,7 @@ export default defineConfig({
         description: 'Wartungsystem für die Kromholz Wassertechnik',
         theme_color: '#85c6ff',
         background_color: '#ffffff',
-        display: 'standalone',
+        display: 'fullscreen',
         start_url: '/',
         icons: [
           {
