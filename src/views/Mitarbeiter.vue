@@ -166,7 +166,7 @@ export default {
           this.deletingEmployee = employeeIndex
           let res = await functions.createExecution(
             '68f3d2b9001562f115c8',
-            JSON.stringify({ userid: 'data.$id' }),
+            JSON.stringify({ userid: data.$id }),
             false,
             '/deleteuser',
           )
