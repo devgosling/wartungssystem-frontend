@@ -64,7 +64,8 @@ export const fillMotorPDF = async (inputValues, signatureBase64) => {
   // SET SIGNATURE
   const pages = pdfDoc.getPages()
   const firstPage = pages[0]
-  const pngDims = (await signatureImage).scale(0.23)
+  let scaleToWidth = 110.4
+  const pngDims = (await signatureImage).scale(scaleToWidth / signatureImage.width)
 
   firstPage.drawImage(signatureImage, {
     x: 453,
@@ -133,7 +134,8 @@ export const fillMüllanlagePDF = async (inputValues, signatureBase64) => {
   // SET SIGNATURE
   const pages = pdfDoc.getPages()
   const firstPage = pages[1]
-  const pngDims = (await signatureImage).scale(0.23)
+  let scaleToWidth = 110.4
+  const pngDims = (await signatureImage).scale(scaleToWidth / signatureImage.width)
 
   firstPage.drawImage(signatureImage, {
     x: 453,
@@ -202,7 +204,8 @@ export const fillPumpePDF = async (inputValues, signatureBase64) => {
   // SET SIGNATURE
   const pages = pdfDoc.getPages()
   const firstPage = pages[0]
-  const pngDims = (await signatureImage).scale(0.23)
+  let scaleToWidth = 110.4
+  const pngDims = (await signatureImage).scale(scaleToWidth / signatureImage.width)
 
   firstPage.drawImage(signatureImage, {
     x: 453,
@@ -271,7 +274,8 @@ export const fillWehrtorePDF = async (inputValues, signatureBase64) => {
   // SET SIGNATURE
   const pages = pdfDoc.getPages()
   const firstPage = pages[0]
-  const pngDims = (await signatureImage).scale(0.23)
+  let scaleToWidth = 110.4
+  const pngDims = (await signatureImage).scale(scaleToWidth / signatureImage.width)
 
   firstPage.drawImage(signatureImage, {
     x: 453,
@@ -340,7 +344,8 @@ export const fillLüfterPDF = async (inputValues, signatureBase64) => {
   // SET SIGNATURE
   const pages = pdfDoc.getPages()
   const firstPage = pages[0]
-  const pngDims = (await signatureImage).scale(0.23)
+  let scaleToWidth = 110.4
+  const pngDims = (await signatureImage).scale(scaleToWidth / signatureImage.width)
 
   firstPage.drawImage(signatureImage, {
     x: 453,
@@ -409,7 +414,8 @@ export const fillSchmutzwasserPDF = async (inputValues, signatureBase64) => {
   // SET SIGNATURE
   const pages = pdfDoc.getPages()
   const firstPage = pages[0]
-  const pngDims = (await signatureImage).scale(0.23)
+  let scaleToWidth = 110.4
+  const pngDims = (await signatureImage).scale(scaleToWidth / signatureImage.width)
 
   firstPage.drawImage(signatureImage, {
     x: 453,
@@ -478,7 +484,8 @@ export const fillWärmetauscherPDF = async (inputValues, signatureBase64) => {
   // SET SIGNATURE
   const pages = pdfDoc.getPages()
   const firstPage = pages[0]
-  const pngDims = (await signatureImage).scale(0.23)
+  let scaleToWidth = 110.4
+  const pngDims = (await signatureImage).scale(scaleToWidth / signatureImage.width)
 
   firstPage.drawImage(signatureImage, {
     x: 453,
@@ -555,7 +562,8 @@ export const fillEnthärtungsanlagePDF = async (inputValues, signatureBase64) =>
   // SET SIGNATURE
   const pages = pdfDoc.getPages()
   const firstPage = pages[0]
-  const pngDims = (await signatureImage).scale(0.23)
+  let scaleToWidth = 110.4
+  const pngDims = (await signatureImage).scale(scaleToWidth / signatureImage.width)
 
   firstPage.drawImage(signatureImage, {
     x: 453,

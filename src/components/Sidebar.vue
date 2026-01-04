@@ -1,70 +1,89 @@
 <template>
-  <div class="sidebar">
-    <div class="sidebar-uppr">
-      <img src="../assets/Wassertechnik_Schrift.png" alt="" draggable="false" />
+  <div>
+    <!-- Mobile Menu Button -->
+    <button 
+      v-if="isMobile" 
+      class="mobile-menu-btn" 
+      @click="toggleSidebar"
+      :class="{ 'menu-open': sidebarOpen }"
+    >
+      <i :class="sidebarOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars'"></i>
+    </button>
 
-      <!-- TODO: Wartungsberichte Tabs einfügen -->
-      <!-- TODO: Kundendatenbank einfügen -->
-      <!-- TODO: Benutzerverwaltung einfügem -->
+    <!-- Overlay for mobile -->
+    <div 
+      v-if="isMobile && sidebarOpen" 
+      class="sidebar-overlay" 
+      @click="closeSidebar"
+    ></div>
 
-      <button
-        v-for="(tab, index) in tabs"
-        :key="index"
-        class="sidebar-tab"
-        :data-active="vrouter.currentRoute.path == tab.path ? true : false"
-        @click="navigate($event, tab.path)"
-      >
-        <i :class="tab.icon"></i> {{ tab.title }}
-      </button>
-      <!--<Button variant="outlined" severity="secondary" class="sidebar-ctgry-tab">Lüfter</Button>
-      <Button variant="outlined" severity="secondary" class="sidebar-ctgry-tab">Motor</Button>
-      <Button variant="outlined" severity="secondary" class="sidebar-ctgry-tab">Wehrtore</Button>
-      <Button variant="outlined" severity="secondary" class="sidebar-ctgry-tab">Schmutzwasser [...]</Button>
-      <Button variant="outlined" severity="secondary" class="sidebar-ctgry-tab">Müllanlage</Button>
-      <Button variant="outlined" severity="secondary" class="sidebar-ctgry-tab">Pumpe</Button>
-      <Button variant="outlined" severity="secondary" class="sidebar-ctgry-tab">Wärmetaucher</Button>-->
-    </div>
+    <!-- Sidebar -->
+    <div 
+      class="sidebar" 
+      :class="{ 
+        'mobile-closed': isMobile && !sidebarOpen,
+        'mobile-open': isMobile && sidebarOpen 
+      }"
+    >
+      <div class="sidebar-uppr">
+        <img src="../assets/Wassertechnik_Schrift.png" alt="" draggable="false" />
 
-    <div class="sidebar-lwr" style="display: flex; flex-direction: column;">
-      <div style="padding: 0.5rem">
-        <div style="width: 100%; background-color: var(--p-surface-300); height: 1px"></div>
+        <button
+          v-for="(tab, index) in tabs"
+          :key="index"
+          class="sidebar-tab"
+          :data-active="vrouter.currentRoute.path == tab.path ? true : false"
+          @click="navigate($event, tab.path)"
+        >
+          <i :class="tab.icon"></i> 
+          <span class="tab-title">{{ tab.title }}</span>
+        </button>
       </div>
-      <div style="background-color: var(--p-surface-200); padding: 0.5rem; border-radius: 0.5rem; display: flex; flex-direction: column; gap: 0.3rem">
-        <span style="font-size: 0.875rem; color: var(--p-surface-600);">Angemeldet als</span>
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <Avatar
-            v-if="username"
-            :label="
-              username
-                .toString()
-                .split(' ')
-                .map((v, i) => v.split('')[0])
-                .join('')
-            "
-            style="background-color: var(--p-primary-300);"
-            shape="circle"
-          />
-          <span style="font-weight: 500; font-size: 1rem; color: var(--p-surface-700);">
-            {{ username }}
-          </span>
+
+      <div class="sidebar-lwr">
+        <div class="divider-wrapper">
+          <div class="divider"></div>
         </div>
-        <Button @click="logout" icon="fa-solid fa-arrow-right-from-bracket" size="small" severity="secondary" label="Abmelden"></Button>
+        <div class="user-info-card">
+          <span class="user-label">Angemeldet als</span>
+          <div class="user-details">
+            <Avatar
+              v-if="username"
+              :label="
+                username
+                  .toString()
+                  .split(' ')
+                  .map((v, i) => v.split('')[0])
+                  .join('')
+              "
+              style="background-color: var(--p-primary-300);"
+              shape="circle"
+            />
+            <span class="username">{{ username }}</span>
+          </div>
+          <Button 
+            @click="logout" 
+            icon="fa-solid fa-arrow-right-from-bracket" 
+            size="small" 
+            severity="secondary" 
+            label="Abmelden"
+          ></Button>
+        </div>
       </div>
     </div>
   </div>
 </template>
+
 <script>
 import { account } from '@/lib/appwrite'
 import router from '@/router'
 import { useInputStore } from '@/stores/inputStore'
-import { toString } from 'lodash'
-import { Avatar, Button, Divider } from 'primevue'
+import { Avatar, Button } from 'primevue'
 
 export default {
   components: {
     Button,
     Avatar,
-    Divider,
   },
 
   data() {
@@ -77,17 +96,38 @@ export default {
         { title: 'Mitarbeiter', icon: 'fa-regular fa-users', path: '/employees' },
       ],
       username: null,
+      sidebarOpen: false,
+      isMobile: false,
     }
   },
 
   async mounted() {
     let userAccount = await account.get()
     this.username = userAccount.name
+    this.checkMobile()
+    window.addEventListener('resize', this.checkMobile)
+  },
+
+  beforeUnmount() {
+    window.removeEventListener('resize', this.checkMobile)
   },
 
   methods: {
+    checkMobile() {
+      this.isMobile = window.innerWidth <= 768
+      if (!this.isMobile) {
+        this.sidebarOpen = false
+      }
+    },
+    toggleSidebar() {
+      this.sidebarOpen = !this.sidebarOpen
+    },
+    closeSidebar() {
+      this.sidebarOpen = false
+    },
     async logout() {
       await account.deleteSession('current')
+      this.closeSidebar()
       router.push('/login')
     },
     async navigate(event, path) {
@@ -107,39 +147,104 @@ export default {
             severity: 'danger',
           },
           accept: async () => {
+            this.closeSidebar()
             router.push(path)
           },
         })
       } else {
+        this.closeSidebar()
         router.push(path)
       }
     },
   },
 }
 </script>
-<style lang="scss">
-.sidebar {
-  animation-name: sidebarPopup;
-  animation-duration: 500ms;
-  animation-delay: 100ms;
-  animation-fill-mode: forwards;
-  transform: translateX(-100%);
 
+<style lang="scss">
+/* Mobile Menu Button */
+.mobile-menu-btn {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1001;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.5rem;
+  background-color: rgba(14, 102, 255, 0.9);
+  color: white;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s;
+
+  &:hover {
+    background-color: rgba(14, 102, 255, 1);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+/* Sidebar Overlay */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.sidebar {
   height: 100dvh;
   width: 100%;
-
   padding: 2rem 1rem;
-
   background-color: rgb(221, 240, 255);
-
   display: flex;
   flex-direction: column;
-
   justify-content: space-between;
+
+  /* Desktop Animation */
+  @media (min-width: 769px) {
+    animation: sidebarPopup 500ms 100ms forwards;
+    transform: translateX(-100%);
+  }
+
+  /* Mobile Styles */
+  @media (max-width: 768px) {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    width: 280px;
+    max-width: 85vw;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+
+    &.mobile-closed {
+      transform: translateX(-100%);
+    }
+
+    &.mobile-open {
+      transform: translateX(0);
+    }
+  }
 
   &-tab {
     transition: all 0.3s;
-
     width: 100%;
     font-size: 1rem;
     font-weight: 500;
@@ -150,21 +255,34 @@ export default {
     text-align: left;
     padding: 0.8rem 0.8rem;
     border-radius: 0.6rem;
-
     display: flex;
     gap: 0.6rem;
     align-items: center;
-
     cursor: pointer;
+
+    /* Mobile tap target size */
+    @media (max-width: 768px) {
+      padding: 1rem 0.8rem;
+      font-size: 0.95rem;
+    }
+
+    i {
+      min-width: 1.25rem;
+      text-align: center;
+    }
+
+    .tab-title {
+      flex: 1;
+    }
   }
 
   &-tab.danger {
     background-color: #ef4444;
     color: white;
-  }
 
-  &-tab.danger:hover {
-    background-color: #c73838;
+    &:hover {
+      background-color: #c73838;
+    }
   }
 
   &-tab[data-active='false']:hover {
@@ -179,6 +297,10 @@ export default {
   img {
     width: 100%;
     margin-bottom: 1rem;
+
+    @media (max-width: 768px) {
+      margin-bottom: 0.75rem;
+    }
   }
 
   .p-button {
@@ -189,13 +311,68 @@ export default {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    overflow-y: auto;
+    flex: 1;
+    padding-bottom: 1rem;
+
+    /* Custom scrollbar for mobile */
+    @media (max-width: 768px) {
+      &::-webkit-scrollbar {
+        width: 4px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background-color: rgba(14, 102, 255, 0.3);
+        border-radius: 2px;
+      }
+    }
   }
 
-  &-ctgry-title {
-    color: rgb(121, 155, 187);
-    font-size: 0.8rem;
-    font-weight: 600;
-    letter-spacing: 0.02rem;
+  &-lwr {
+    display: flex;
+    flex-direction: column;
+
+    .divider-wrapper {
+      padding: 0.5rem;
+
+      .divider {
+        width: 100%;
+        background-color: var(--p-surface-300);
+        height: 1px;
+      }
+    }
+
+    .user-info-card {
+      background-color: var(--p-surface-200);
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+
+      .user-label {
+        font-size: 0.875rem;
+        color: var(--p-surface-600);
+      }
+
+      .user-details {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        .username {
+          font-weight: 500;
+          font-size: 1rem;
+          color: var(--p-surface-700);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+
+          @media (max-width: 768px) {
+            font-size: 0.9rem;
+          }
+        }
+      }
+    }
   }
 }
 
@@ -205,6 +382,13 @@ export default {
   }
   to {
     transform: translateX(0%);
+  }
+}
+
+/* Prevent body scroll when sidebar is open on mobile */
+@media (max-width: 768px) {
+  body.sidebar-open {
+    overflow: hidden;
   }
 }
 </style>

@@ -110,7 +110,11 @@
                         </div>
                         <div class="wartungsberichte-create-panel-grid-inpt">
                           <label for="wartungsbericht-slct">Bearbeitender Mitarbeiter</label>
-                          <InputText id="wartungsbericht-slct" disabled :value="inputValues.employee" />
+                          <InputText
+                            id="wartungsbericht-slct"
+                            disabled
+                            :value="inputValues.employee"
+                          />
                         </div>
                         <div class="wartungsberichte-create-panel-grid-inpt">
                           <label for="wartungsbericht-slct">Datum</label>
@@ -889,6 +893,14 @@ export default {
         i: null,
         move: null,
       },
+
+      signpadResizeHandler: null,
+    }
+  },
+
+  beforeUnmount() {
+    if (this.signpadResizeHandler) {
+      window.removeEventListener('resize', this.signpadResizeHandler)
     }
   },
 
@@ -1363,21 +1375,67 @@ export default {
       })
     },
     activateSignPad() {
-      /*if (this.signature) {
-        this.signpad.fromDataURL(this.signature)
-        return
-      }*/
       if (this.signpad) return
 
       let canvas = document.getElementById('signpad')
-      canvas.setAttribute('width', getComputedStyle(canvas).width.replace('px', ''))
-      canvas.setAttribute('height', getComputedStyle(canvas).height.replace('px', ''))
-      this.signpad = new SignaturePad(canvas)
 
+      // Function to resize canvas properly
+      const resizeCanvas = () => {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1)
+
+        // Get actual display size from CSS
+        const rect = canvas.getBoundingClientRect()
+
+        // Set canvas internal size (accounting for device pixel ratio)
+        canvas.width = rect.width * ratio
+        canvas.height = rect.height * ratio
+
+        // Scale context to match device pixel ratio
+        const ctx = canvas.getContext('2d')
+        ctx.scale(ratio, ratio)
+
+        // If signature pad exists, restore the signature data
+        if (this.signpad && this.signature) {
+          this.signpad.fromDataURL(this.signature)
+        }
+      }
+
+      // Initial resize
+      resizeCanvas()
+
+      // Initialize SignaturePad
+      this.signpad = new SignaturePad(canvas, {
+        backgroundColor: 'rgb(255, 255, 255)',
+      })
+
+      // Handle signature events
       this.signpad.addEventListener('beginStroke', () => {
-        this.isSignpadEmpty = !this.signpad.isEmpty
+        this.isSignpadEmpty = false
+      })
+
+      this.signpad.addEventListener('endStroke', () => {
         this.signature = this.signpad.toDataURL()
       })
+
+      // Handle window resize
+      const handleResize = () => {
+        if (!this.signpad) return
+        const data = this.signpad.toData()
+        resizeCanvas()
+        this.signpad.clear()
+        if (data && data.length > 0) {
+          this.signpad.fromData(data)
+        }
+      }
+
+      this.$nextTick(() => {
+        handleResize()
+      })
+
+      window.addEventListener('resize', handleResize)
+
+      // Store the event listener so we can remove it later
+      this.signpadResizeHandler = handleResize
     },
     async submit(stepCallback) {
       this.generatingPDF = true
@@ -1524,10 +1582,31 @@ export default {
   &-header {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    h1 {
+      font-size: 2rem;
+
+      @media (max-width: 768px) {
+        font-size: 1.5rem;
+      }
+    }
 
     &-btns {
       display: flex;
       gap: 0.3rem;
+      flex-wrap: wrap;
+
+      @media (max-width: 768px) {
+        width: 100%;
+
+        .p-button {
+          flex: 1;
+          min-width: 0;
+        }
+      }
     }
   }
 
@@ -1535,6 +1614,10 @@ export default {
     font-size: 1rem;
     font-weight: 500;
     font-family: 'Inter', sans-serif;
+
+    @media (max-width: 768px) {
+      font-size: 0.9rem;
+    }
   }
 
   &-create-panel {
@@ -1544,27 +1627,48 @@ export default {
 
     &-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 1rem;
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
 
       &-inpt {
         display: flex;
         flex-direction: column;
+        min-width: 0;
 
         label {
           font-weight: 600;
           font-size: 1rem;
           padding-bottom: 0.3rem;
+
+          @media (max-width: 768px) {
+            font-size: 0.9rem;
+          }
+        }
+
+        .p-select,
+        .p-inputtext,
+        .p-datepicker {
+          min-width: 0;
         }
       }
 
       &-slct-type {
-        max-width: 1fr;
+        width: 100%;
+        min-width: 0;
       }
     }
 
     &-btn {
       width: fit-content;
+
+      @media (max-width: 768px) {
+        width: 100%;
+      }
     }
   }
 
@@ -1575,6 +1679,10 @@ export default {
 
     &-btn {
       width: fit-content;
+
+      @media (max-width: 768px) {
+        width: 100%;
+      }
     }
   }
 
@@ -1591,24 +1699,46 @@ export default {
         margin-top: 0.5rem;
         display: flex;
         gap: 0.3rem;
+        flex-wrap: wrap;
+
+        @media (max-width: 768px) {
+          .p-button:not(.p-button-icon-only) {
+            flex: 1;
+          }
+        }
       }
     }
 
     &-btn {
       width: fit-content;
+
+      @media (max-width: 768px) {
+        width: 100%;
+      }
     }
 
     label {
       font-weight: 600;
       font-size: 1rem;
       padding-bottom: 0.3rem;
+
+      @media (max-width: 768px) {
+        font-size: 0.9rem;
+      }
     }
 
     &-signpad {
-      width: 30rem;
-      height: 7.5rem;
+      width: 100%;
+      max-width: 30rem;
+      aspect-ratio: 4 / 1;
       border-radius: 0.5rem;
       border: 1px solid var(--p-surface-300);
+      touch-action: none;
+      display: block;
+
+      @media (max-width: 768px) {
+        max-width: 100%;
+      }
     }
   }
 
@@ -1622,6 +1752,11 @@ export default {
       grid-template-columns: 1fr 1fr;
       gap: 0.3rem;
 
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
       &-board {
         display: flex;
         flex-direction: column;
@@ -1630,15 +1765,36 @@ export default {
           display: flex;
           flex-wrap: wrap;
           gap: 0.5rem;
+
+          @media (max-width: 768px) {
+            .p-button {
+              flex: 1;
+              min-width: 0;
+            }
+          }
         }
 
         p {
           margin-bottom: 0;
+
+          @media (max-width: 768px) {
+            font-size: 0.9rem;
+          }
         }
 
         h3 {
           margin-top: 0;
           margin-bottom: 0;
+
+          @media (max-width: 768px) {
+            font-size: 1.25rem;
+          }
+        }
+
+        span {
+          @media (max-width: 768px) {
+            font-size: 0.9rem;
+          }
         }
       }
 
@@ -1648,18 +1804,81 @@ export default {
         max-width: 40rem;
         border-radius: 0.5rem;
         border: 1px solid var(--p-surface-300);
+
+        @media (max-width: 768px) {
+          justify-self: center;
+          max-width: 100%;
+        }
       }
     }
 
     &-btn {
       width: fit-content;
-    }
 
-    &-iframe {
-      height: 800rem;
+      @media (max-width: 768px) {
+        width: 100%;
+      }
     }
   }
 }
+
+/* DataTable Mobile Responsiveness */
+.p-datatable {
+  @media (max-width: 768px) {
+    font-size: 0.875rem;
+
+    .p-datatable-thead > tr > th {
+      padding: 0.5rem;
+      font-size: 0.8rem;
+    }
+
+    .p-datatable-tbody > tr > td {
+      padding: 0.5rem;
+    }
+
+    .p-button {
+      padding: 0.4rem 0.6rem;
+      font-size: 0.875rem;
+    }
+  }
+}
+
+/* Card Mobile Spacing */
+.p-card {
+  @media (max-width: 768px) {
+    .p-card-content {
+      padding: 0.75rem;
+    }
+  }
+}
+
+/* Stepper Mobile Adjustments */
+.p-stepper {
+  @media (max-width: 768px) {
+    .p-stepper-header {
+      padding: 0.5rem;
+    }
+
+    .p-steppanel-content {
+      padding: 0.75rem;
+    }
+  }
+}
+
+/* Dialog Mobile Responsiveness */
+.p-dialog {
+  @media (max-width: 768px) {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    margin: 0.5rem;
+
+    .p-dialog-content {
+      padding: 1rem;
+    }
+  }
+}
+
+/* Confetti */
 .dot-container {
   position: absolute;
   left: 0;
@@ -1668,8 +1887,9 @@ export default {
   z-index: 5000;
   pointer-events: none;
 }
+
 .dot {
   position: absolute;
-  pointer-events: none; /*performance optimization*/
+  pointer-events: none;
 }
 </style>

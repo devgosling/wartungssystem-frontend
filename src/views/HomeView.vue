@@ -240,6 +240,8 @@ export default {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
     }
 
     &-chart canvas {

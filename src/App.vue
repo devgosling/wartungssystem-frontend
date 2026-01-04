@@ -30,13 +30,14 @@
       ></Button>
     </div>
   </Dialog>
-  <main>
+  <main :class="{ 'no-sidebar': hideSidebar }">
     <Sidebar v-if="!hideSidebar" />
     <div id="router-view-main">
       <RouterView />
     </div>
   </main>
 </template>
+
 <script>
 import { RouterView, useRouter } from 'vue-router'
 import Toast from 'primevue/toast'
@@ -112,10 +113,20 @@ export default {
   },
 }
 </script>
+
 <style lang="scss">
 #router-view-main {
   padding: 1.5rem;
-  overflow-y: scroll;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+
+  /* Mobile: Add top padding for menu button */
+  @media (max-width: 768px) {
+    padding: 4.5rem 1rem 1.5rem 1rem;
+  }
 }
 
 h1 {
@@ -126,9 +137,23 @@ main {
   height: 100dvh;
   width: 100vw;
   display: grid;
-  grid-template-columns: 17rem auto;
   background-color: var(--p-surface-50);
   overflow: hidden;
+  position: relative;
+
+  /* Desktop layout with sidebar */
+  @media (min-width: 769px) {
+    grid-template-columns: 17rem 1fr;
+    
+    &.no-sidebar {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Mobile layout - full width, sidebar is overlay */
+  @media (max-width: 768px) {
+    grid-template-columns: auto 1fr;
+  }
 }
 
 .setpassword {
@@ -145,6 +170,14 @@ main {
       font-weight: 600;
       font-size: 1.05rem;
     }
+  }
+}
+
+/* Ensure dialogs are responsive */
+.p-dialog {
+  @media (max-width: 768px) {
+    width: 90vw !important;
+    max-width: 90vw !important;
   }
 }
 </style>
