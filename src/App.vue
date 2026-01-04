@@ -80,6 +80,7 @@ export default {
     let isLoggedIn = false
     do {
       isLoggedIn = await isUserLoggedIn()
+      await new Promise((resolve) => setTimeout(resolve, 1000))
     } while (!isLoggedIn)
 
     let userAccount = await account.get()

@@ -1,0 +1,158 @@
+body,
+#app {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+a {
+  color: var(--p-primary-600);
+  opacity: 1;
+}
+
+a:hover {
+  color: var(--p-primary-700);
+  opacity: 0.8;
+}
+
+// Horizontal scroll wrapper for all filler components on mobile
+// Add this to each filler component or a shared stylesheet
+
+// Wrapper styles for horizontal scrolling on mobile
+@media (max-width: 768px) {
+  // Wrap all filler components to allow horizontal scroll
+  .wb_luefter,
+  .wb_motor,
+  .wb_muell,
+  .wb_pumpe,
+  .wb_wehrtor,
+  .wb_waermetauscher,
+  .wb_schmutzwasser,
+  .wb_ehanlage {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: visible;
+    -webkit-overflow-scrolling: touch; // Smooth scrolling on iOS
+
+    // Minimum width to maintain layout
+    min-width: 100%;
+
+    // Inner content maintains its size
+    > * {
+      min-width: max-content;
+    }
+
+    // Specific minimum widths for different sections
+    &-multinputs {
+      min-width: 700px; // 3 columns need space
+    }
+
+    &-multidata {
+      min-width: 600px; // 4 columns need space
+    }
+
+    &-fat {
+      min-width: 600px;
+    }
+
+    &-resistance {
+      min-width: 650px;
+    }
+
+    &-vorlaufe {
+      min-width: 600px;
+    }
+
+    &-groups {
+      min-width: 700px;
+    }
+
+    // Headers and textareas can be full width
+    &-header,
+    &-subheader,
+    &-sonstiges-area,
+    h2,
+    h3,
+    h4 {
+      min-width: 100%;
+      width: 100%;
+    }
+
+    // Ensure textareas don't overflow
+    textarea {
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+
+    // Custom scrollbar styling
+    &::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--p-surface-100);
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--p-surface-400);
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: var(--p-surface-500);
+    }
+  }
+
+  // Add padding hint to show more content exists
+  .wb_luefter > *:last-child,
+  .wb_motor > *:last-child,
+  .wb_muell > *:last-child,
+  .wb_pumpe > *:last-child,
+  .wb_wehrtor > *:last-child,
+  .wb_waermetauscher > *:last-child,
+  .wb_schmutzwasser > *:last-child,
+  .wb_ehanlage > *:last-child {
+    padding-right: 1rem;
+  }
+
+  // Optional: Add a scroll indicator hint
+  .wb_luefter::after,
+  .wb_motor::after,
+  .wb_muell::after,
+  .wb_pumpe::after,
+  .wb_wehrtor::after,
+  .wb_waermetauscher::after,
+  .wb_schmutzwasser::after,
+  .wb_ehanlage::after {
+    content: '← Swipe →';
+    display: block;
+    text-align: center;
+    color: var(--p-surface-400);
+    font-size: 0.75rem;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    position: sticky;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to bottom, transparent, var(--p-surface-50));
+  }
+}
+
+// Desktop - remove scroll hints
+@media (min-width: 769px) {
+  .wb_luefter::after,
+  .wb_motor::after,
+  .wb_muell::after,
+  .wb_pumpe::after,
+  .wb_wehrtor::after,
+  .wb_waermetauscher::after,
+  .wb_schmutzwasser::after,
+  .wb_ehanlage::after {
+    display: none;
+  }
+}

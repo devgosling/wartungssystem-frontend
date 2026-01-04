@@ -1676,6 +1676,7 @@ export default {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    padding-right: 3rem;
 
     &-btn {
       width: fit-content;
@@ -1839,6 +1840,41 @@ export default {
     .p-button {
       padding: 0.4rem 0.6rem;
       font-size: 0.875rem;
+    }
+
+    .p-datatable-header {
+      padding: 0.75rem !important;
+
+      > div {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.5rem;
+
+        h4 {
+          font-size: 0.9rem;
+        }
+
+        .p-iconfield {
+          width: 100%;
+
+          .p-inputtext {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* DataTable Scroll Height Fix for Mobile */
+@media (max-width: 768px) {
+  .p-datatable-wrapper {
+    max-height: calc(100vh - 22rem) !important;
+  }
+
+  .p-datatable[scrollable='true'] {
+    .p-datatable-wrapper {
+      max-height: calc(100vh - 22rem) !important;
     }
   }
 }
