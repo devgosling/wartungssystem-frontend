@@ -46,9 +46,19 @@
         placeholder="Biblis"
       ></InputText>
     </div>
-    <div class="viewcustomerdialog-inputgroup">
-      <label for="email">E-Mail Adresse</label>
-      <InputText fluid :invalid="invalidEmail" v-model="dialogValues.email" id="email"></InputText>
+    <div class="viewcustomerdialog-inputchips">
+      <label for="email">E-Mail Adresse(n)</label>
+      <AutoComplete
+        class="viewcustomerdialog-inputchips-input"
+        multiple
+        fluid
+        :invalid="invalidEmail"
+        v-model="dialogValues.emailArray"
+        :suggestions="suggestions"
+        :typeahead="true"
+        @input="keydown($event)"
+        id="email"
+      ></AutoComplete>
     </div>
     <div class="viewcustomerdialog-inputchips">
       <label for="identifiers">Identifikatoren bearbeiten</label>
@@ -75,7 +85,7 @@
             dialogValues['address.street'] &&
             dialogValues['address.zipcode'] &&
             dialogValues['address.city'] &&
-            dialogValues.email
+            dialogValues.emailArray
           ) || isEqual(dialogValues, data)
         "
         label="Änderungen Speichern"
@@ -116,6 +126,7 @@ export default {
         'address.city': null,
         email: null,
         identifiers: [],
+        emailArray: [],
       },
     }
   },
@@ -161,16 +172,18 @@ export default {
     },
     async editCustomer() {
       this.editingCustomer = true
-      if (!validate(this.dialogValues.email)) {
-        this.$toast.add({
-          severity: 'error',
-          summary: 'Üngültige E-Mail Adresse',
-          detail: 'Die angegebene E-Mail ist ungültig',
-          life: 5000,
-        })
-        this.invalidEmail = true
-        this.editingCustomer = false
-        return
+      for (const email of this.dialogValues.emailArray) {
+        if (!validate(email)) {
+          this.$toast.add({
+            severity: 'error',
+            summary: 'Üngültige E-Mail Adresse',
+            detail: `Die angegebene E-Mail (${email}) ist ungültig`,
+            life: 5000,
+          })
+          this.invalidEmail = true
+          this.editingCustomer = false
+          return
+        }
       }
 
       await databases.updateDocument(
@@ -182,7 +195,7 @@ export default {
           'address.street': this.dialogValues['address.street'],
           'address.zipcode': this.dialogValues['address.zipcode'].toString(),
           'address.city': this.dialogValues['address.city'],
-          email: this.dialogValues.email,
+          emailArray: this.dialogValues.emailArray,
           identifiers: this.dialogValues.identifiers,
         },
       )
@@ -198,6 +211,7 @@ export default {
           'address.zipcode': null,
           'address.city': null,
           email: null,
+          emailArray: [],
           identifiers: [],
         }
       }, 100)

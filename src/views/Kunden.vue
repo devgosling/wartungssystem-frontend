@@ -31,7 +31,10 @@
             </template>
           </Column>
           <Column field="name" header="Name"> </Column>
-          <Column field="email" header="Buchaltungs Email-Addresse"> </Column>
+          <Column field="emailArray" header="Buchaltungs Email-Addresse(n)">
+          <template #body="slotProps">
+            {{ slotProps.data.emailArray.join(', ') }}
+          </template></Column>
           <Column field="wartungsberichte" header="Wartungen">
             <template #body="slotProps">
               {{

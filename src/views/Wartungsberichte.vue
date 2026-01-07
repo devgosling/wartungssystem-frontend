@@ -502,8 +502,8 @@
                             ></Button>
                             <Divider />
                             <span>
-                              Der Wartungsbericht wird an die E-Mail Adresse
-                              <b>{{ inputValues.customer?.email }}</b> versendet.<br /><br />
+                              Der Wartungsbericht wird an die E-Mail Adresse(n)
+                              <b>{{ inputValues.customer?.emailArray.join(', ') }}</b> versendet.<br /><br />
                               Ist diese E-Mail Adresse richtig?<br />
                             </span>
                             <Button
@@ -654,10 +654,12 @@
       </div>
     </template>
     <p style="margin-top: 0">
-      Dieser Wartungsbericht wurde an die E-Mail Adresse
-      <a :href="'mailto:' + viewingBericht.data.kunde.email"
-        ><b>{{ viewingBericht.data.kunde.email }}</b></a
-      >
+      Dieser Wartungsbericht wurde an die E-Mail Adresse(n)
+      <template v-for="(mail, index) of viewingBericht.data.kunde.emailArray">
+        <a :href="'mailto:' + mail"><b>{{ mail }}</b></a>
+        <span v-if="index < viewingBericht.data.kunde.emailArray.length - 1">, </span>
+
+      </template>
       versendet.
     </p>
     <img :src="viewingBericht.img" alt="" style="width: 100%" />
@@ -1523,7 +1525,7 @@ export default {
       await functions.createExecution(
         '68f3d2b9001562f115c8',
         JSON.stringify({
-          email: this.inputValues.customer.email,
+          emailArray: this.inputValues.customer.emailArray,
           subject:
             (this.inputValues.berichtType.id == 'enthaertungsanlage'
               ? 'Überprüfungsbericht'

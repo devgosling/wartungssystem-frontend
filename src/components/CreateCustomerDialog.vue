@@ -45,9 +45,19 @@
         placeholder="Biblis"
       ></InputText>
     </div>
-    <div class="createcustomerdialog-inputgroup">
-      <label for="email">E-Mail Adresse</label>
-      <InputText fluid :invalid="invalidEmail" v-model="dialogValues.email" id="email"></InputText>
+    <div class="createcustomerdialog-inputchips">
+      <label for="email">E-Mail Adresse(n)</label>
+      <AutoComplete
+        class="createcustomerdialog-inputchips-input"
+        multiple
+        fluid
+        :invalid="invalidEmail"
+        v-model="dialogValues.emailArray"
+        :suggestions="suggestions"
+        :typeahead="true"
+        @input="keydown($event)"
+        id="email"
+      ></AutoComplete>
     </div>
     <div class="createcustomerdialog-inputchips">
       <label for="identifiers">Identifikatoren einrichten (Optional)</label>
@@ -74,7 +84,7 @@
             dialogValues.street &&
             dialogValues.zipcode &&
             dialogValues.city &&
-            dialogValues.email
+            dialogValues.emailArray
           )
         "
         label="Kunde erstellen"
@@ -112,6 +122,7 @@ export default {
         city: null,
         email: null,
         identifiers: [],
+        emailArray: [],
       },
     }
   },
@@ -134,16 +145,18 @@ export default {
     },
     async createCustomer() {
       this.creatingCustomer = true
-      if (!validate(this.dialogValues.email)) {
-        this.$toast.add({
-          severity: 'error',
-          summary: 'Üngültige E-Mail Adresse',
-          detail: 'Die angegebene E-Mail ist ungültig',
-          life: 5000,
-        })
-        this.invalidEmail = true
-        this.creatingCustomer = false
-        return
+      for (const email of this.dialogValues.emailArray) {
+        if (!validate(email)) {
+          this.$toast.add({
+            severity: 'error',
+            summary: 'Üngültige E-Mail Adresse',
+            detail: `Die angegebene E-Mail (${email}) ist ungültig`,
+            life: 5000,
+          })
+          this.invalidEmail = true
+          this.creatingCustomer = false
+          return
+        }
       }
 
       await databases.createDocument('6878f5900032addce7e5', '68866dbd002a081f337a', ID.unique(), {
@@ -151,7 +164,7 @@ export default {
         'address.street': this.dialogValues.street,
         'address.zipcode': this.dialogValues.zipcode.toString(),
         'address.city': this.dialogValues.city,
-        email: this.dialogValues.email,
+        emailArray: this.dialogValues.emailArray,
         identifiers: this.dialogValues.identifiers,
       })
 
@@ -167,6 +180,7 @@ export default {
           city: null,
           email: null,
           identifiers: [],
+          emailArray: [],
         }
       }, 100)
     },
