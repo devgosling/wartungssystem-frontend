@@ -738,7 +738,9 @@ import Waermetauscher_Filler from '@/components/Waermetauscher_Filler.vue'
 import Enthaertungsanlage_Filler from '@/components/Enthaertungsanlage_Filler.vue'
 import ViewCustomerDialog from '@/components/ViewCustomerDialog.vue'
 import { update } from 'lodash'
-import { enqueueJob, executeJob } from '@/lib/offlineQueue'
+import { enqueueJob} from '@/lib/offlineQueue'
+import { executeJob } from '@/lib/executeJob'
+import { toRaw } from 'vue'
 
 export default {
   components: {
@@ -1505,17 +1507,45 @@ export default {
       await page.render(renderContext).promise
       return canvas.toDataURL('image/png')
     },
+    normalizeInputValues(inputValues) {
+      const raw = toRaw(inputValues)
+
+      return {
+        ...raw,
+        date: raw.date instanceof Date ? raw.date.toISOString() : raw.date,
+        customer: structuredClone(raw.customer),
+        berichtType: structuredClone(raw.berichtType),
+      }
+    },
     async saveAndSend() {
       this.isSending = true
 
       try {
         if (!navigator.onLine) throw new Error('Offline')
-        await executeJob(job)
+        await executeJob({
+          id: crypto.randomUUID(),
+          pdfBase64: this.pdfBytes[1],
+          inputValues: this.normalizeInputValues(this.inputValues),
+          createdAt: Date.now()
+        })
         console.log('Job sent successfully')
         this.fetchWartungsberichte()
       } catch (err) {
         console.warn('Offline – queued for later', err)
-        await enqueueJob(job)
+        this.$toast.add({
+          severity: 'warn',
+          summary: 'Error beim Senden',
+          detail: err.message,
+          life: 7000,
+        })
+
+        await enqueueJob({
+          id: crypto.randomUUID(),
+          pdfBase64: this.pdfBytes[1],
+          inputValues: this.normalizeInputValues(this.inputValues),
+          createdAt: Date.now()
+        })
+
         this.$toast.add({
           severity: 'info',
           summary: 'Offline Modus',

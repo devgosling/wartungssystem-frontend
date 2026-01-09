@@ -1,4 +1,5 @@
-import { getPendingJobs, removeJob, executeJob } from './offlineQueue'
+import { getPendingJobs, removeJob } from './offlineQueue'
+import { executeJob } from './executeJob'
 
 export async function processJobs() {
   const jobs = await getPendingJobs()
@@ -14,6 +15,10 @@ export async function processJobs() {
 }
 
 // Listen for device going online
+let listenerRegistered = false
+
 export function setupOfflineJobProcessor() {
+  if (listenerRegistered) return
+  listenerRegistered = true
   window.addEventListener('online', processJobs)
 }
