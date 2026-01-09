@@ -1507,42 +1507,24 @@ export default {
     async saveAndSend() {
       this.isSending = true
 
-      let url = await fetch('data:application/pdf;base64,' + this.pdfBytes[1])
-      let blob = await url.blob()
-      const fileID = ID.unique()
-      let filename = `${this.inputValues.berichtType.id == 'enthaertungsanlage' ? 'Überprüfungsbericht' : 'Wartungsbericht'}_${this.inputValues.berichtType.filekey}_${new Date(this.inputValues.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}_${this.inputValues.employee.replaceAll(' ', '_')}.pdf`
-      let file = new File([blob], filename, { type: 'application/pdf' })
-      await storage.createFile('6878f5cf00166fde91eb', fileID, file)
-      await databases.createDocument('6878f5900032addce7e5', '68866dc60038038dbe27', ID.unique(), {
-        mitarbeiter: this.inputValues.employee,
-        erstellungsdatum: new Date(),
-        kunde: JSON.stringify(this.inputValues.customer),
-        wartungsberichtid: fileID,
-        identifikator: this.inputValues.identifier ?? null,
-        type: this.inputValues.berichtType.filekey,
-      })
-
-      await functions.createExecution(
-        '68f3d2b9001562f115c8',
-        JSON.stringify({
-          emailArray: this.inputValues.customer.emailArray,
-          subject:
-            (this.inputValues.berichtType.id == 'enthaertungsanlage'
-              ? 'Überprüfungsbericht'
-              : 'Wartungsbericht') +
-            ' - ' +
-            this.inputValues.berichtType.filekey,
-          type: this.inputValues.berichtType.id == 'enthaertungsanlage' ? 1 : 0,
-          fileID: fileID,
-          fileName: filename,
-          monteur: this.inputValues.employee,
-        }),
-        true,
-        '/sendbericht',
-      )
+      try {
+        if (!navigator.onLine) throw new Error('Offline')
+        await executeJob(job)
+        console.log('Job sent successfully')
+        this.fetchWartungsberichte()
+      } catch (err) {
+        console.warn('Offline – queued for later', err)
+        await enqueueJob(job)
+        this.$toast.add({
+          severity: 'info',
+          summary: 'Offline Modus',
+          detail:
+            'Der Wartungsbericht wurde zum späteren Senden in die Warteschlange gestellt, da keine Internetverbindung besteht.',
+          life: 7000,
+        })
+      }
 
       await this.confetti_play()
-      this.fetchWartungsberichte()
 
       this.isSending = false
       this.isSent = true

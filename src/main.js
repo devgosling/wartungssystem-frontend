@@ -8,7 +8,7 @@ import Aura from '@primeuix/themes/aura'
 import ToastService from 'primevue/toastservice'
 import * as DE from './assets/de.json'
 import { registerSW } from 'virtual:pwa-register'
-import { setupOfflineJobProcessor } from './lib/offlineJobProcessor'
+import { setupOfflineJobProcessor, processJobs } from './lib/offlineJobProcessor'
 import * as pdfjs from 'pdfjs-dist/build/pdf' // KEEP - Builder
 import * as pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs' // KEEP - Worker COPY
 
@@ -54,3 +54,7 @@ registerSW({
 })
 
 setupOfflineJobProcessor()
+
+if (navigator.onLine) {
+  processJobs()
+}
