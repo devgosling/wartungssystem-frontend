@@ -1443,6 +1443,8 @@ export default {
       this.signpadResizeHandler = handleResize
     },
     async submit(stepCallback) {
+    try {
+        this.signpad.toDataURL()
       this.generatingPDF = true
       let signature = this.signpad.toDataURL()
       let pdf;
@@ -1487,6 +1489,13 @@ export default {
 
       stepCallback('4')
       this.generatingPDF = false
+      } catch (err) {
+        this.$toast.add({
+          severity: 'error',
+          summary: 'Fehler beim Erstellen des PDFs',
+          detail: err.message,
+          life: 10000,
+        })}
     },
     async turnPDFToPNG(pdfBuffer, pageNumber = 1) {
       let pdf = await pdfjsLib.getDocument(pdfBuffer).promise
