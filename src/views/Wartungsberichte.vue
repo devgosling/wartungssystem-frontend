@@ -5,11 +5,9 @@
       <div class="wartungsberichte-header-btns">
         <Button
           icon="fa-regular fa-plus"
-          :disabled="!pdfsCached"
-          :title="!pdfsCached ? 'PDF-Vorlagen nicht verfügbar - Bitte stellen Sie eine Internetverbindung her und laden Sie die Seite neu.' : ''"
           @click="
             function () {
-              if (tabCooldown < Date.now() && pdfsCached) {
+              if (tabCooldown < Date.now()) {
                 tab = 1
                 setTabtext()
                 tabCooldown = Date.now() + 400
@@ -290,7 +288,7 @@
                             inputValues.employee
                           )
                         "
-                        @click="activateCallback('2')"
+                        @click="proceedToStep2(activateCallback)"
                       />
                     </div>
                   </StepPanel>
@@ -1057,6 +1055,18 @@ export default {
       } finally {
         this.checkingPDFCache = false
       }
+    },
+    proceedToStep2(activateCallback) {
+      if (!this.pdfsCached) {
+        this.$toast.add({
+          severity: 'warn',
+          summary: 'PDF-Vorlagen nicht verfügbar',
+          detail: 'Bitte stellen Sie eine Internetverbindung her und laden Sie die Seite neu, um die PDF-Vorlagen zwischenzuspeichern.',
+          life: 10000,
+        })
+        return
+      }
+      activateCallback('2')
     },
     confetti_getRandom(min, max) {
       var rand = min + Math.random() * (max - min)
