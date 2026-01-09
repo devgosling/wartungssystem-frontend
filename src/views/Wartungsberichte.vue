@@ -1490,12 +1490,29 @@ export default {
       stepCallback('4')
       this.generatingPDF = false
       } catch (err) {
-        this.$toast.add({
-          severity: 'error',
-          summary: 'Fehler beim Erstellen des PDFs',
-          detail: err.message,
-          life: 10000,
-        })}
+        this.generatingPDF = false
+        
+        // Check if error is network-related (offline)
+        const isNetworkError = err.message.includes('fetch') || 
+                              err.message.includes('network') || 
+                              err.name === 'TypeError' && !navigator.onLine
+        
+        if (isNetworkError && !navigator.onLine) {
+          this.$toast.add({
+            severity: 'warn',
+            summary: 'Offline - PDF kann nicht erstellt werden',
+            detail: 'Die PDF-Vorlagen müssen zuerst geladen werden. Bitte stellen Sie eine Internetverbindung her und laden Sie die Seite neu, damit die Vorlagen zwischengespeichert werden können.',
+            life: 15000,
+          })
+        } else {
+          this.$toast.add({
+            severity: 'error',
+            summary: 'Fehler beim Erstellen des PDFs',
+            detail: err.message,
+            life: 10000,
+          })
+        }
+      }
     },
     async turnPDFToPNG(pdfBuffer, pageNumber = 1) {
       let pdf = await pdfjsLib.getDocument(pdfBuffer).promise

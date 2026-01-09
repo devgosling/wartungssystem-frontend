@@ -41,6 +41,15 @@ export default defineConfig({
               cacheName: 'images',
               expiration: { maxEntries: 60, maxAgeSeconds: 30 * 24 * 60 * 60 }
             }
+          },
+          {
+            // Cache PDF templates for offline PDF generation
+            urlPattern: /\.pdf$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'pdf-templates',
+              expiration: { maxEntries: 20, maxAgeSeconds: 90 * 24 * 60 * 60 } // 90 days
+            }
           }
         ]
       },
