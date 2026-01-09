@@ -5,9 +5,11 @@
       <div class="wartungsberichte-header-btns">
         <Button
           icon="fa-regular fa-plus"
+          :disabled="!pdfsCached"
+          :title="!pdfsCached ? 'PDF-Vorlagen nicht verfügbar - Bitte stellen Sie eine Internetverbindung her und laden Sie die Seite neu.' : ''"
           @click="
             function () {
-              if (tabCooldown < Date.now()) {
+              if (tabCooldown < Date.now() && pdfsCached) {
                 tab = 1
                 setTabtext()
                 tabCooldown = Date.now() + 400
@@ -741,6 +743,7 @@ import { update } from 'lodash'
 import { enqueueJob} from '@/lib/offlineQueue'
 import { executeJob } from '@/lib/executeJob'
 import { toRaw } from 'vue'
+import { canCreateReport } from '@/lib/cacheUtils'
 
 export default {
   components: {
@@ -792,6 +795,9 @@ export default {
       filters: {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       },
+
+      pdfsCached: true,
+      checkingPDFCache: false,
 
       inputValues: {
         berichtType: '',
@@ -933,6 +939,9 @@ export default {
     this.fetchCustomers()
 
     this.inputValues.employee = (await account.get()).name
+
+    // Check if PDFs are cached
+    this.checkPDFCache()
   },
 
   methods: {
@@ -1040,6 +1049,14 @@ export default {
         container: this.confetti.container,
         animation: this.confetti_createExplosion(this.confetti.container),
       })
+    },
+    async checkPDFCache() {
+      this.checkingPDFCache = true
+      try {
+        this.pdfsCached = await canCreateReport()
+      } finally {
+        this.checkingPDFCache = false
+      }
     },
     confetti_getRandom(min, max) {
       var rand = min + Math.random() * (max - min)
