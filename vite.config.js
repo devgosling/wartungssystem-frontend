@@ -22,6 +22,27 @@ export default defineConfig({
       ],
       workbox: {
         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10 MB
+        cleanupOutdatedCaches: true,
+        runtimeCaching: [
+          {
+            // Cache all Appwrite Cloud API calls
+            urlPattern: ({ url }) => url.hostname.endsWith('cloud.appwrite.io'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'appwrite-api-cache',
+              expiration: { maxEntries: 100, maxAgeSeconds: 24 * 60 * 60 },
+              cacheableResponse: { statuses: [0, 200] }
+            }
+          },
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images',
+              expiration: { maxEntries: 60, maxAgeSeconds: 30 * 24 * 60 * 60 }
+            }
+          }
+        ]
       },
       manifest: {
         name: 'Wartungsystem Kromholz Wassertechnik',
