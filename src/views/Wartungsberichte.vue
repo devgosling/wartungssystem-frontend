@@ -738,6 +738,7 @@ import Waermetauscher_Filler from '@/components/Waermetauscher_Filler.vue'
 import Enthaertungsanlage_Filler from '@/components/Enthaertungsanlage_Filler.vue'
 import ViewCustomerDialog from '@/components/ViewCustomerDialog.vue'
 import { update } from 'lodash'
+import { enqueueJob, executeJob } from '@/lib/offlineQueue'
 
 export default {
   components: {
@@ -1442,7 +1443,7 @@ export default {
     async submit(stepCallback) {
       this.generatingPDF = true
       let signature = this.signpad.toDataURL()
-      let pdf
+      let pdf;
       let has2Pages = false
       this.$refs.filler.broadcastInputsToStore()
 
