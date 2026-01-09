@@ -1531,13 +1531,7 @@ export default {
         console.log('Job sent successfully')
         this.fetchWartungsberichte()
       } catch (err) {
-        console.warn('Offline – queued for later', err)
-        this.$toast.add({
-          severity: 'warn',
-          summary: 'Error beim Senden',
-          detail: err.message,
-          life: 7000,
-        })
+        console.warn('Offline – queued for later', err);
 
         await enqueueJob({
           id: crypto.randomUUID(),
@@ -1551,7 +1545,7 @@ export default {
           summary: 'Offline Modus',
           detail:
             'Der Wartungsbericht wurde zum späteren Senden in die Warteschlange gestellt, da keine Internetverbindung besteht.',
-          life: 7000,
+          life: 15000,
         })
       }
 
