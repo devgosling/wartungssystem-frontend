@@ -288,7 +288,7 @@
                             inputValues.employee
                           )
                         "
-                        @click="activateCallback('2')"
+                        @click="proceedToStep2(activateCallback)"
                       />
                     </div>
                   </StepPanel>
@@ -738,6 +738,10 @@ import Waermetauscher_Filler from '@/components/Waermetauscher_Filler.vue'
 import Enthaertungsanlage_Filler from '@/components/Enthaertungsanlage_Filler.vue'
 import ViewCustomerDialog from '@/components/ViewCustomerDialog.vue'
 import { update } from 'lodash'
+import { enqueueJob} from '@/lib/offlineQueue'
+import { executeJob } from '@/lib/executeJob'
+import { toRaw } from 'vue'
+import { canCreateReport } from '@/lib/cacheUtils'
 
 export default {
   components: {
@@ -789,6 +793,9 @@ export default {
       filters: {
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       },
+
+      pdfsCached: true,
+      checkingPDFCache: false,
 
       inputValues: {
         berichtType: '',
@@ -930,6 +937,9 @@ export default {
     this.fetchCustomers()
 
     this.inputValues.employee = (await account.get()).name
+
+    // Check if PDFs are cached
+    this.checkPDFCache()
   },
 
   methods: {
@@ -1037,6 +1047,26 @@ export default {
         container: this.confetti.container,
         animation: this.confetti_createExplosion(this.confetti.container),
       })
+    },
+    async checkPDFCache() {
+      this.checkingPDFCache = true
+      try {
+        this.pdfsCached = await canCreateReport()
+      } finally {
+        this.checkingPDFCache = false
+      }
+    },
+    proceedToStep2(activateCallback) {
+      if (!this.pdfsCached) {
+        this.$toast.add({
+          severity: 'warn',
+          summary: 'PDF-Vorlagen nicht verfügbar',
+          detail: 'Bitte stellen Sie eine Internetverbindung her und laden Sie die Seite neu, um die PDF-Vorlagen zwischenzuspeichern.',
+          life: 10000,
+        })
+        return
+      }
+      activateCallback('2')
     },
     confetti_getRandom(min, max) {
       var rand = min + Math.random() * (max - min)
@@ -1440,9 +1470,11 @@ export default {
       this.signpadResizeHandler = handleResize
     },
     async submit(stepCallback) {
+    try {
+        this.signpad.toDataURL()
       this.generatingPDF = true
       let signature = this.signpad.toDataURL()
-      let pdf
+      let pdf;
       let has2Pages = false
       this.$refs.filler.broadcastInputsToStore()
 
@@ -1484,6 +1516,30 @@ export default {
 
       stepCallback('4')
       this.generatingPDF = false
+      } catch (err) {
+        this.generatingPDF = false
+        
+        // Check if error is network-related (offline)
+        const isNetworkError = err.message.includes('fetch') || 
+                              err.message.includes('network') || 
+                              err.name === 'TypeError' && !navigator.onLine
+        
+        if (isNetworkError && !navigator.onLine) {
+          this.$toast.add({
+            severity: 'warn',
+            summary: 'Offline - PDF kann nicht erstellt werden',
+            detail: 'Die PDF-Vorlagen müssen zuerst geladen werden. Bitte stellen Sie eine Internetverbindung her und laden Sie die Seite neu, damit die Vorlagen zwischengespeichert werden können.',
+            life: 15000,
+          })
+        } else {
+          this.$toast.add({
+            severity: 'error',
+            summary: 'Fehler beim Erstellen des PDFs',
+            detail: err.message,
+            life: 10000,
+          })
+        }
+      }
     },
     async turnPDFToPNG(pdfBuffer, pageNumber = 1) {
       let pdf = await pdfjsLib.getDocument(pdfBuffer).promise
@@ -1504,45 +1560,49 @@ export default {
       await page.render(renderContext).promise
       return canvas.toDataURL('image/png')
     },
+    normalizeInputValues(inputValues) {
+      const raw = toRaw(inputValues)
+
+      return {
+        ...raw,
+        date: raw.date instanceof Date ? raw.date.toISOString() : raw.date,
+        customer: structuredClone(raw.customer),
+        berichtType: structuredClone(raw.berichtType),
+      }
+    },
     async saveAndSend() {
       this.isSending = true
 
-      let url = await fetch('data:application/pdf;base64,' + this.pdfBytes[1])
-      let blob = await url.blob()
-      const fileID = ID.unique()
-      let filename = `${this.inputValues.berichtType.id == 'enthaertungsanlage' ? 'Überprüfungsbericht' : 'Wartungsbericht'}_${this.inputValues.berichtType.filekey}_${new Date(this.inputValues.date).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}_${this.inputValues.employee.replaceAll(' ', '_')}.pdf`
-      let file = new File([blob], filename, { type: 'application/pdf' })
-      await storage.createFile('6878f5cf00166fde91eb', fileID, file)
-      await databases.createDocument('6878f5900032addce7e5', '68866dc60038038dbe27', ID.unique(), {
-        mitarbeiter: this.inputValues.employee,
-        erstellungsdatum: new Date(),
-        kunde: JSON.stringify(this.inputValues.customer),
-        wartungsberichtid: fileID,
-        identifikator: this.inputValues.identifier ?? null,
-        type: this.inputValues.berichtType.filekey,
-      })
+      try {
+        if (!navigator.onLine) throw new Error('Offline')
+        await executeJob({
+          id: crypto.randomUUID(),
+          pdfBase64: this.pdfBytes[1],
+          inputValues: this.normalizeInputValues(this.inputValues),
+          createdAt: Date.now()
+        })
+        console.log('Job sent successfully')
+        this.fetchWartungsberichte()
+      } catch (err) {
+        console.warn('Offline – queued for later', err);
 
-      await functions.createExecution(
-        '68f3d2b9001562f115c8',
-        JSON.stringify({
-          emailArray: this.inputValues.customer.emailArray,
-          subject:
-            (this.inputValues.berichtType.id == 'enthaertungsanlage'
-              ? 'Überprüfungsbericht'
-              : 'Wartungsbericht') +
-            ' - ' +
-            this.inputValues.berichtType.filekey,
-          type: this.inputValues.berichtType.id == 'enthaertungsanlage' ? 1 : 0,
-          fileID: fileID,
-          fileName: filename,
-          monteur: this.inputValues.employee,
-        }),
-        true,
-        '/sendbericht',
-      )
+        await enqueueJob({
+          id: crypto.randomUUID(),
+          pdfBase64: this.pdfBytes[1],
+          inputValues: this.normalizeInputValues(this.inputValues),
+          createdAt: Date.now()
+        })
+
+        this.$toast.add({
+          severity: 'info',
+          summary: 'Offline Modus',
+          detail:
+            'Der Wartungsbericht wurde zum späteren Senden in die Warteschlange gestellt, da keine Internetverbindung besteht.',
+          life: 15000,
+        })
+      }
 
       await this.confetti_play()
-      this.fetchWartungsberichte()
 
       this.isSending = false
       this.isSent = true
