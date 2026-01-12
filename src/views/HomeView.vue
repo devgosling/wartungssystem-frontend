@@ -56,7 +56,7 @@ import gsap from 'gsap'
 import router from '@/router'
 import { subDays, format, parseISO } from 'date-fns'
 import Chart from 'primevue/chart'
-import { ExecutionMethod } from 'appwrite'
+import { ExecutionMethod, Query } from 'appwrite'
 
 export default {
   components: {
@@ -130,9 +130,21 @@ export default {
 
   methods: {
     async loadFiles() {
-      this.files = (
-        await databases.listDocuments('6878f5900032addce7e5', '68866dc60038038dbe27')
-      ).documents
+      let page = 1
+      const perPage = 25
+      let fetchedFiles = []
+      do {
+        const response = await databases.listDocuments(
+          '6878f5900032addce7e5',
+          '68866dc60038038dbe27',
+          [Query.limit(perPage), Query.offset((page - 1) * perPage)],
+        )
+        fetchedFiles = response.documents
+        this.files.push(...fetchedFiles)
+        page++
+      } while (fetchedFiles.length === perPage)
+
+      this.files = this.files.sort((a, b) => (a.$createdAt < b.$createdAt ? 1 : -1))
 
       this.updateChartData()
     },
