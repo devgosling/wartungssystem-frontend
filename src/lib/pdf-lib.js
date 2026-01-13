@@ -47,7 +47,7 @@ export const fillMotorPDF = async (inputValues, signatureBase64) => {
     }
 
     // SET RADIO GROUPS
-    if (fieldDataMotor.radiogroups[key]) {
+    if (fieldDataMotor.radiogroups[key] && value) {
       form.getRadioGroup(fieldDataMotor.radiogroups[key]).select('Auswahl' + value)
     }
 
@@ -117,7 +117,7 @@ export const fillMüllanlagePDF = async (inputValues, signatureBase64) => {
     }
 
     // SET RADIO GROUPS
-    if (fieldDataMuell.radiogroups[key]) {
+    if (fieldDataMuell.radiogroups[key] && value) {
       form.getRadioGroup(fieldDataMuell.radiogroups[key]).select('Auswahl' + value)
     }
 
@@ -187,7 +187,7 @@ export const fillPumpePDF = async (inputValues, signatureBase64) => {
     }
 
     // SET RADIO GROUPS
-    if (fieldDataPumpe.radiogroups[key]) {
+    if (fieldDataPumpe.radiogroups[key] && value) {
       form.getRadioGroup(fieldDataPumpe.radiogroups[key]).select('Auswahl' + value)
     }
 
@@ -257,7 +257,7 @@ export const fillWehrtorePDF = async (inputValues, signatureBase64) => {
     }
 
     // SET RADIO GROUPS
-    if (fieldDataWehrtor.radiogroups[key]) {
+    if (fieldDataWehrtor.radiogroups[key] && value) {
       form.getRadioGroup(fieldDataWehrtor.radiogroups[key]).select('Auswahl' + value)
     }
 
@@ -327,7 +327,7 @@ export const fillLüfterPDF = async (inputValues, signatureBase64) => {
     }
 
     // SET RADIO GROUPS
-    if (fieldDataLuefter.radiogroups[key]) {
+    if (fieldDataLuefter.radiogroups[key] && value) {
       form.getRadioGroup(fieldDataLuefter.radiogroups[key]).select('Auswahl' + value)
     }
 
@@ -397,7 +397,7 @@ export const fillSchmutzwasserPDF = async (inputValues, signatureBase64) => {
     }
 
     // SET RADIO GROUPS
-    if (fieldDataSchmutzwasser.radiogroups[key]) {
+    if (fieldDataSchmutzwasser.radiogroups[key] && value) {
       form.getRadioGroup(fieldDataSchmutzwasser.radiogroups[key]).select('Auswahl' + value)
     }
 
@@ -467,7 +467,7 @@ export const fillWärmetauscherPDF = async (inputValues, signatureBase64) => {
     }
 
     // SET RADIO GROUPS
-    if (fieldDataWaermetauscher.radiogroups[key]) {
+    if (fieldDataWaermetauscher.radiogroups[key] && value) {
       form.getRadioGroup(fieldDataWaermetauscher.radiogroups[key]).select('Auswahl' + value)
     }
 
@@ -539,7 +539,7 @@ export const fillEnthärtungsanlagePDF = async (inputValues, signatureBase64) =>
     }
 
     // SET RADIO GROUPS
-    if (fieldDataEnthaertungsanlage.radiogroups[key]) {
+    if (fieldDataEnthaertungsanlage.radiogroups[key] && value) {
       form.getRadioGroup(fieldDataEnthaertungsanlage.radiogroups[key]).select('Auswahl' + value)
     }
 
