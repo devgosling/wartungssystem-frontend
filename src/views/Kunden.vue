@@ -32,9 +32,10 @@
           </Column>
           <Column field="name" header="Name"> </Column>
           <Column field="emailArray" header="Buchaltungs Email-Addresse(n)">
-          <template #body="slotProps">
-            {{ slotProps.data.emailArray.join(', ') }}
-          </template></Column>
+            <template #body="slotProps">
+              {{ slotProps.data.emailArray.join(', ') }}
+            </template></Column
+          >
           <Column field="wartungsberichte" header="Wartungen">
             <template #body="slotProps">
               {{
@@ -198,14 +199,24 @@ export default {
           [Query.orderAsc('$sequence')],
         )
 
-        const wartungsberichteList = await databases.listDocuments(
-          '6878f5900032addce7e5',
-          '68866dc60038038dbe27',
-          [Query.orderDesc('erstellungsdatum')],
-        )
+        let page = 1
+        const perPage = 25
+        let fetchedFiles = []
+        let documentList = []
+        do {
+          const response = await databases.listDocuments(
+            '6878f5900032addce7e5',
+            '68866dc60038038dbe27',
+            [Query.limit(perPage), Query.offset((page - 1) * perPage)],
+          )
+          fetchedFiles = response.documents
+          documentList.push(...fetchedFiles)
+          page++
+        } while (fetchedFiles.length === perPage)
+
         let berichtCountRegistry = {}
 
-        wartungsberichteList.documents.forEach((doc) => {
+        documentList.forEach((doc) => {
           var kundeJSON = JSON.parse(doc.kunde)
           if (berichtCountRegistry[kundeJSON.name]) {
             berichtCountRegistry[kundeJSON.name] += 1

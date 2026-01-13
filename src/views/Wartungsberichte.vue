@@ -503,7 +503,8 @@
                             <Divider />
                             <span>
                               Der Wartungsbericht wird an die E-Mail Adresse(n)
-                              <b>{{ inputValues.customer?.emailArray.join(', ') }}</b> versendet.<br /><br />
+                              <b>{{ inputValues.customer?.emailArray.join(', ') }}</b>
+                              versendet.<br /><br />
                               Ist diese E-Mail Adresse richtig?<br />
                             </span>
                             <Button
@@ -656,9 +657,10 @@
     <p style="margin-top: 0">
       Dieser Wartungsbericht wurde an die E-Mail Adresse(n)
       <template v-for="(mail, index) of viewingBericht.data.kunde.emailArray">
-        <a :href="'mailto:' + mail"><b>{{ mail }}</b></a>
+        <a :href="'mailto:' + mail"
+          ><b>{{ mail }}</b></a
+        >
         <span v-if="index < viewingBericht.data.kunde.emailArray.length - 1">, </span>
-
       </template>
       versendet.
     </p>
@@ -738,7 +740,7 @@ import Waermetauscher_Filler from '@/components/Waermetauscher_Filler.vue'
 import Enthaertungsanlage_Filler from '@/components/Enthaertungsanlage_Filler.vue'
 import ViewCustomerDialog from '@/components/ViewCustomerDialog.vue'
 import { update } from 'lodash'
-import { enqueueJob} from '@/lib/offlineQueue'
+import { enqueueJob } from '@/lib/offlineQueue'
 import { executeJob } from '@/lib/executeJob'
 import { toRaw } from 'vue'
 import { canCreateReport } from '@/lib/cacheUtils'
@@ -1061,7 +1063,8 @@ export default {
         this.$toast.add({
           severity: 'warn',
           summary: 'PDF-Vorlagen nicht verfügbar',
-          detail: 'Bitte stellen Sie eine Internetverbindung her und laden Sie die Seite neu, um die PDF-Vorlagen zwischenzuspeichern.',
+          detail:
+            'Bitte stellen Sie eine Internetverbindung her und laden Sie die Seite neu, um die PDF-Vorlagen zwischenzuspeichern.',
           life: 10000,
         })
         return
@@ -1204,12 +1207,22 @@ export default {
       })
     },
     async fetchWartungsberichte() {
-      const documentList = await databases.listDocuments(
-        '6878f5900032addce7e5',
-        '68866dc60038038dbe27',
-        [Query.orderDesc('erstellungsdatum')],
-      )
-      documentList.documents.forEach(function (doc, index, theArray) {
+      let page = 1
+      const perPage = 25
+      let documentList = []
+      let fetchedFiles = []
+      do {
+        const response = await databases.listDocuments(
+          '6878f5900032addce7e5',
+          '68866dc60038038dbe27',
+          [Query.limit(perPage), Query.offset((page - 1) * perPage)],
+        )
+        fetchedFiles = response.documents
+        documentList.push(...fetchedFiles)
+        page++
+      } while (fetchedFiles.length === perPage)
+
+      documentList.forEach(function (doc, index, theArray) {
         doc.kunde = JSON.parse(doc.kunde)
         doc.erstellungsdatum = new Date(doc.erstellungsdatum).toLocaleString('de-DE', {
           day: '2-digit',
@@ -1220,7 +1233,17 @@ export default {
         })
       })
 
-      this.wartungsberichte = documentList
+      console.log(documentList)
+
+      const sortedDocuments = documentList.sort(
+        (a, b) => new Date(b.$createdAt).getTime() - new Date(a.$createdAt).getTime(),
+      )
+
+      // DataTable expects an object with `documents`; previously we set an array so nothing rendered.
+      this.wartungsberichte = {
+        documents: sortedDocuments,
+        total: sortedDocuments.length,
+      }
     },
 
     async resetDataAndCreateNew(callback) {
@@ -1470,65 +1493,67 @@ export default {
       this.signpadResizeHandler = handleResize
     },
     async submit(stepCallback) {
-    try {
+      try {
         this.signpad.toDataURL()
-      this.generatingPDF = true
-      let signature = this.signpad.toDataURL()
-      let pdf;
-      let has2Pages = false
-      this.$refs.filler.broadcastInputsToStore()
+        this.generatingPDF = true
+        let signature = this.signpad.toDataURL()
+        let pdf
+        let has2Pages = false
+        this.$refs.filler.broadcastInputsToStore()
 
-      switch (this.inputValues.berichtType.id) {
-        case 'motor':
-          pdf = await fillMotorPDF(this.inputValues, signature)
-          break
-        case 'pumpe':
-          pdf = await fillPumpePDF(this.inputValues, signature)
-          break
-        case 'wehrtore':
-          pdf = await fillWehrtorePDF(this.inputValues, signature)
-          break
-        case 'luefter':
-          pdf = await fillLüfterPDF(this.inputValues, signature)
-          break
-        case 'schmutzwasser':
-          pdf = await fillSchmutzwasserPDF(this.inputValues, signature)
-          break
-        case 'waermetauscher':
-          pdf = await fillWärmetauscherPDF(this.inputValues, signature)
-          break
-        case 'müllanlage':
-          pdf = await fillMüllanlagePDF(this.inputValues, signature)
-          has2Pages = true
-          break
-        case 'enthaertungsanlage':
-          pdf = await fillEnthärtungsanlagePDF(this.inputValues, signature)
-          break
-        default:
-          break
-      }
+        switch (this.inputValues.berichtType.id) {
+          case 'motor':
+            pdf = await fillMotorPDF(this.inputValues, signature)
+            break
+          case 'pumpe':
+            pdf = await fillPumpePDF(this.inputValues, signature)
+            break
+          case 'wehrtore':
+            pdf = await fillWehrtorePDF(this.inputValues, signature)
+            break
+          case 'luefter':
+            pdf = await fillLüfterPDF(this.inputValues, signature)
+            break
+          case 'schmutzwasser':
+            pdf = await fillSchmutzwasserPDF(this.inputValues, signature)
+            break
+          case 'waermetauscher':
+            pdf = await fillWärmetauscherPDF(this.inputValues, signature)
+            break
+          case 'müllanlage':
+            pdf = await fillMüllanlagePDF(this.inputValues, signature)
+            has2Pages = true
+            break
+          case 'enthaertungsanlage':
+            pdf = await fillEnthärtungsanlagePDF(this.inputValues, signature)
+            break
+          default:
+            break
+        }
 
-      let pdfBufferClone = pdf[0]
-      let pdfBufferCopy = new Uint8Array(pdfBufferClone)
-      if (has2Pages) this.pdfImg2 = await this.turnPDFToPNG(pdfBufferCopy, 2)
-      this.pdfImg = await this.turnPDFToPNG(pdf[0])
-      this.pdfBytes = pdf
+        let pdfBufferClone = pdf[0]
+        let pdfBufferCopy = new Uint8Array(pdfBufferClone)
+        if (has2Pages) this.pdfImg2 = await this.turnPDFToPNG(pdfBufferCopy, 2)
+        this.pdfImg = await this.turnPDFToPNG(pdf[0])
+        this.pdfBytes = pdf
 
-      stepCallback('4')
-      this.generatingPDF = false
+        stepCallback('4')
+        this.generatingPDF = false
       } catch (err) {
         this.generatingPDF = false
-        
+
         // Check if error is network-related (offline)
-        const isNetworkError = err.message.includes('fetch') || 
-                              err.message.includes('network') || 
-                              err.name === 'TypeError' && !navigator.onLine
-        
+        const isNetworkError =
+          err.message.includes('fetch') ||
+          err.message.includes('network') ||
+          (err.name === 'TypeError' && !navigator.onLine)
+
         if (isNetworkError && !navigator.onLine) {
           this.$toast.add({
             severity: 'warn',
             summary: 'Offline - PDF kann nicht erstellt werden',
-            detail: 'Die PDF-Vorlagen müssen zuerst geladen werden. Bitte stellen Sie eine Internetverbindung her und laden Sie die Seite neu, damit die Vorlagen zwischengespeichert werden können.',
+            detail:
+              'Die PDF-Vorlagen müssen zuerst geladen werden. Bitte stellen Sie eine Internetverbindung her und laden Sie die Seite neu, damit die Vorlagen zwischengespeichert werden können.',
             life: 15000,
           })
         } else {
@@ -1579,18 +1604,18 @@ export default {
           id: crypto.randomUUID(),
           pdfBase64: this.pdfBytes[1],
           inputValues: this.normalizeInputValues(this.inputValues),
-          createdAt: Date.now()
+          createdAt: Date.now(),
         })
         console.log('Job sent successfully')
         this.fetchWartungsberichte()
       } catch (err) {
-        console.warn('Offline – queued for later', err);
+        console.warn('Offline – queued for later', err)
 
         await enqueueJob({
           id: crypto.randomUUID(),
           pdfBase64: this.pdfBytes[1],
           inputValues: this.normalizeInputValues(this.inputValues),
-          createdAt: Date.now()
+          createdAt: Date.now(),
         })
 
         this.$toast.add({

@@ -21,11 +21,19 @@
         <div class="wb_wehrtor-multidata-data-radiobtns">
           <div class="wb_wehrtor-multidata-data-radiobtns-btn">
             <label>i.O.</label>
-            <RadioButton v-model="inputValues[input.id]" value="1"></RadioButton>
+            <RadioButton
+              v-model="inputValues[input.id]"
+              value="1"
+              @click="toggleRadio(input.id, '1')"
+            ></RadioButton>
           </div>
           <div class="wb_wehrtor-multidata-data-radiobtns-btn">
             <label>n.i.O.</label>
-            <RadioButton v-model="inputValues[input.id]" value="2"></RadioButton>
+            <RadioButton
+              v-model="inputValues[input.id]"
+              value="2"
+              @click="toggleRadio(input.id, '2')"
+            ></RadioButton>
           </div>
         </div>
         <div class="wb_wehrtor-multidata-data-checkbox">
@@ -48,11 +56,19 @@
         <div class="wb_wehrtor-multidata-data-radiobtns">
           <div class="wb_wehrtor-multidata-data-radiobtns-btn">
             <label>i.O.</label>
-            <RadioButton v-model="inputValues[input.id]" value="1"></RadioButton>
+            <RadioButton
+              v-model="inputValues[input.id]"
+              value="1"
+              @click="toggleRadio(input.id, '1')"
+            ></RadioButton>
           </div>
           <div class="wb_wehrtor-multidata-data-radiobtns-btn">
             <label>n.i.O</label>
-            <RadioButton v-model="inputValues[input.id]" value="2"></RadioButton>
+            <RadioButton
+              v-model="inputValues[input.id]"
+              value="2"
+              @click="toggleRadio(input.id, '2')"
+            ></RadioButton>
           </div>
         </div>
         <div class="wb_wehrtor-multidata-data-checkbox">
@@ -95,6 +111,7 @@
           <RadioButton
             v-model="inputValues['fettnachschmierung_ausgefuehrt']"
             value="1"
+            @click="toggleRadio('fettnachschmierung_ausgefuehrt', '1')"
           ></RadioButton>
         </div>
         <div>
@@ -102,6 +119,7 @@
           <RadioButton
             v-model="inputValues['fettnachschmierung_ausgefuehrt']"
             value="2"
+            @click="toggleRadio('fettnachschmierung_ausgefuehrt', '2')"
           ></RadioButton>
         </div>
       </div>
@@ -179,8 +197,15 @@ export default {
   },
 
   methods: {
+    toggleRadio(field, value) {
+      if (this.inputValues[field] === value) {
+        this.inputValues[field] = null
+      }
+    },
     broadcastInputsToStore() {
-      this.inputValues["identifier"] = this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.inputValues.identifier ?? null
+      this.inputValues['identifier'] =
+        this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.inputValues
+          .identifier ?? null
       useInputStore().setInputData(this.inputValues)
     },
   },

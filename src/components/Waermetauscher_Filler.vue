@@ -19,11 +19,19 @@
         <div class="wb_waermetauscher-multidata-data-radiobtns">
           <div class="wb_waermetauscher-multidata-data-radiobtns-btn">
             <label>Lauf</label>
-            <RadioButton v-model="inputValues['sichtpruefung']" value="1"></RadioButton>
+            <RadioButton
+              v-model="inputValues['sichtpruefung']"
+              value="1"
+              @click="toggleRadio('sichtpruefung', '1')"
+            ></RadioButton>
           </div>
           <div class="wb_waermetauscher-multidata-data-radiobtns-btn">
             <label>Ruhe</label>
-            <RadioButton v-model="inputValues['sichtpruefung']" value="2"></RadioButton>
+            <RadioButton
+              v-model="inputValues['sichtpruefung']"
+              value="2"
+              @click="toggleRadio('sichtpruefung', '2')"
+            ></RadioButton>
           </div>
         </div>
         <div></div>
@@ -38,11 +46,19 @@
         <div class="wb_waermetauscher-multidata-data-radiobtns">
           <div class="wb_waermetauscher-multidata-data-radiobtns-btn">
             <label>i.O.</label>
-            <RadioButton v-model="inputValues[input.id]" value="1"></RadioButton>
+            <RadioButton
+              v-model="inputValues[input.id]"
+              value="1"
+              @click="toggleRadio(input.id, '1')"
+            ></RadioButton>
           </div>
           <div class="wb_waermetauscher-multidata-data-radiobtns-btn">
             <label>n.i.O.</label>
-            <RadioButton v-model="inputValues[input.id]" value="2"></RadioButton>
+            <RadioButton
+              v-model="inputValues[input.id]"
+              value="2"
+              @click="toggleRadio(input.id, '2')"
+            ></RadioButton>
           </div>
         </div>
         <div class="wb_waermetauscher-multidata-data-checkbox">
@@ -69,11 +85,19 @@
         <div class="wb_waermetauscher-multidata-data-radiobtns">
           <div class="wb_waermetauscher-multidata-data-radiobtns-btn">
             <label>i.O.</label>
-            <RadioButton v-model="inputValues[input.id]" value="1"></RadioButton>
+            <RadioButton
+              v-model="inputValues[input.id]"
+              value="1"
+              @click="toggleRadio(input.id, '1')"
+            ></RadioButton>
           </div>
           <div class="wb_waermetauscher-multidata-data-radiobtns-btn">
             <label>n.i.O</label>
-            <RadioButton v-model="inputValues[input.id]" value="2"></RadioButton>
+            <RadioButton
+              v-model="inputValues[input.id]"
+              value="2"
+              @click="toggleRadio(input.id, '2')"
+            ></RadioButton>
           </div>
         </div>
         <div class="wb_waermetauscher-multidata-data-checkbox">
@@ -100,11 +124,19 @@
         <div class="wb_waermetauscher-multidata-data-radiobtns">
           <div class="wb_waermetauscher-multidata-data-radiobtns-btn">
             <label>i.O.</label>
-            <RadioButton v-model="inputValues[input.id]" value="1"></RadioButton>
+            <RadioButton
+              v-model="inputValues[input.id]"
+              value="1"
+              @click="toggleRadio(input.id, '1')"
+            ></RadioButton>
           </div>
           <div class="wb_waermetauscher-multidata-data-radiobtns-btn">
             <label>n.i.O</label>
-            <RadioButton v-model="inputValues[input.id]" value="2"></RadioButton>
+            <RadioButton
+              v-model="inputValues[input.id]"
+              value="2"
+              @click="toggleRadio(input.id, '2')"
+            ></RadioButton>
           </div>
         </div>
         <div class="wb_waermetauscher-multidata-data-checkbox">
@@ -155,7 +187,7 @@
       <Textarea
         class="wb_waermetauscher-vorlaufe-note"
         type="text"
-        style="resize: none; grid-row: 2 / 5;"
+        style="resize: none; grid-row: 2 / 5"
         v-model="inputValues['bemerkung.vorlaufe']"
         fluid
         size="small"
@@ -235,8 +267,15 @@ export default {
   },
 
   methods: {
+    toggleRadio(field, value) {
+      if (this.inputValues[field] === value) {
+        this.inputValues[field] = null
+      }
+    },
     broadcastInputsToStore() {
-      this.inputValues["identifier"] = this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.inputValues.identifier ?? null
+      this.inputValues['identifier'] =
+        this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.inputValues
+          .identifier ?? null
       useInputStore().setInputData(this.inputValues)
     },
   },

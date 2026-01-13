@@ -46,8 +46,16 @@
         <div class="wb_muell-multidata-data-label">{{ input.label }}</div>
         <div class="wb_muell-multidata-data-description">{{ input.description }}</div>
         <div class="wb_muell-multidata-data-radiobtns">
-          <RadioButton v-model="inputValues[input.id]" value="1"></RadioButton>
-          <RadioButton v-model="inputValues[input.id]" value="2"></RadioButton>
+          <RadioButton
+            v-model="inputValues[input.id]"
+            value="1"
+            @click="toggleRadio(input.id, '1')"
+          ></RadioButton>
+          <RadioButton
+            v-model="inputValues[input.id]"
+            value="2"
+            @click="toggleRadio(input.id, '2')"
+          ></RadioButton>
         </div>
         <Textarea
           class="wb_muell-multidata-data-note"
@@ -66,8 +74,16 @@
         <div class="wb_muell-multidata-data-label">{{ input.label }}</div>
         <div class="wb_muell-multidata-data-description">{{ input.description }}</div>
         <div class="wb_muell-multidata-data-radiobtns">
-          <RadioButton v-model="inputValues[input.id]" value="1"></RadioButton>
-          <RadioButton v-model="inputValues[input.id]" value="2"></RadioButton>
+          <RadioButton
+            v-model="inputValues[input.id]"
+            value="1"
+            @click="toggleRadio(input.id, '1')"
+          ></RadioButton>
+          <RadioButton
+            v-model="inputValues[input.id]"
+            value="2"
+            @click="toggleRadio(input.id, '2')"
+          ></RadioButton>
         </div>
         <Textarea
           class="wb_muell-multidata-data-note"
@@ -86,8 +102,16 @@
         <div class="wb_muell-multidata-data-label">{{ input.label }}</div>
         <div class="wb_muell-multidata-data-description">{{ input.description }}</div>
         <div class="wb_muell-multidata-data-radiobtns">
-          <RadioButton v-model="inputValues[input.id]" value="1"></RadioButton>
-          <RadioButton v-model="inputValues[input.id]" value="2"></RadioButton>
+          <RadioButton
+            v-model="inputValues[input.id]"
+            value="1"
+            @click="toggleRadio(input.id, '1')"
+          ></RadioButton>
+          <RadioButton
+            v-model="inputValues[input.id]"
+            value="2"
+            @click="toggleRadio(input.id, '2')"
+          ></RadioButton>
         </div>
         <Textarea
           class="wb_muell-multidata-data-note"
@@ -106,8 +130,16 @@
         <div class="wb_muell-multidata-data-label">{{ input.label }}</div>
         <div class="wb_muell-multidata-data-description">{{ input.description }}</div>
         <div class="wb_muell-multidata-data-radiobtns">
-          <RadioButton v-model="inputValues[input.id]" value="1"></RadioButton>
-          <RadioButton v-model="inputValues[input.id]" value="2"></RadioButton>
+          <RadioButton
+            v-model="inputValues[input.id]"
+            value="1"
+            @click="toggleRadio(input.id, '1')"
+          ></RadioButton>
+          <RadioButton
+            v-model="inputValues[input.id]"
+            value="2"
+            @click="toggleRadio(input.id, '2')"
+          ></RadioButton>
         </div>
         <Textarea
           class="wb_muell-multidata-data-note"
@@ -126,8 +158,16 @@
         <div class="wb_muell-multidata-data-label">{{ input.label }}</div>
         <div class="wb_muell-multidata-data-description">{{ input.description }}</div>
         <div class="wb_muell-multidata-data-radiobtns">
-          <RadioButton v-model="inputValues[input.id]" value="1"></RadioButton>
-          <RadioButton v-model="inputValues[input.id]" value="2"></RadioButton>
+          <RadioButton
+            v-model="inputValues[input.id]"
+            value="1"
+            @click="toggleRadio(input.id, '1')"
+          ></RadioButton>
+          <RadioButton
+            v-model="inputValues[input.id]"
+            value="2"
+            @click="toggleRadio(input.id, '2')"
+          ></RadioButton>
         </div>
         <Textarea
           class="wb_muell-multidata-data-note"
@@ -146,8 +186,16 @@
         <div class="wb_muell-multidata-data-label">{{ input.label }}</div>
         <div class="wb_muell-multidata-data-description">{{ input.description }}</div>
         <div class="wb_muell-multidata-data-radiobtns">
-          <RadioButton v-model="inputValues[input.id]" value="1"></RadioButton>
-          <RadioButton v-model="inputValues[input.id]" value="2"></RadioButton>
+          <RadioButton
+            v-model="inputValues[input.id]"
+            value="1"
+            @click="toggleRadio(input.id, '1')"
+          ></RadioButton>
+          <RadioButton
+            v-model="inputValues[input.id]"
+            value="2"
+            @click="toggleRadio(input.id, '2')"
+          ></RadioButton>
         </div>
         <Textarea
           class="wb_muell-multidata-data-note"
@@ -166,8 +214,16 @@
         <div class="wb_muell-multidata-data-label">{{ input.label }}</div>
         <div class="wb_muell-multidata-data-description">{{ input.description }}</div>
         <div class="wb_muell-multidata-data-radiobtns">
-          <RadioButton v-model="inputValues[input.id]" value="1"></RadioButton>
-          <RadioButton v-model="inputValues[input.id]" value="2"></RadioButton>
+          <RadioButton
+            v-model="inputValues[input.id]"
+            value="1"
+            @click="toggleRadio(input.id, '1')"
+          ></RadioButton>
+          <RadioButton
+            v-model="inputValues[input.id]"
+            value="2"
+            @click="toggleRadio(input.id, '2')"
+          ></RadioButton>
         </div>
         <Textarea
           class="wb_muell-multidata-data-note"
@@ -186,8 +242,16 @@
         <div class="wb_muell-multidata-data-label">{{ input.label }}</div>
         <div class="wb_muell-multidata-data-description">{{ input.description }}</div>
         <div class="wb_muell-multidata-data-radiobtns">
-          <RadioButton v-model="inputValues[input.id]" value="1"></RadioButton>
-          <RadioButton v-model="inputValues[input.id]" value="2"></RadioButton>
+          <RadioButton
+            v-model="inputValues[input.id]"
+            value="1"
+            @click="toggleRadio(input.id, '1')"
+          ></RadioButton>
+          <RadioButton
+            v-model="inputValues[input.id]"
+            value="2"
+            @click="toggleRadio(input.id, '2')"
+          ></RadioButton>
         </div>
         <Textarea
           class="wb_muell-multidata-data-note"
@@ -402,8 +466,15 @@ export default {
   },
 
   methods: {
+    toggleRadio(field, value) {
+      if (this.inputValues[field] === value) {
+        this.inputValues[field] = null
+      }
+    },
     broadcastInputsToStore() {
-      this.inputValues["identifier"] = this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.inputValues.identifier ?? null
+      this.inputValues['identifier'] =
+        this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.inputValues
+          .identifier ?? null
       useInputStore().setInputData(this.inputValues)
     },
   },

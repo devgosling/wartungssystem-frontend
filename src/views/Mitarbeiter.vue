@@ -308,14 +308,23 @@ export default {
 
         console.log(userList)
 
-        const wartungsberichteList = await databases.listDocuments(
-          '6878f5900032addce7e5',
-          '68866dc60038038dbe27',
-          [Query.orderDesc('erstellungsdatum')],
-        )
+        let page = 1
+        const perPage = 25
+        let fetchedFiles = []
+        let wartungsberichteList = []
+        do {
+          const response = await databases.listDocuments(
+            '6878f5900032addce7e5',
+            '68866dc60038038dbe27',
+            [Query.limit(perPage), Query.offset((page - 1) * perPage)],
+          )
+          fetchedFiles = response.documents
+          wartungsberichteList.push(...fetchedFiles)
+          page++
+        } while (fetchedFiles.length === perPage)
         let berichtCountRegistry = {}
 
-        wartungsberichteList.documents.forEach((doc) => {
+        wartungsberichteList.forEach((doc) => {
           if (berichtCountRegistry[doc.mitarbeiter]) {
             berichtCountRegistry[doc.mitarbeiter] += 1
           } else {

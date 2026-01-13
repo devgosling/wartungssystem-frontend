@@ -21,11 +21,19 @@
         <div class="wb_ehanlage-multidata-data-radiobtns">
           <div class="wb_ehanlage-multidata-data-radiobtns-btn">
             <label>i.O.</label>
-            <RadioButton v-model="inputValues[input.id]" value="1"></RadioButton>
+            <RadioButton
+              v-model="inputValues[input.id]"
+              value="1"
+              @click="toggleRadio(input.id, '1')"
+            ></RadioButton>
           </div>
           <div class="wb_ehanlage-multidata-data-radiobtns-btn">
             <label>n.i.O</label>
-            <RadioButton v-model="inputValues[input.id]" value="2"></RadioButton>
+            <RadioButton
+              v-model="inputValues[input.id]"
+              value="2"
+              @click="toggleRadio(input.id, '2')"
+            ></RadioButton>
           </div>
         </div>
         <div class="wb_ehanlage-multidata-data-checkbox">
@@ -126,6 +134,11 @@ export default {
   },
 
   methods: {
+    toggleRadio(field, value) {
+      if (this.inputValues[field] === value) {
+        this.inputValues[field] = null
+      }
+    },
     broadcastInputsToStore() {
       this.inputValues['identifier'] =
         this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.inputValues

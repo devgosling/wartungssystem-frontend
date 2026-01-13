@@ -3,11 +3,7 @@
     <h2 class="wb_luefter-header">Wartungsbericht — Lüfter</h2>
     <h3 class="wb_luefter-subheader">Allgemeines</h3>
     <div class="wb_luefter-multinputs">
-      <div
-        v-for="(input, index) in inputs[0]"
-        :key="index"
-        class="wb_luefter-multinputs-inpt"
-      >
+      <div v-for="(input, index) in inputs[0]" :key="index" class="wb_luefter-multinputs-inpt">
         <label>{{ input.label }}</label>
         <div class="wb_luefter-multinputs-inpt-2" v-if="input.id === 'foerdermenge'">
           <InputText fluid v-model="inputValues[input.id]"></InputText>
@@ -26,11 +22,19 @@
         <div class="wb_luefter-multidata-data-radiobtns">
           <div class="wb_luefter-multidata-data-radiobtns-btn">
             <label>Lauf</label>
-            <RadioButton v-model="inputValues['sichtpruefung']" value="1"></RadioButton>
+            <RadioButton
+              v-model="inputValues['sichtpruefung']"
+              value="1"
+              @click="toggleRadio('sichtpruefung', '1')"
+            ></RadioButton>
           </div>
           <div class="wb_luefter-multidata-data-radiobtns-btn">
             <label>Ruhe</label>
-            <RadioButton v-model="inputValues['sichtpruefung']" value="2"></RadioButton>
+            <RadioButton
+              v-model="inputValues['sichtpruefung']"
+              value="2"
+              @click="toggleRadio('sichtpruefung', '2')"
+            ></RadioButton>
           </div>
         </div>
         <div></div>
@@ -41,11 +45,19 @@
         <div class="wb_luefter-multidata-data-radiobtns">
           <div class="wb_luefter-multidata-data-radiobtns-btn">
             <label>i.O.</label>
-            <RadioButton v-model="inputValues[input.id]" value="1"></RadioButton>
+            <RadioButton
+              v-model="inputValues[input.id]"
+              value="1"
+              @click="toggleRadio(input.id, '1')"
+            ></RadioButton>
           </div>
           <div class="wb_luefter-multidata-data-radiobtns-btn">
             <label>n.i.O.</label>
-            <RadioButton v-model="inputValues[input.id]" value="2"></RadioButton>
+            <RadioButton
+              v-model="inputValues[input.id]"
+              value="2"
+              @click="toggleRadio(input.id, '2')"
+            ></RadioButton>
           </div>
         </div>
         <div class="wb_luefter-multidata-data-checkbox">
@@ -62,11 +74,19 @@
         <div class="wb_luefter-multidata-data-radiobtns">
           <div class="wb_luefter-multidata-data-radiobtns-btn">
             <label>Lauf</label>
-            <RadioButton v-model="inputValues['lagerung']" value="1"></RadioButton>
+            <RadioButton
+              v-model="inputValues['lagerung']"
+              value="1"
+              @click="toggleRadio('lagerung', '1')"
+            ></RadioButton>
           </div>
           <div class="wb_luefter-multidata-data-radiobtns-btn">
             <label>Ruhe</label>
-            <RadioButton v-model="inputValues['lagerung']" value="2"></RadioButton>
+            <RadioButton
+              v-model="inputValues['lagerung']"
+              value="2"
+              @click="toggleRadio('lagerung', '2')"
+            ></RadioButton>
           </div>
         </div>
         <div></div>
@@ -77,11 +97,19 @@
         <div class="wb_luefter-multidata-data-radiobtns">
           <div class="wb_luefter-multidata-data-radiobtns-btn">
             <label>i.O.</label>
-            <RadioButton v-model="inputValues[input.id]" value="1"></RadioButton>
+            <RadioButton
+              v-model="inputValues[input.id]"
+              value="1"
+              @click="toggleRadio(input.id, '1')"
+            ></RadioButton>
           </div>
           <div class="wb_luefter-multidata-data-radiobtns-btn">
             <label>n.i.O</label>
-            <RadioButton v-model="inputValues[input.id]" value="2"></RadioButton>
+            <RadioButton
+              v-model="inputValues[input.id]"
+              value="2"
+              @click="toggleRadio(input.id, '2')"
+            ></RadioButton>
           </div>
         </div>
         <div class="wb_luefter-multidata-data-checkbox">
@@ -124,6 +152,7 @@
           <RadioButton
             v-model="inputValues['fettnachschmierung_ausgefuehrt']"
             value="1"
+            @click="toggleRadio('fettnachschmierung_ausgefuehrt', '1')"
           ></RadioButton>
         </div>
         <div>
@@ -131,6 +160,7 @@
           <RadioButton
             v-model="inputValues['fettnachschmierung_ausgefuehrt']"
             value="2"
+            @click="toggleRadio('fettnachschmierung_ausgefuehrt', '2')"
           ></RadioButton>
         </div>
       </div>
@@ -213,8 +243,15 @@ export default {
   },
 
   methods: {
+    toggleRadio(field, value) {
+      if (this.inputValues[field] === value) {
+        this.inputValues[field] = null
+      }
+    },
     broadcastInputsToStore() {
-      this.inputValues["identifier"] = this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.inputValues.identifier ?? null
+      this.inputValues['identifier'] =
+        this.$parent.$parent.$parent.$parent.$parent.$parent.$parent.$parent.inputValues
+          .identifier ?? null
       useInputStore().setInputData(this.inputValues)
     },
   },
