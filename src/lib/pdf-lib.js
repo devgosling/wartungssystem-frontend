@@ -181,6 +181,8 @@ export const fillPumpePDF = async (inputValues, signatureBase64) => {
 
   // SET FIELDS
   for (const [key, value] of Object.entries(inputData)) {
+    console.log(key, value)
+
     // SET TEXT FIELDS
     if (fieldDataPumpe.textfields[key]) {
       form.getTextField(fieldDataPumpe.textfields[key]).setText(value.toString())

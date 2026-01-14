@@ -56,20 +56,20 @@
   },
 
   "checkboxes": {
-    "verschmutzung": "Kontrollkästchen 79",
-    "beschaedigungen": "Kontrollkästchen 78",
-    "leichtgaengigkeit_schott": "Kontrollkästchen 80",
-    "handrad_betrieb": "Kontrollkästchen 81",
-    "zahnstange": "Kontrollkästchen 82",
-    "zahnstange_gefettet": "Kontrollkästchen 83",
-    "endschalter": "Kontrollkästchen 84",
-    "schottzustand": "Kontrollkästchen 85",
-    "gummilippe_schott": "Kontrollkästchen 86",
-    "rutschkupplung": "Kontrollkästchen 87",
-    "antrieb_aufabfahren": "Kontrollkästchen 88",
-    "endschalter2": "Kontrollkästchen 89",
-    "handbetrieb": "Kontrollkästchen 90",
-    "automatik": "Kontrollkästchen 91",
-    "rutschkupplung2": "Kontrollkästchen 92"
+    "fixed.verschmutzung": "Kontrollkästchen 79",
+    "fixed.beschaedigungen": "Kontrollkästchen 78",
+    "fixed.leichtgaengigkeit_schott": "Kontrollkästchen 80",
+    "fixed.handrad_betrieb": "Kontrollkästchen 81",
+    "fixed.zahnstange": "Kontrollkästchen 82",
+    "fixed.zahnstange_gefettet": "Kontrollkästchen 83",
+    "fixed.endschalter": "Kontrollkästchen 84",
+    "fixed.schottzustand": "Kontrollkästchen 85",
+    "fixed.gummilippe_schott": "Kontrollkästchen 86",
+    "fixed.rutschkupplung": "Kontrollkästchen 87",
+    "fixed.antrieb_aufabfahren": "Kontrollkästchen 88",
+    "fixed.endschalter2": "Kontrollkästchen 89",
+    "fixed.handbetrieb": "Kontrollkästchen 90",
+    "fixed.automatik": "Kontrollkästchen 91",
+    "fixed.rutschkupplung2": "Kontrollkästchen 92"
   }
 }

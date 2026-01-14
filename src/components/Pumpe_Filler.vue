@@ -68,7 +68,7 @@
         <div></div>
         <span><b>Bemerkung</b></span>
       </div>
-      <div v-for="(input, index) in inputs[1]" :key="index" class="wb_pumpe-multidata-data">
+      <div v-for="(input, index) in inputs[2]" :key="index" class="wb_pumpe-multidata-data">
         <span>{{ input.label }}</span>
         <div class="wb_pumpe-multidata-data-radiobtns">
           <div class="wb_pumpe-multidata-data-radiobtns-btn">

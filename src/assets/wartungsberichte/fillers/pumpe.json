@@ -54,15 +54,15 @@
   },
 
   "checkboxes": {
-    "verschmutzung": "Kontrollkästchen 94",
-    "beschaedigungen": "Kontrollkästchen 93",
-    "schrauben+bolzen": "Kontrollkästchen 95",
-    "rohrleitung": "Kontrollkästchen 96",
-    "gleitringdichtung": "Kontrollkästchen 98",
-    "packung": "Kontrollkästchen 97",
-    "entlueftungsschraube": "Kontrollkästchen 99",
-    "oel+kuehlmittel": "Kontrollkästchen 100",
-    "laufgeraeusche": "Kontrollkästchen 101",
-    "schwingungen": "Kontrollkästchen 102"
+    "fixed.verschmutzung": "Kontrollkästchen 94",
+    "fixed.beschaedigungen": "Kontrollkästchen 93",
+    "fixed.schrauben+bolzen": "Kontrollkästchen 95",
+    "fixed.rohrleitung": "Kontrollkästchen 96",
+    "fixed.gleitringdichtung": "Kontrollkästchen 98",
+    "fixed.packung": "Kontrollkästchen 97",
+    "fixed.entlueftungsschraube": "Kontrollkästchen 99",
+    "fixed.oel+kuehlmittel": "Kontrollkästchen 100",
+    "fixed.laufgeraeusche": "Kontrollkästchen 101",
+    "fixed.schwingungen": "Kontrollkästchen 102"
   }
 }

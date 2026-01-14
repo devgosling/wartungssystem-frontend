@@ -27,8 +27,8 @@
   },
 
   "checkboxes": {
-    "verschmutzung": "Kontrollkästchen 33",
-    "beschaedigung": "Kontrollkästchen 26",
-    "dichheit": "Kontrollkästchen 27"
+    "fixed.verschmutzung": "Kontrollkästchen 33",
+    "fixed.beschaedigung": "Kontrollkästchen 26",
+    "fixed.dichtheit": "Kontrollkästchen 27"
   }
 }
