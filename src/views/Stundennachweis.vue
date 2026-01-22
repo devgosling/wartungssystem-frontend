@@ -1888,6 +1888,13 @@ export default {
               'Die PDF-Vorlagen müssen zuerst geladen werden. Bitte stellen Sie eine Internetverbindung her und laden Sie die Seite neu, damit die Vorlagen zwischengespeichert werden können.',
             life: 15000,
           })
+
+          this.$toast.add({
+            severity: 'error',
+            summary: 'Fehler beim Erstellen des PDFs',
+            detail: err.message,
+            life: 10000,
+          })
         } else {
           this.$toast.add({
             severity: 'error',
