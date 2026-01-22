@@ -4,28 +4,16 @@
  */
 export async function arePDFsCached() {
   try {
-    // Import PDF URLs (Vite generates hashed URLs)
-    const pdfModules = await Promise.all([
-      import('../assets/wartungsberichte/Wartungsbericht_Motor_Formular.pdf'),
-      import('../assets/wartungsberichte/Wartungsbericht_Muellanlage_Formular.pdf'),
-      import('../assets/wartungsberichte/Wartungsbericht_Pumpe_Formular.pdf'),
-      import('../assets/wartungsberichte/Wartungsbericht_Wehrtore_Formular.pdf'),
-      import('../assets/wartungsberichte/Wartungsbericht_Luefter_Formular.pdf'),
-      import('../assets/wartungsberichte/Wartungsbericht_Schmutzwasser_Formular.pdf'),
-      import('../assets/wartungsberichte/Wartungsbericht_Waermetauscher_Formular.pdf'),
-      import('../assets/wartungsberichte/Ueberpruefungsbericht_Enthaertungsanlage_Formular.pdf'),
-      import('../assets/wartungsberichte/Stundenzettel_Formular.pdf'),
-    ])
-
-    const pdfUrls = pdfModules.map((m) => m.default)
     const cache = await caches.open('pdf-templates')
+    const keys = await cache.keys()
 
-    // Check if all PDFs are in cache
-    for (const pdfUrl of pdfUrls) {
-      const response = await cache.match(pdfUrl)
-      if (!response) {
-        return false
-      }
+    // Check if we have at least some PDFs cached (the 9 templates)
+    // We check by looking for .pdf files in the cache
+    const pdfKeys = keys.filter((request) => request.url.includes('.pdf'))
+
+    // We need at least 9 PDF templates cached
+    if (pdfKeys.length < 9) {
+      return false
     }
 
     return true
