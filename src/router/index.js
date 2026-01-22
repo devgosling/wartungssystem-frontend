@@ -10,6 +10,7 @@ import CustomersView from '@/views/Kunden.vue'
 import { AppwriteException } from 'appwrite'
 import { isUserLoggedIn } from '@/lib/utils'
 import { useInputStore } from '@/stores/inputStore'
+import Stundennachweis from '@/views/Stundennachweis.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -49,6 +50,15 @@ const router = createRouter({
       meta: {
         requiresAuth: true,
         title: 'Kunden',
+      },
+    },
+    {
+      path: '/stundennachweis',
+      name: 'stundennachweis',
+      component: Stundennachweis,
+      meta: {
+        requiresAuth: true,
+        title: 'Stundennachweis',
       },
     },
     {

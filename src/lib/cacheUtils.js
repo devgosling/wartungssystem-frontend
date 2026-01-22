@@ -13,7 +13,8 @@ export async function arePDFsCached() {
       'Wartungsbericht_Luefter_Formular.pdf',
       'Wartungsbericht_Schmutzwasser_Formular.pdf',
       'Wartungsbericht_Waermetauscher_Formular.pdf',
-      'Ueberpruefungsbericht_Enthaertungsanlage_Formular.pdf'
+      'Ueberpruefungsbericht_Enthaertungsanlage_Formular.pdf',
+      'Stundenzettel_Formular.pdf',
     ]
 
     const cache = await caches.open('pdf-templates')

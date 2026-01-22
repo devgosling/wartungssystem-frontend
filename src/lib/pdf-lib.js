@@ -7,6 +7,7 @@ import luefterpdf from '../assets/wartungsberichte/Wartungsbericht_Luefter_Formu
 import schmutzwasserpdf from '../assets/wartungsberichte/Wartungsbericht_Schmutzwasser_Formular.pdf'
 import waermetauscherpdf from '../assets/wartungsberichte/Wartungsbericht_Waermetauscher_Formular.pdf'
 import enthaertungsanlagepdf from '../assets/wartungsberichte/Ueberpruefungsbericht_Enthaertungsanlage_Formular.pdf'
+import stundenzettelpdf from '../assets/wartungsberichte/Stundenzettel_Formular.pdf'
 import fieldDataMotor from '../assets/wartungsberichte/fillers/motor.json'
 import fieldDataMuell from '../assets/wartungsberichte/fillers/muellanlage.json'
 import fieldDataPumpe from '../assets/wartungsberichte/fillers/pumpe.json'
@@ -15,6 +16,7 @@ import fieldDataLuefter from '../assets/wartungsberichte/fillers/luefter.json'
 import fieldDataSchmutzwasser from '../assets/wartungsberichte/fillers/schmutzwasser.json'
 import fieldDataWaermetauscher from '../assets/wartungsberichte/fillers/waermetauscher.json'
 import fieldDataEnthaertungsanlage from '../assets/wartungsberichte/fillers/enthaertungsanlage.json'
+import fieldDataStundenzettel from '../assets/wartungsberichte/fillers/stundenzettel.json'
 import { useInputStore } from '@/stores/inputStore'
 
 export const fillMotorPDF = async (inputValues, signatureBase64) => {
@@ -587,7 +589,219 @@ export const fillEnthärtungsanlagePDF = async (inputValues, signatureBase64) =>
   link.click()*/
 }
 
+export const fillStundenzettelPDF = async (
+  inputValues,
+  stundenData,
+  signatureBase64Monteur,
+  signatureBase64Kunde,
+) => {
+  const formPdfBytes = await fetch(stundenzettelpdf).then((res) => res.arrayBuffer())
+  const pdfDoc = await PDFDocument.load(formPdfBytes)
+  const signatureImageMonteur = await pdfDoc.embedPng(signatureBase64Monteur)
+  const signatureImageKunde = signatureBase64Kunde
+    ? await pdfDoc.embedPng(signatureBase64Kunde)
+    : null
+
+  const form = pdfDoc.getForm()
+
+  // SET HEADER DATA
+  if (fieldDataStundenzettel.textfields.monteur && inputValues.employee) {
+    form.getTextField(fieldDataStundenzettel.textfields.monteur).setText(inputValues.employee)
+  }
+  if (fieldDataStundenzettel.textfields.kunde && inputValues.customer) {
+    form
+      .getTextField(fieldDataStundenzettel.textfields.kunde)
+      .setText(
+        `${inputValues.customer.name}\n${inputValues.customer['address.street']}\n${inputValues.customer['address.zipcode']} ${inputValues.customer['address.city']}`,
+      )
+  }
+  if (fieldDataStundenzettel.textfields.objekt && inputValues.objekt) {
+    form.getTextField(fieldDataStundenzettel.textfields.objekt).setText(inputValues.objekt)
+  }
+  if (fieldDataStundenzettel.textfields.bestellNr && inputValues.bestellNr) {
+    form.getTextField(fieldDataStundenzettel.textfields.bestellNr).setText(inputValues.bestellNr)
+  }
+  if (fieldDataStundenzettel.textfields.auftragsNr && inputValues.auftragsNr) {
+    form.getTextField(fieldDataStundenzettel.textfields.auftragsNr).setText(inputValues.auftragsNr)
+  }
+
+  // SET TABLE ROWS
+  for (let i = 0; i < stundenData.rows.length; i++) {
+    const row = stundenData.rows[i]
+    const rowPrefix = `rows.${i}.`
+
+    // Format date if it exists
+    if (row.datum && fieldDataStundenzettel.textfields[rowPrefix + 'datum']) {
+      const dateStr = new Date(row.datum).toLocaleDateString('de-DE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      })
+      form.getTextField(fieldDataStundenzettel.textfields[rowPrefix + 'datum']).setText(dateStr)
+    }
+
+    // Set other row fields
+    const rowFields = [
+      'arbeitszeit1',
+      'arbeitszeit2',
+      'pause',
+      'pauseStd',
+      'ueberstunden1',
+      'ueberstunden2',
+      'ueberstundenStd',
+      'anfahrt1',
+      'anfahrt2',
+      'anfahrtStd',
+      'abfahrt1',
+      'abfahrt2',
+      'km',
+      'totalStd',
+    ]
+    for (const field of rowFields) {
+      const fieldKey = rowPrefix + field
+      if (row[field] && fieldDataStundenzettel.textfields[fieldKey]) {
+        form
+          .getTextField(fieldDataStundenzettel.textfields[fieldKey])
+          .setText(row[field].toString())
+      }
+    }
+  }
+
+  // SET TOTALS
+  if (stundenData.totalPause && fieldDataStundenzettel.textfields.totalPause) {
+    form
+      .getTextField(fieldDataStundenzettel.textfields.totalPause)
+      .setText(stundenData.totalPause.toString())
+  }
+  if (stundenData.totalUeberstunden && fieldDataStundenzettel.textfields.totalUeberstunden) {
+    form
+      .getTextField(fieldDataStundenzettel.textfields.totalUeberstunden)
+      .setText(stundenData.totalUeberstunden.toString())
+  }
+  if (stundenData.totalAnfahrt && fieldDataStundenzettel.textfields.totalAnfahrt) {
+    form
+      .getTextField(fieldDataStundenzettel.textfields.totalAnfahrt)
+      .setText(stundenData.totalAnfahrt.toString())
+  }
+  if (stundenData.totalAbfahrt && fieldDataStundenzettel.textfields.totalAbfahrt) {
+    form
+      .getTextField(fieldDataStundenzettel.textfields.totalAbfahrt)
+      .setText(stundenData.totalAbfahrt.toString())
+  }
+  if (stundenData.totalStd && fieldDataStundenzettel.textfields.totalStd) {
+    form
+      .getTextField(fieldDataStundenzettel.textfields.totalStd)
+      .setText(stundenData.totalStd.toString())
+  }
+
+  // SET TEXTAREAS
+  if (stundenData.ausgefuehrteArbeiten && fieldDataStundenzettel.textfields.ausgefuehrteArbeiten) {
+    form
+      .getTextField(fieldDataStundenzettel.textfields.ausgefuehrteArbeiten)
+      .setText(stundenData.ausgefuehrteArbeiten)
+  }
+  if (stundenData.besonderheiten && fieldDataStundenzettel.textfields.besonderheiten) {
+    form
+      .getTextField(fieldDataStundenzettel.textfields.besonderheiten)
+      .setText(stundenData.besonderheiten)
+  }
+  if (stundenData.material && fieldDataStundenzettel.textfields.material) {
+    form.getTextField(fieldDataStundenzettel.textfields.material).setText(stundenData.material)
+  }
+
+  // SET MONTEUR SIGNATURE
+  const pages = pdfDoc.getPages()
+  const firstPage = pages[0]
+  let scaleToWidth = 110.4
+  const pngDimsMonteur = (await signatureImageMonteur).scale(
+    scaleToWidth / signatureImageMonteur.width,
+  )
+
+  firstPage.drawImage(signatureImageMonteur, {
+    x: 90,
+    y: 41,
+    width: pngDimsMonteur.width,
+    height: pngDimsMonteur.height,
+  })
+
+  // SET KUNDE SIGNATURE (only if customer signed)
+  if (signatureImageKunde) {
+    const pngDimsKunde = (await signatureImageKunde).scale(scaleToWidth / signatureImageKunde.width)
+
+    firstPage.drawImage(signatureImageKunde, {
+      x: 455,
+      y: 41,
+      width: pngDimsKunde.width,
+      height: pngDimsKunde.height,
+    })
+  }
+
+  // SAVE PDF
+  const pdfBytes = await pdfDoc.save()
+  const pdfBase64 = await pdfDoc.saveAsBase64()
+
+  return [pdfBytes, pdfBase64]
+}
+
 export const getAmountOfPagesInPDF = async (pdfBytes) => {
   const pdfDoc = await PDFDocument.load(pdfBytes)
   return pdfDoc.getPageCount()
+}
+
+/**
+ * Add a customer signature to an existing Stundenzettel PDF
+ * @param {ArrayBuffer} pdfBytes - The existing PDF bytes
+ * @param {string} signatureBase64 - The signature as base64 PNG
+ * @returns {Promise<[Uint8Array, string]>} - [pdfBytes, pdfBase64]
+ */
+export const addCustomerSignatureToPDF = async (pdfBytes, signatureBase64) => {
+  const pdfDoc = await PDFDocument.load(pdfBytes)
+  const signatureImage = await pdfDoc.embedPng(signatureBase64)
+
+  const pages = pdfDoc.getPages()
+  const firstPage = pages[0]
+  const scaleToWidth = 110.4
+  const pngDims = signatureImage.scale(scaleToWidth / signatureImage.width)
+
+  // Customer signature position (x: 400, y: 41) - same as in fillStundenzettelPDF
+  firstPage.drawImage(signatureImage, {
+    x: 455,
+    y: 41,
+    width: pngDims.width,
+    height: pngDims.height,
+  })
+
+  const newPdfBytes = await pdfDoc.save()
+  const newPdfBase64 = await pdfDoc.saveAsBase64()
+
+  return [newPdfBytes, newPdfBase64]
+}
+
+/**
+ * Add a control/verification signature to an existing Stundenzettel PDF
+ * @param {ArrayBuffer} pdfBytes - The existing PDF bytes
+ * @param {string} signatureBase64 - The signature as base64 PNG
+ * @returns {Promise<[Uint8Array, string]>} - [pdfBytes, pdfBase64]
+ */
+export const addControlSignatureToPDF = async (pdfBytes, signatureBase64) => {
+  const pdfDoc = await PDFDocument.load(pdfBytes)
+  const signatureImage = await pdfDoc.embedPng(signatureBase64)
+
+  const pages = pdfDoc.getPages()
+  const firstPage = pages[0]
+  const scaleToWidth = 110.4
+  const pngDims = signatureImage.scale(scaleToWidth / signatureImage.width)
+
+  // Control signature position (x: 250, y: 41) - between monteur and customer signatures
+  firstPage.drawImage(signatureImage, {
+    x: 270,
+    y: 41,
+    width: pngDims.width,
+    height: pngDims.height,
+  })
+
+  const newPdfBytes = await pdfDoc.save()
+  const newPdfBase64 = await pdfDoc.saveAsBase64()
+
+  return [newPdfBytes, newPdfBase64]
 }

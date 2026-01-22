@@ -1612,6 +1612,7 @@ export default {
         console.warn('Offline – queued for later', err)
 
         await enqueueJob({
+          type: 'wartungsbericht',
           id: crypto.randomUUID(),
           pdfBase64: this.pdfBytes[1],
           inputValues: this.normalizeInputValues(this.inputValues),
