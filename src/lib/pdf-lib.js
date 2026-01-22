@@ -700,13 +700,19 @@ export const fillStundenzettelPDF = async (
       .getTextField(fieldDataStundenzettel.textfields.ausgefuehrteArbeiten)
       .setText(stundenData.ausgefuehrteArbeiten)
   }
-  if (stundenData.besonderheiten && fieldDataStundenzettel.textfields.besonderheiten) {
-    form
-      .getTextField(fieldDataStundenzettel.textfields.besonderheiten)
-      .setText(stundenData.besonderheiten)
-  }
   if (stundenData.material && fieldDataStundenzettel.textfields.material) {
     form.getTextField(fieldDataStundenzettel.textfields.material).setText(stundenData.material)
+  }
+
+  // SET CHECKBOXES (Besonderheiten)
+  if (stundenData.notdienst && fieldDataStundenzettel.checkboxes.notdienst) {
+    form.getCheckBox(fieldDataStundenzettel.checkboxes.notdienst).check()
+  }
+  if (stundenData.kundendienst && fieldDataStundenzettel.checkboxes.kundendienst) {
+    form.getCheckBox(fieldDataStundenzettel.checkboxes.kundendienst).check()
+  }
+  if (stundenData.wartung && fieldDataStundenzettel.checkboxes.wartung) {
+    form.getCheckBox(fieldDataStundenzettel.checkboxes.wartung).check()
   }
 
   // SET MONTEUR SIGNATURE

@@ -241,15 +241,33 @@
 
                       <!-- Besonderheiten -->
                       <div class="stundenfiller-section">
-                        <label for="besonderheiten" class="stundenfiller-section-label"
-                          >Besonderheiten</label
-                        >
-                        <Textarea
-                          id="besonderheiten"
-                          v-model="stundenData.besonderheiten"
-                          rows="8"
-                          class="stundenfiller-section-textarea"
-                        />
+                        <label class="stundenfiller-section-label">Besonderheiten</label>
+                        <div class="stundenfiller-checkboxes">
+                          <div class="stundenfiller-checkbox">
+                            <Checkbox
+                              inputId="notdienst"
+                              v-model="stundenData.notdienst"
+                              :binary="true"
+                            />
+                            <label for="notdienst">Notdienst</label>
+                          </div>
+                          <div class="stundenfiller-checkbox">
+                            <Checkbox
+                              inputId="kundendienst"
+                              v-model="stundenData.kundendienst"
+                              :binary="true"
+                            />
+                            <label for="kundendienst">Kundendienst</label>
+                          </div>
+                          <div class="stundenfiller-checkbox">
+                            <Checkbox
+                              inputId="wartung"
+                              v-model="stundenData.wartung"
+                              :binary="true"
+                            />
+                            <label for="wartung">Wartung</label>
+                          </div>
+                        </div>
                       </div>
 
                       <!-- Material -->
@@ -737,6 +755,7 @@ import {
   Dialog,
   Tag,
   Textarea,
+  Checkbox,
 } from 'primevue'
 import StepPanel from 'primevue/steppanel'
 import StepItem from 'primevue/stepitem'
@@ -785,6 +804,7 @@ export default {
     Tag,
     ViewCustomerDialog,
     Textarea,
+    Checkbox,
   },
 
   data() {
@@ -833,7 +853,9 @@ export default {
         totalAbfahrt: '',
         totalStd: '',
         ausgefuehrteArbeiten: '',
-        besonderheiten: '',
+        notdienst: false,
+        kundendienst: false,
+        wartung: false,
         material: '',
       },
       tabCooldown: -1,
@@ -1133,6 +1155,37 @@ export default {
       }
 
       this.inputValues.employee = (await account.get()).name
+
+      // Reset stundenData
+      this.stundenData = {
+        rows: Array.from({ length: 8 }, () => ({
+          datum: null,
+          arbeitszeit1: '',
+          arbeitszeit2: '',
+          pause: '',
+          pauseStd: '',
+          ueberstunden1: '',
+          ueberstunden2: '',
+          ueberstundenStd: '',
+          anfahrt1: '',
+          anfahrt2: '',
+          anfahrtStd: '',
+          abfahrt1: '',
+          abfahrt2: '',
+          km: '',
+          totalStd: '',
+        })),
+        totalPause: '',
+        totalUeberstunden: '',
+        totalAnfahrt: '',
+        totalAbfahrt: '',
+        totalStd: '',
+        ausgefuehrteArbeiten: '',
+        notdienst: false,
+        kundendienst: false,
+        wartung: false,
+        material: '',
+      }
 
       await callback('1')
 
@@ -2574,6 +2627,25 @@ export default {
   .stundennachweise-sign-panel-signpad {
     max-width: 100%;
     box-sizing: border-box;
+  }
+}
+
+/* Checkbox styles for Besonderheiten */
+.stundenfiller-checkboxes {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.stundenfiller-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  label {
+    cursor: pointer;
+    user-select: none;
   }
 }
 </style>
