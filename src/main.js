@@ -9,6 +9,7 @@ import ToastService from 'primevue/toastservice'
 import * as DE from './assets/de.json'
 import { registerSW } from 'virtual:pwa-register'
 import { setupOfflineJobProcessor, processJobs } from './lib/offlineJobProcessor'
+import { preloadPDFTemplates } from './lib/cacheUtils'
 import * as pdfjs from 'pdfjs-dist/build/pdf' // KEEP - Builder
 import * as pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs' // KEEP - Worker COPY
 
@@ -57,4 +58,6 @@ setupOfflineJobProcessor()
 
 if (navigator.onLine) {
   processJobs()
+  // Preload PDF templates for offline use
+  preloadPDFTemplates()
 }

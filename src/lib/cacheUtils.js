@@ -36,3 +36,34 @@ export async function canCreateReport() {
   // Offline - check if PDFs are cached
   return await arePDFsCached()
 }
+
+/**
+ * Preload all PDF templates to ensure they are cached by the service worker
+ * Call this while online to cache PDFs for offline use
+ */
+export async function preloadPDFTemplates() {
+  if (!navigator.onLine) return
+
+  try {
+    // Import all PDF URLs
+    const pdfModules = await Promise.all([
+      import('../assets/wartungsberichte/Wartungsbericht_Motor_Formular.pdf'),
+      import('../assets/wartungsberichte/Wartungsbericht_Muellanlage_Formular.pdf'),
+      import('../assets/wartungsberichte/Wartungsbericht_Pumpe_Formular.pdf'),
+      import('../assets/wartungsberichte/Wartungsbericht_Wehrtore_Formular.pdf'),
+      import('../assets/wartungsberichte/Wartungsbericht_Luefter_Formular.pdf'),
+      import('../assets/wartungsberichte/Wartungsbericht_Schmutzwasser_Formular.pdf'),
+      import('../assets/wartungsberichte/Wartungsbericht_Waermetauscher_Formular.pdf'),
+      import('../assets/wartungsberichte/Ueberpruefungsbericht_Enthaertungsanlage_Formular.pdf'),
+      import('../assets/wartungsberichte/Stundenzettel_Formular.pdf'),
+    ])
+
+    // Fetch each PDF to trigger service worker caching
+    const fetchPromises = pdfModules.map((m) => fetch(m.default))
+    await Promise.all(fetchPromises)
+
+    console.log('All PDF templates preloaded and cached')
+  } catch (err) {
+    console.error('Error preloading PDF templates:', err)
+  }
+}

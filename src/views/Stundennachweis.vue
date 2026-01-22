@@ -1873,27 +1873,21 @@ export default {
         this.generatingPDF = false
       } catch (err) {
         this.generatingPDF = false
+        console.error('PDF generation error:', err)
 
         // Check if error is network-related (offline)
         const isNetworkError =
-          err.message.includes('fetch') ||
-          err.message.includes('network') ||
+          err.message?.toLowerCase().includes('failed to fetch') ||
+          err.message?.toLowerCase().includes('network') ||
           (err.name === 'TypeError' && !navigator.onLine)
 
-        if (isNetworkError && !navigator.onLine) {
+        if (isNetworkError) {
           this.$toast.add({
             severity: 'warn',
             summary: 'Offline - PDF kann nicht erstellt werden',
             detail:
-              'Die PDF-Vorlagen müssen zuerst geladen werden. Bitte stellen Sie eine Internetverbindung her und laden Sie die Seite neu, damit die Vorlagen zwischengespeichert werden können.',
+              'Die PDF-Vorlage für Stundennachweise muss zuerst geladen werden. Bitte stellen Sie eine Internetverbindung her und laden Sie die Seite neu.',
             life: 15000,
-          })
-
-          this.$toast.add({
-            severity: 'error',
-            summary: 'Fehler beim Erstellen des PDFs',
-            detail: err.message,
-            life: 10000,
           })
         } else {
           this.$toast.add({
