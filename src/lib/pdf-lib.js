@@ -624,6 +624,15 @@ export const fillStundenzettelPDF = async (
   if (fieldDataStundenzettel.textfields.auftragsNr && inputValues.auftragsNr) {
     form.getTextField(fieldDataStundenzettel.textfields.auftragsNr).setText(inputValues.auftragsNr)
   }
+  if (
+    fieldDataStundenzettel.textfields.employees &&
+    inputValues.employees &&
+    inputValues.employees.length > 0
+  ) {
+    form
+      .getTextField(fieldDataStundenzettel.textfields.employees)
+      .setText(inputValues.employees.join(', '))
+  }
 
   // SET TABLE ROWS
   for (let i = 0; i < stundenData.rows.length; i++) {

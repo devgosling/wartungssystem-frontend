@@ -110,6 +110,50 @@
                       />
                     </div>
                     <div class="stundennachweise-create-panel-grid-inpt">
+                      <label for="stundennachweis-kunde">Weitere Mitarbeiter</label>
+                      <MultiSelect
+                        id="stundennachweis-employees"
+                        placeholder="Keine weiteren Mitarbeiter ausgewählt"
+                        :options="mitarbeiter.slice().sort((a, b) => a.localeCompare(b))"
+                        class="stundennachweise-create-panel-grid-slct-type"
+                        filter
+                        multiple
+                        optionLabel="name"
+                        v-model="inputValues.employees"
+                        :showClear="!kundeLocked"
+                      >
+                        <template #value="slotProps">
+                          <div v-if="slotProps.value">
+                            {{ slotProps.value.join(', ') }}
+                          </div>
+                          <div v-else>
+                            {{ slotProps.placeholder }}
+                          </div>
+                        </template>
+                        <template #option="slotProps">
+                          <div
+                            style="
+                              text-wrap: wrap;
+                              word-wrap: normal;
+                              display: grid;
+                              grid-template-columns: 0.9rem auto;
+                              gap: 0.5rem;
+                              align-items: center;
+                            "
+                          >
+                            <i :class="'fa-solid fa-user'" />{{ slotProps.option }}
+                          </div>
+                        </template>
+                        <template #header>
+                          <div
+                            style="font-weight: 500; padding: 0.75rem 1rem; padding-bottom: 0.1rem"
+                          >
+                            Verfügbare Mitarbeiter
+                          </div>
+                        </template>
+                      </MultiSelect>
+                    </div>
+                    <div class="stundennachweise-create-panel-grid-inpt">
                       <label for="stundennachweis-objekt">Objekt</label>
                       <InputText
                         id="stundennachweis-objekt"
@@ -736,7 +780,7 @@
   </Dialog>
 </template>
 <script>
-import { account, databases, storage } from '@/lib/appwrite'
+import { account, databases, functions, storage } from '@/lib/appwrite'
 import {
   Toolbar,
   Button,
@@ -756,6 +800,7 @@ import {
   Tag,
   Textarea,
   Checkbox,
+  MultiSelect,
 } from 'primevue'
 import StepPanel from 'primevue/steppanel'
 import StepItem from 'primevue/stepitem'
@@ -770,7 +815,7 @@ import {
 } from '@/lib/pdf-lib'
 import * as pdfjsLib from 'pdfjs-dist'
 import { useInputStore } from '@/stores/inputStore'
-import { AppwriteException, Query } from 'appwrite'
+import { AppwriteException, ExecutionMethod, Query } from 'appwrite'
 import { FilterMatchMode } from '@primevue/core'
 import CreateCustomerDialog from '@/components/CreateCustomerDialog.vue'
 import ViewCustomerDialog from '@/components/ViewCustomerDialog.vue'
@@ -805,6 +850,7 @@ export default {
     ViewCustomerDialog,
     Textarea,
     Checkbox,
+    MultiSelect,
   },
 
   data() {
@@ -847,6 +893,7 @@ export default {
           km: '',
           totalStd: '',
         })),
+        employees: [],
         totalPause: '',
         totalUeberstunden: '',
         totalAnfahrt: '',
@@ -933,6 +980,7 @@ export default {
   async mounted() {
     this.fetchStundenzettel()
     this.fetchCustomers()
+    this.fetchEmployees()
 
     const currentUser = await account.get()
     this.inputValues.employee = currentUser.name
@@ -1063,7 +1111,21 @@ export default {
       }
       activateCallback('2')
     },
+    async fetchEmployees() {
+      let userList = JSON.parse(
+        (
+          await functions.createExecution(
+            '68f3d2b9001562f115c8',
+            '{}',
+            false,
+            '/listusers',
+            ExecutionMethod.GET,
+          )
+        ).responseBody,
+      )
 
+      this.mitarbeiter = userList.users.map((user) => user.name)
+    },
     async fetchCustomers() {
       this.kunden = []
 
@@ -1181,6 +1243,7 @@ export default {
         totalAbfahrt: '',
         totalStd: '',
         ausgefuehrteArbeiten: '',
+        employees: [],
         notdienst: false,
         kundendienst: false,
         wartung: false,

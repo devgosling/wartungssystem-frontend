@@ -6,6 +6,8 @@
     "auftragsNr": "Textfeld 124",
     "kunde": "Textfeld 126",
 
+    "employees": "Employees",
+
     "rows.0.datum": "Textfeld 127",
     "rows.0.arbeitszeit1": "Textfeld 128",
     "rows.0.arbeitszeit2": "Textfeld 129",
@@ -135,6 +137,5 @@
     "notdienst": "Kontrollkästchen1",
     "kundendienst": "Kontrollkästchen2",
     "wartung": "Kontrollkästchen3"
-
   }
 }
