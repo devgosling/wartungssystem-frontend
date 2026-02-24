@@ -556,8 +556,8 @@ export const fillEnthärtungsanlagePDF = async (inputValues, signatureBase64) =>
       }
     }
 
-    if (key.startsWith('group_') && value) {
-      form.getTextField(key).setText(value.toString())
+    if (key.startsWith('group_') && value || value === 0) {
+      form.getTextField(key).setText(value.toFixed(1).toString().replace('.', ','))
     }
   }
 
