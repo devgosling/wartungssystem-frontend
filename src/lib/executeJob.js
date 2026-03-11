@@ -19,19 +19,14 @@ export async function executeJob(job) {
   await storage.createFile('6878f5cf00166fde91eb', fileID, file)
 
   // Create document
-  await databases.createDocument(
-    '6878f5900032addce7e5',
-    '68866dc60038038dbe27',
-    ID.unique(),
-    {
-      mitarbeiter: inputValues.employee,
-      erstellungsdatum: new Date(),
-      kunde: JSON.stringify(inputValues.customer),
-      wartungsberichtid: fileID,
-      identifikator: inputValues.identifier ?? null,
-      type: inputValues.berichtType.filekey,
-    }
-  )
+  await databases.createDocument('6878f5900032addce7e5', '68866dc60038038dbe27', ID.unique(), {
+    mitarbeiter: inputValues.employee,
+    erstellungsdatum: new Date(),
+    kunde: JSON.stringify(inputValues.customer),
+    wartungsberichtid: fileID,
+    identifikator: inputValues.identifier ?? null,
+    type: inputValues.berichtType.filekey,
+  })
 
   // Trigger Appwrite function
   await functions.createExecution(
@@ -39,7 +34,9 @@ export async function executeJob(job) {
     JSON.stringify({
       emailArray: inputValues.customer.emailArray,
       subject:
-        (inputValues.berichtType.id === 'enthaertungsanlage' ? 'Überprüfungsbericht' : 'Wartungsbericht') +
+        (inputValues.berichtType.id === 'enthaertungsanlage'
+          ? 'Überprüfungsbericht'
+          : 'Wartungsbericht') +
         ' - ' +
         inputValues.berichtType.filekey,
       type: inputValues.berichtType.id === 'enthaertungsanlage' ? 1 : 0,
@@ -47,6 +44,7 @@ export async function executeJob(job) {
       fileName: filename,
       monteur: inputValues.employee,
     }),
-    true
+    true,
+    '/sendbericht',
   )
 }
