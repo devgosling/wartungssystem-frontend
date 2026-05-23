@@ -216,6 +216,7 @@
                           <span style="grid-column: 9 / 11">Anfahrt</span>
                           <span>Std.</span>
                           <span style="grid-column: 12 / 14">Abfahrt</span>
+                          <span>Std.</span>
                           <span>KM</span>
                           <span>Total Std.</span>
                         </div>
@@ -230,43 +231,121 @@
                           <InputText
                             size="small"
                             v-model="stundenData.rows[row - 1].arbeitszeit1"
+                            @blur="normalizeRowTime(row - 1, 'arbeitszeit1')"
                           />
                           <InputText
                             size="small"
                             v-model="stundenData.rows[row - 1].arbeitszeit2"
+                            @blur="normalizeRowTime(row - 1, 'arbeitszeit2')"
                           />
-                          <InputText size="small" v-model="stundenData.rows[row - 1].pause" />
-                          <InputText size="small" v-model="stundenData.rows[row - 1].pauseStd" />
+                          <InputText
+                            size="small"
+                            v-model="stundenData.rows[row - 1].pause"
+                            @blur="normalizeRowTime(row - 1, 'pause')"
+                          />
+                          <InputText
+                            size="small"
+                            v-model="stundenData.rows[row - 1].pauseStd"
+                            readonly
+                            class="stundenfiller-derived"
+                          />
                           <InputText
                             size="small"
                             v-model="stundenData.rows[row - 1].ueberstunden1"
+                            @blur="normalizeRowTime(row - 1, 'ueberstunden1')"
                           />
                           <InputText
                             size="small"
                             v-model="stundenData.rows[row - 1].ueberstunden2"
+                            @blur="normalizeRowTime(row - 1, 'ueberstunden2')"
                           />
                           <InputText
                             size="small"
                             v-model="stundenData.rows[row - 1].ueberstundenStd"
+                            readonly
+                            class="stundenfiller-derived"
                           />
-                          <InputText size="small" v-model="stundenData.rows[row - 1].anfahrt1" />
-                          <InputText size="small" v-model="stundenData.rows[row - 1].anfahrt2" />
-                          <InputText size="small" v-model="stundenData.rows[row - 1].anfahrtStd" />
-                          <InputText size="small" v-model="stundenData.rows[row - 1].abfahrt1" />
-                          <InputText size="small" v-model="stundenData.rows[row - 1].abfahrt2" />
+                          <InputText
+                            size="small"
+                            v-model="stundenData.rows[row - 1].anfahrt1"
+                            @blur="normalizeRowTime(row - 1, 'anfahrt1')"
+                          />
+                          <InputText
+                            size="small"
+                            v-model="stundenData.rows[row - 1].anfahrt2"
+                            @blur="normalizeRowTime(row - 1, 'anfahrt2')"
+                          />
+                          <InputText
+                            size="small"
+                            v-model="stundenData.rows[row - 1].anfahrtStd"
+                            readonly
+                            class="stundenfiller-derived"
+                          />
+                          <InputText
+                            size="small"
+                            v-model="stundenData.rows[row - 1].abfahrt1"
+                            @blur="normalizeRowTime(row - 1, 'abfahrt1')"
+                          />
+                          <InputText
+                            size="small"
+                            v-model="stundenData.rows[row - 1].abfahrt2"
+                            @blur="normalizeRowTime(row - 1, 'abfahrt2')"
+                          />
+                          <InputText
+                            size="small"
+                            v-model="stundenData.rows[row - 1].abfahrtStd"
+                            readonly
+                            class="stundenfiller-derived"
+                          />
                           <InputText size="small" v-model="stundenData.rows[row - 1].km" />
-                          <InputText size="small" v-model="stundenData.rows[row - 1].totalStd" />
+                          <InputText
+                            size="small"
+                            v-model="stundenData.rows[row - 1].totalStd"
+                            readonly
+                            class="stundenfiller-derived"
+                          />
                         </div>
                         <div class="stundenfiller-table-totals">
                           <span style="grid-column: 1 / 5" class="total-label">TOTAL</span>
-                          <InputText size="small" v-model="stundenData.totalPause" />
+                          <InputText
+                            size="small"
+                            v-model="stundenData.totalPause"
+                            readonly
+                            class="stundenfiller-derived"
+                          />
                           <span style="grid-column: 6 / 8" class="total-label">TOTAL</span>
-                          <InputText size="small" v-model="stundenData.totalUeberstunden" />
+                          <InputText
+                            size="small"
+                            v-model="stundenData.totalUeberstunden"
+                            readonly
+                            class="stundenfiller-derived"
+                          />
                           <span style="grid-column: 9 / 11" class="total-label">TOTAL</span>
-                          <InputText size="small" v-model="stundenData.totalAnfahrt" />
+                          <InputText
+                            size="small"
+                            v-model="stundenData.totalAnfahrt"
+                            readonly
+                            class="stundenfiller-derived"
+                          />
                           <span style="grid-column: 12 / 14" class="total-label">TOTAL</span>
-                          <InputText size="small" v-model="stundenData.totalAbfahrt" />
-                          <InputText size="small" v-model="stundenData.totalStd" />
+                          <InputText
+                            size="small"
+                            v-model="stundenData.totalAbfahrt"
+                            readonly
+                            class="stundenfiller-derived"
+                          />
+                          <InputText
+                            size="small"
+                            v-model="stundenData.totalKm"
+                            readonly
+                            class="stundenfiller-derived"
+                          />
+                          <InputText
+                            size="small"
+                            v-model="stundenData.totalStd"
+                            readonly
+                            class="stundenfiller-derived"
+                          />
                         </div>
                       </div>
 
@@ -890,6 +969,7 @@ export default {
           anfahrtStd: '',
           abfahrt1: '',
           abfahrt2: '',
+          abfahrtStd: '',
           km: '',
           totalStd: '',
         })),
@@ -898,6 +978,7 @@ export default {
         totalUeberstunden: '',
         totalAnfahrt: '',
         totalAbfahrt: '',
+        totalKm: '',
         totalStd: '',
         ausgefuehrteArbeiten: '',
         notdienst: false,
@@ -990,7 +1071,166 @@ export default {
     this.checkPDFCache()
   },
 
+  watch: {
+    'stundenData.rows': {
+      handler() {
+        this.recalculateTotals()
+      },
+      deep: true,
+    },
+  },
+
   methods: {
+    // #region Time helpers + auto-totals
+    parseTimeToMinutes(value) {
+      if (typeof value !== 'string') return null
+      const trimmed = value.trim()
+      if (!trimmed) return null
+
+      let m = trimmed.match(/^(\d{1,2}):(\d{1,2})$/)
+      if (m) {
+        const h = parseInt(m[1], 10)
+        const min = parseInt(m[2], 10)
+        if (h > 23 || min > 59) return null
+        return h * 60 + min
+      }
+
+      m = trimmed.match(/^(\d{1,4})$/)
+      if (m) {
+        const digits = m[1]
+        if (digits.length <= 2) {
+          const h = parseInt(digits, 10)
+          if (h > 23) return null
+          return h * 60
+        }
+        if (digits.length === 3) {
+          const h = parseInt(digits.slice(0, 1), 10)
+          const min = parseInt(digits.slice(1), 10)
+          if (min > 59) return null
+          return h * 60 + min
+        }
+        const h = parseInt(digits.slice(0, 2), 10)
+        const min = parseInt(digits.slice(2), 10)
+        if (h > 23 || min > 59) return null
+        return h * 60 + min
+      }
+
+      m = trimmed.match(/^(\d{1,2})[.,](\d{1,2})$/)
+      if (m) {
+        const h = parseInt(m[1], 10)
+        const decimal = parseFloat('0.' + m[2])
+        return Math.round((h + decimal) * 60)
+      }
+
+      return null
+    },
+
+    formatMinutesAsTime(minutes) {
+      if (minutes == null || isNaN(minutes)) return ''
+      const m = ((minutes % (24 * 60)) + 24 * 60) % (24 * 60)
+      const h = Math.floor(m / 60)
+      const mm = m % 60
+      return String(h).padStart(2, '0') + ':' + String(mm).padStart(2, '0')
+    },
+
+    formatMinutesAsDecimal(minutes) {
+      if (minutes == null || isNaN(minutes) || minutes <= 0) return ''
+      return (minutes / 60).toFixed(2).replace('.', ',')
+    },
+
+    diffMinutes(start, end) {
+      const s = this.parseTimeToMinutes(start)
+      const e = this.parseTimeToMinutes(end)
+      if (s == null || e == null) return null
+      let diff = e - s
+      if (diff < 0) diff += 24 * 60
+      return diff
+    },
+
+    normalizeRowTime(idx, field) {
+      const row = this.stundenData.rows[idx]
+      if (!row) return
+      const cur = row[field]
+      if (typeof cur !== 'string' || !cur.trim()) return
+      const minutes = this.parseTimeToMinutes(cur)
+      if (minutes != null) {
+        const formatted = this.formatMinutesAsTime(minutes)
+        if (row[field] !== formatted) row[field] = formatted
+      }
+    },
+
+    recalculateTotals() {
+      let sumWorkNet = 0
+      let sumUeber = 0
+      let sumAnfahrt = 0
+      let sumAbfahrt = 0
+      let sumKm = 0
+      let sumTotal = 0
+
+      for (const row of this.stundenData.rows) {
+        const work = this.diffMinutes(row.arbeitszeit1, row.arbeitszeit2)
+        const pause = this.parseTimeToMinutes(row.pause) ?? 0
+        const ueber = this.diffMinutes(row.ueberstunden1, row.ueberstunden2)
+        const anfahrt = this.diffMinutes(row.anfahrt1, row.anfahrt2)
+        const abfahrt = this.diffMinutes(row.abfahrt1, row.abfahrt2)
+
+        // "Std." next to Pause = net Arbeitszeit (work window − pause).
+        const workNet = work != null ? Math.max(0, work - pause) : null
+
+        // Daily total = net work + overtime + travel there + travel back.
+        const anyEntered =
+          work != null || ueber != null || anfahrt != null || abfahrt != null
+        const dailyTotal = anyEntered
+          ? (workNet ?? 0) + (ueber ?? 0) + (anfahrt ?? 0) + (abfahrt ?? 0)
+          : null
+
+        const newPauseStd = this.formatMinutesAsDecimal(workNet)
+        const newUeberStd = this.formatMinutesAsDecimal(ueber)
+        const newAnfahrtStd = this.formatMinutesAsDecimal(anfahrt)
+        const newAbfahrtStd = this.formatMinutesAsDecimal(abfahrt)
+        const newTotalStd = this.formatMinutesAsDecimal(dailyTotal)
+
+        if (row.pauseStd !== newPauseStd) row.pauseStd = newPauseStd
+        if (row.ueberstundenStd !== newUeberStd) row.ueberstundenStd = newUeberStd
+        if (row.anfahrtStd !== newAnfahrtStd) row.anfahrtStd = newAnfahrtStd
+        if (row.abfahrtStd !== newAbfahrtStd) row.abfahrtStd = newAbfahrtStd
+        if (row.totalStd !== newTotalStd) row.totalStd = newTotalStd
+
+        if (workNet != null && workNet > 0) sumWorkNet += workNet
+        if (ueber != null && ueber > 0) sumUeber += ueber
+        if (anfahrt != null && anfahrt > 0) sumAnfahrt += anfahrt
+        if (abfahrt != null && abfahrt > 0) sumAbfahrt += abfahrt
+        if (dailyTotal != null && dailyTotal > 0) sumTotal += dailyTotal
+
+        const kmNum =
+          typeof row.km === 'string' && row.km.trim()
+            ? parseFloat(row.km.replace(',', '.'))
+            : NaN
+        if (!isNaN(kmNum) && kmNum > 0) sumKm += kmNum
+      }
+
+      const newTotalPause = this.formatMinutesAsDecimal(sumWorkNet)
+      const newTotalUeber = this.formatMinutesAsDecimal(sumUeber)
+      const newTotalAnfahrt = this.formatMinutesAsDecimal(sumAnfahrt)
+      const newTotalAbfahrt = this.formatMinutesAsDecimal(sumAbfahrt)
+      const newTotalStd = this.formatMinutesAsDecimal(sumTotal)
+      const newTotalKm = sumKm > 0 ? sumKm.toString().replace('.', ',') : ''
+
+      if (this.stundenData.totalPause !== newTotalPause)
+        this.stundenData.totalPause = newTotalPause
+      if (this.stundenData.totalUeberstunden !== newTotalUeber)
+        this.stundenData.totalUeberstunden = newTotalUeber
+      if (this.stundenData.totalAnfahrt !== newTotalAnfahrt)
+        this.stundenData.totalAnfahrt = newTotalAnfahrt
+      if (this.stundenData.totalAbfahrt !== newTotalAbfahrt)
+        this.stundenData.totalAbfahrt = newTotalAbfahrt
+      if (this.stundenData.totalKm !== newTotalKm)
+        this.stundenData.totalKm = newTotalKm
+      if (this.stundenData.totalStd !== newTotalStd)
+        this.stundenData.totalStd = newTotalStd
+    },
+    // #endregion
+
     // #region Fadein & -out animations
     async setTabtext() {
       let tabTexts = {
@@ -1234,6 +1474,7 @@ export default {
           anfahrtStd: '',
           abfahrt1: '',
           abfahrt2: '',
+          abfahrtStd: '',
           km: '',
           totalStd: '',
         })),
@@ -1241,6 +1482,7 @@ export default {
         totalUeberstunden: '',
         totalAnfahrt: '',
         totalAbfahrt: '',
+        totalKm: '',
         totalStd: '',
         ausgefuehrteArbeiten: '',
         employees: [],
@@ -2447,6 +2689,7 @@ export default {
         minmax(75px, 0.75fr) /* Anfahrt Std. */
         minmax(75px, 0.75fr) /* Abfahrt 1 */
         minmax(75px, 0.75fr) /* Abfahrt 2 */
+        minmax(75px, 0.75fr) /* Abfahrt Std. */
         minmax(75px, 0.75fr) /* KM */
         minmax(75px, 0.75fr); /* Total Std. */
       background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
@@ -2483,6 +2726,7 @@ export default {
         minmax(75px, 0.75fr) /* Anfahrt Std. */
         minmax(75px, 0.75fr) /* Abfahrt 1 */
         minmax(75px, 0.75fr) /* Abfahrt 2 */
+        minmax(75px, 0.75fr) /* Abfahrt Std. */
         minmax(75px, 0.75fr) /* KM */
         minmax(75px, 0.75fr); /* Total Std. */
       border-bottom: 1px solid #e5e7eb;
@@ -2574,6 +2818,7 @@ export default {
         minmax(75px, 0.75fr) /* Anfahrt Std. */
         minmax(75px, 0.75fr) /* Abfahrt 1 */
         minmax(75px, 0.75fr) /* Abfahrt 2 */
+        minmax(75px, 0.75fr) /* Abfahrt Std. */
         minmax(75px, 0.75fr) /* KM */
         minmax(75px, 0.75fr); /* Total Std. */
       background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
@@ -2711,5 +2956,11 @@ export default {
     cursor: pointer;
     user-select: none;
   }
+}
+
+.stundenfiller-derived :deep(input) {
+  background: var(--p-surface-100, #f1f5f9);
+  color: var(--p-text-color-secondary, #64748b);
+  cursor: default;
 }
 </style>
