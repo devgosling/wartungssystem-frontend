@@ -1,15 +1,23 @@
 import { Client, Account, Functions, Storage, Databases, Teams } from 'appwrite'
 
+export const APPWRITE_ENDPOINT =
+  import.meta.env.VITE_APPWRITE_ENDPOINT || 'https://fra.cloud.appwrite.io/v1'
+export const APPWRITE_PROJECT_ID = import.meta.env.VITE_APPWRITE_PROJECT_ID || 'wskwt'
+export const APPWRITE_FUNCTION_ID = import.meta.env.VITE_APPWRITE_FUNCTION_ID || 'wskwt-function'
+
 export const client = new Client()
 export const functions = new Functions(client)
 export const storage = new Storage(client)
 export const databases = new Databases(client)
 export const teams = new Teams(client)
 
-client.setEndpoint('https://fra.cloud.appwrite.io/v1').setProject('6876a8f9001f4dd7353c')
-client.setDevKey(
-  'ff9e56f3d94926205324c43388bd07d127f8115b8347e3f7c5c8d7f1e3df57477c9d6ead1b2b00e0c77f375d9ac9d0dd2f2d4dca26484e0b8299c509a316b0316171c9e4d0c2bae2b26a36da712be27ffc17f085f98ee3d9c6bebf7fa65575977ac4dbd56bfbc4a66f1d53e809aa75b98cff776d560d1ca7e79ea95bdaa06e3a',
-)
+client.setEndpoint(APPWRITE_ENDPOINT).setProject(APPWRITE_PROJECT_ID)
+
+// Dev keys bypass rate limits and origin checks, so they must never end up in the public bundle.
+// For local development put VITE_APPWRITE_DEV_KEY in .env.local (ignored by git).
+if (import.meta.env.DEV && import.meta.env.VITE_APPWRITE_DEV_KEY) {
+  client.setDevKey(import.meta.env.VITE_APPWRITE_DEV_KEY)
+}
 
 export const account = new Account(client)
 export { ID } from 'appwrite'

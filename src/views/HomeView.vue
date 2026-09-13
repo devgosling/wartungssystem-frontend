@@ -50,7 +50,7 @@
   </div>
 </template>
 <script>
-import { account, databases, functions } from '@/lib/appwrite'
+import { account, databases, functions, APPWRITE_FUNCTION_ID } from '@/lib/appwrite'
 import { Card, SelectButton } from 'primevue'
 import gsap from 'gsap'
 import router from '@/router'
@@ -226,7 +226,7 @@ export default {
       let userList = JSON.parse(
         (
           await functions.createExecution(
-            '68f3d2b9001562f115c8',
+            APPWRITE_FUNCTION_ID,
             '{}',
             false,
             '/listusers',

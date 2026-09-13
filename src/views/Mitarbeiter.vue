@@ -111,7 +111,7 @@
   </Dialog>
 </template>
 <script>
-import { databases, functions } from '@/lib/appwrite'
+import { databases, functions, APPWRITE_FUNCTION_ID } from '@/lib/appwrite'
 import { FilterMatchMode } from '@primevue/core'
 import { AppwriteException, ExecutionMethod, ID, Query } from 'appwrite'
 import { Button, Card, Column, DataTable, Dialog, IconField, InputIcon, InputText } from 'primevue'
@@ -165,7 +165,7 @@ export default {
         accept: async () => {
           this.deletingEmployee = employeeIndex
           let res = await functions.createExecution(
-            '68f3d2b9001562f115c8',
+            APPWRITE_FUNCTION_ID,
             JSON.stringify({ userid: data.$id }),
             false,
             '/deleteuser',
@@ -238,7 +238,7 @@ export default {
       }
 
       let res = await functions.createExecution(
-        '68f3d2b9001562f115c8',
+        APPWRITE_FUNCTION_ID,
         JSON.stringify({
           firstname: firstname,
           lastname: lastname,
@@ -276,7 +276,7 @@ export default {
       let userList = JSON.parse(
         (
           await functions.createExecution(
-            '68f3d2b9001562f115c8',
+            APPWRITE_FUNCTION_ID,
             '{}',
             false,
             '/listusers',
@@ -297,7 +297,7 @@ export default {
         let userList = JSON.parse(
           (
             await functions.createExecution(
-              '68f3d2b9001562f115c8',
+              APPWRITE_FUNCTION_ID,
               '{}',
               false,
               '/listusers',

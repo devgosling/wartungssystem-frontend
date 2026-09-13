@@ -859,7 +859,7 @@
   </Dialog>
 </template>
 <script>
-import { account, databases, functions, storage } from '@/lib/appwrite'
+import { account, databases, functions, storage, APPWRITE_FUNCTION_ID } from '@/lib/appwrite'
 import {
   Toolbar,
   Button,
@@ -1355,7 +1355,7 @@ export default {
       let userList = JSON.parse(
         (
           await functions.createExecution(
-            '68f3d2b9001562f115c8',
+            APPWRITE_FUNCTION_ID,
             '{}',
             false,
             '/listusers',
