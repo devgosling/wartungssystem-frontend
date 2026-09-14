@@ -1,4 +1,4 @@
-import { storage, databases, functions, ID } from './appwrite'
+import { storage, databases, functions, ID, APPWRITE_FUNCTION_ID } from './appwrite'
 
 export async function executeJob(job) {
   const { pdfBase64, inputValues } = job
@@ -30,7 +30,7 @@ export async function executeJob(job) {
 
   // Trigger Appwrite function
   await functions.createExecution(
-    '68f3d2b9001562f115c8',
+    APPWRITE_FUNCTION_ID,
     JSON.stringify({
       emailArray: inputValues.customer.emailArray,
       subject:
