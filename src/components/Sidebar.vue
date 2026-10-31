@@ -76,6 +76,7 @@
 
 <script>
 import { account } from '@/lib/appwrite'
+import { clearFileServiceAuth } from '@/lib/fileStore'
 import router from '@/router'
 import { useInputStore } from '@/stores/inputStore'
 import { Avatar, Button } from 'primevue'
@@ -128,6 +129,7 @@ export default {
     },
     async logout() {
       await account.deleteSession('current')
+      clearFileServiceAuth()
       this.closeSidebar()
       router.push('/login')
     },

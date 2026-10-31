@@ -859,7 +859,8 @@
   </Dialog>
 </template>
 <script>
-import { account, databases, functions, storage, APPWRITE_FUNCTION_ID } from '@/lib/appwrite'
+import { account, databases, functions, APPWRITE_FUNCTION_ID } from '@/lib/appwrite'
+import { deleteFile, getFileBlob, replaceFile } from '@/lib/fileStore'
 import {
   Toolbar,
   Button,
@@ -1515,19 +1516,7 @@ export default {
     async viewBericht(data, berichtIndex) {
       this.viewingBericht.loading = berichtIndex
       try {
-        let fileDownload = await storage.getFileDownload(
-          '6878f5cf00166fde91eb',
-          data.stundenzettelId,
-        )
-        let fileData = await storage.getFile('6878f5cf00166fde91eb', data.stundenzettelId)
-        let jwtObject = await account.createJWT()
-        // Add cache-busting and no-store to prevent showing old cached version
-        const cacheBuster = `${fileDownload}${fileDownload.includes('?') ? '&' : '?'}_t=${Date.now()}`
-        let fileResponse = await fetch(cacheBuster, {
-          headers: { 'x-appwrite-jwt': jwtObject.jwt },
-          cache: 'no-store',
-        })
-        let blob = await fileResponse.blob()
+        const { blob, name: fileName } = await getFileBlob(data.stundenzettelId)
         let buffer = await blob.arrayBuffer()
         let buffer2 = await blob.arrayBuffer()
         let fileBytes2 = new Uint8Array(buffer2)
@@ -1535,7 +1524,7 @@ export default {
 
         let pages = await getAmountOfPagesInPDF(buffer)
 
-        this.viewingBericht.name = fileData.name
+        this.viewingBericht.name = fileName
         this.viewingBericht.data = data
         if (pages > 1) this.viewingBericht.img2 = await this.turnPDFToPNG(fileBytes2, 2)
         else this.viewingBericht.img2 = null
@@ -1571,22 +1560,12 @@ export default {
     async downloadBericht(data, berichtIndex) {
       this.downloadingBericht = berichtIndex
       try {
-        let fileDownload = await storage.getFileDownload(
-          '6878f5cf00166fde91eb',
-          data.stundenzettelId,
-        )
-
-        let fileData = await storage.getFile('6878f5cf00166fde91eb', data.stundenzettelId)
-        let jwtObject = await account.createJWT()
-        let fileResponse = await fetch(fileDownload, {
-          headers: { 'x-appwrite-jwt': jwtObject.jwt },
-        })
-        let blob = await fileResponse.blob()
+        const { blob, name: fileName } = await getFileBlob(data.stundenzettelId)
         let blobURL = URL.createObjectURL(blob)
 
         const a = document.createElement('a')
         a.setAttribute('href', blobURL)
-        a.setAttribute('download', fileData.name)
+        a.setAttribute('download', fileName)
         a.style.display = 'none'
         document.body.appendChild(a)
 
@@ -1647,7 +1626,7 @@ export default {
 
           try {
             if (!navigator.onLine) throw new Error('Offline')
-            await storage.deleteFile('6878f5cf00166fde91eb', data.stundenzettelId)
+            await deleteFile(data.stundenzettelId)
             await databases.deleteDocument('6878f5900032addce7e5', 'stundenzettel', data.$id)
 
             this.$toast.add({
@@ -1814,32 +1793,17 @@ export default {
         const signatureBase64 = this.customerSignDialog.signpad.toDataURL()
 
         // Download the existing PDF
-        const fileDownload = await storage.getFileDownload(
-          '6878f5cf00166fde91eb',
-          data.stundenzettelId,
-        )
-        const fileData = await storage.getFile('6878f5cf00166fde91eb', data.stundenzettelId)
-        const jwtObject = await account.createJWT()
-        const fileResponse = await fetch(
-          `${fileDownload}${fileDownload.includes('?') ? '&' : '?'}_t=${Date.now()}`,
-          {
-            headers: { 'x-appwrite-jwt': jwtObject.jwt },
-            cache: 'no-store',
-          },
-        )
-        const blob = await fileResponse.blob()
+        const { blob, name: fileName } = await getFileBlob(data.stundenzettelId)
         const pdfBuffer = await blob.arrayBuffer()
 
         // Add customer signature to PDF
         const [newPdfBytes] = await addCustomerSignatureToPDF(pdfBuffer, signatureBase64)
 
-        // Delete old file and upload new one with same ID and same name
-        await storage.deleteFile('6878f5cf00166fde91eb', data.stundenzettelId)
-
-        const newFile = new File([newPdfBytes], fileData.name, {
-          type: 'application/pdf',
-        })
-        await storage.createFile('6878f5cf00166fde91eb', data.stundenzettelId, newFile)
+        // Replace the file in place, keeping ID and name
+        await replaceFile(
+          data.stundenzettelId,
+          new File([newPdfBytes], fileName, { type: 'application/pdf' }),
+        )
 
         // Update the document in the database
         await databases.updateDocument('6878f5900032addce7e5', 'stundenzettel', data.$id, {
@@ -1969,32 +1933,17 @@ export default {
         const signatureBase64 = this.controlSignDialog.signpad.toDataURL()
 
         // Download the existing PDF
-        const fileDownload = await storage.getFileDownload(
-          '6878f5cf00166fde91eb',
-          data.stundenzettelId,
-        )
-        const fileData = await storage.getFile('6878f5cf00166fde91eb', data.stundenzettelId)
-        const jwtObject = await account.createJWT()
-        const fileResponse = await fetch(
-          `${fileDownload}${fileDownload.includes('?') ? '&' : '?'}_t=${Date.now()}`,
-          {
-            headers: { 'x-appwrite-jwt': jwtObject.jwt },
-            cache: 'no-store',
-          },
-        )
-        const blob = await fileResponse.blob()
+        const { blob, name: fileName } = await getFileBlob(data.stundenzettelId)
         const pdfBuffer = await blob.arrayBuffer()
 
         // Add control signature to PDF
         const [newPdfBytes] = await addControlSignatureToPDF(pdfBuffer, signatureBase64)
 
-        // Delete old file and upload new one with same ID and same name
-        await storage.deleteFile('6878f5cf00166fde91eb', data.stundenzettelId)
-
-        const newFile = new File([newPdfBytes], fileData.name, {
-          type: 'application/pdf',
-        })
-        await storage.createFile('6878f5cf00166fde91eb', data.stundenzettelId, newFile)
+        // Replace the file in place, keeping ID and name
+        await replaceFile(
+          data.stundenzettelId,
+          new File([newPdfBytes], fileName, { type: 'application/pdf' }),
+        )
 
         // Update the document in the database
         await databases.updateDocument('6878f5900032addce7e5', 'stundenzettel', data.$id, {

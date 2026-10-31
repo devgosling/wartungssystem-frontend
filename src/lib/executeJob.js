@@ -1,4 +1,5 @@
-import { storage, databases, functions, ID, APPWRITE_FUNCTION_ID } from './appwrite'
+import { databases, functions, ID, APPWRITE_FUNCTION_ID } from './appwrite'
+import { uploadFile } from './fileStore'
 
 export async function executeJob(job) {
   const { pdfBase64, inputValues } = job
@@ -16,7 +17,7 @@ export async function executeJob(job) {
   const file = new File([blob], filename, { type: 'application/pdf' })
 
   // Upload PDF
-  await storage.createFile('6878f5cf00166fde91eb', fileID, file)
+  await uploadFile(fileID, file)
 
   // Create document
   await databases.createDocument('6878f5900032addce7e5', '68866dc60038038dbe27', ID.unique(), {

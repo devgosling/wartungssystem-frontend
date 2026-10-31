@@ -687,7 +687,8 @@
   ></CreateIdentifierDialog>
 </template>
 <script>
-import { ID, account, client, databases, functions, storage } from '@/lib/appwrite'
+import { ID, account, client, databases, functions } from '@/lib/appwrite'
+import { deleteFile, getFileBlob } from '@/lib/fileStore'
 import {
   Toolbar,
   Button,
@@ -1273,16 +1274,7 @@ export default {
     async viewBericht(data, berichtIndex) {
       this.viewingBericht.loading = berichtIndex
       try {
-        let fileDownload = await storage.getFileDownload(
-          '6878f5cf00166fde91eb',
-          data.wartungsberichtid,
-        )
-        let fileData = await storage.getFile('6878f5cf00166fde91eb', data.wartungsberichtid)
-        let jwtObject = await account.createJWT()
-        let fileResponse = await fetch(fileDownload, {
-          headers: { 'x-appwrite-jwt': jwtObject.jwt },
-        })
-        let blob = await fileResponse.blob()
+        const { blob, name: fileName } = await getFileBlob(data.wartungsberichtid)
         let buffer = await blob.arrayBuffer()
         let buffer2 = await blob.arrayBuffer()
         let fileBytes2 = new Uint8Array(buffer2)
@@ -1290,7 +1282,7 @@ export default {
 
         let pages = await getAmountOfPagesInPDF(buffer)
 
-        this.viewingBericht.name = fileData.name
+        this.viewingBericht.name = fileName
         this.viewingBericht.data = data
         if (pages > 1) this.viewingBericht.img2 = await this.turnPDFToPNG(fileBytes2, 2)
         else this.viewingBericht.img2 = null
@@ -1319,22 +1311,12 @@ export default {
     async downloadBericht(data, berichtIndex) {
       this.downloadingBericht = berichtIndex
       try {
-        let fileDownload = await storage.getFileDownload(
-          '6878f5cf00166fde91eb',
-          data.wartungsberichtid,
-        )
-
-        let fileData = await storage.getFile('6878f5cf00166fde91eb', data.wartungsberichtid)
-        let jwtObject = await account.createJWT()
-        let fileResponse = await fetch(fileDownload, {
-          headers: { 'x-appwrite-jwt': jwtObject.jwt },
-        })
-        let blob = await fileResponse.blob()
+        const { blob, name: fileName } = await getFileBlob(data.wartungsberichtid)
         let blobURL = URL.createObjectURL(blob)
 
         const a = document.createElement('a')
         a.setAttribute('href', blobURL)
-        a.setAttribute('download', fileData.name)
+        a.setAttribute('download', fileName)
         a.style.display = 'none'
         document.body.appendChild(a)
 
@@ -1386,7 +1368,7 @@ export default {
           this.deletingBericht = berichtIndex
 
           try {
-            await storage.deleteFile('6878f5cf00166fde91eb', data.wartungsberichtid)
+            await deleteFile(data.wartungsberichtid)
             await databases.deleteDocument('6878f5900032addce7e5', '68866dc60038038dbe27', data.$id)
           } catch (err) {
             if (err instanceof AppwriteException) {
